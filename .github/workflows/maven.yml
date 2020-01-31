@@ -1,0 +1,15 @@
+name: Chip8 Core Verify
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: "xlui/action-maven-cli/jdk11@master"
+      with:
+        args: -B clean verify --file pom.xml
