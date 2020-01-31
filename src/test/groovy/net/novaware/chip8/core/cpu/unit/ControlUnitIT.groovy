@@ -342,12 +342,6 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x2 as short
     }
 
-    @Ignore("write integration test instead")
-    def "pressing 5 on keyboard is visible in register"() {
-        expect:
-        false
-    }
-
     def "should properly AND value of Vy into Vx"() {
         given:
         registers.getProgramCounter().set(0x400)
