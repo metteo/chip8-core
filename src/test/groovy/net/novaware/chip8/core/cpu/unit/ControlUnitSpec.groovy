@@ -12,7 +12,7 @@ class ControlUnitSpec extends Specification {
 
     Memory memory = new PhysicalMemory("test", 4096)
 
-    ControlUnit cu = new ControlUnit(registers, memory)
+    ControlUnit cu = new ControlUnit(registers, memory, null, null, null, null)
 
     def "should fetch instruction from memory pointed by PC"() {
         given:

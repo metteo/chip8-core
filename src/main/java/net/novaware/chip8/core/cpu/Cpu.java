@@ -1,8 +1,7 @@
 package net.novaware.chip8.core.cpu;
 
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.cpu.unit.ControlUnit;
-import net.novaware.chip8.core.cpu.unit.ProcessingUnit;
+import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
 
@@ -16,13 +15,19 @@ import javax.inject.Singleton;
 @Singleton
 public class Cpu {
 
-    // Internal parts ---------------------------
+    // Contains ---------------------------------
 
     private final Registers registers;
 
     private final ControlUnit controlUnit;
 
-    private final ProcessingUnit processingUnit;
+    private final ArithmeticLogic alu;
+
+    private final AddressGeneration agu;
+
+    private final StackEngine stackEngine;
+
+    private final GraphicsProcessing gpu;
 
     // Accessible -------------------------------
 
@@ -33,8 +38,12 @@ public class Cpu {
         this.memory = memory;
         this.registers = registers;
 
-        controlUnit = new ControlUnit(registers, this.memory);
-        processingUnit = new ProcessingUnit(registers, this.memory);
+        alu = new ArithmeticLogic(registers, memory);
+        agu = new AddressGeneration(registers, memory);
+        stackEngine = new StackEngine(registers, memory);
+        gpu = new GraphicsProcessing(registers, memory);
+
+        controlUnit = new ControlUnit(registers, this.memory, alu, agu, stackEngine, gpu);
     }
 
     public void initialize() { //TODO: move it to interpreter and start from 0x0000
@@ -52,6 +61,6 @@ public class Cpu {
     public void cycle() {
         controlUnit.fetch();
         controlUnit.decode();
-        processingUnit.execute();
+        controlUnit.execute();
     }
 }

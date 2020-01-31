@@ -1,4 +1,4 @@
-name: Chip8 Core Verify
+name: chip-core
 
 on: [push]
 
@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout sources
+    - name: git-checkout
       uses: actions/checkout@v2
       
-    - name: Build with Maven
+    - name: maven-build
       uses: "xlui/action-maven-cli/jdk11@master"
       with:
         args: -B clean verify --file pom.xml

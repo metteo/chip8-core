@@ -8,13 +8,21 @@ import spock.lang.Specification
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 
-class ProcessingUnitIT extends Specification {
+class ControlUnitIT extends Specification {
 
     Memory memory = new PhysicalMemory("test", 4096)
 
     Registers registers = new Registers()
 
-    ProcessingUnit pu = new ProcessingUnit(registers, memory)
+    ArithmeticLogic alu = new ArithmeticLogic(registers, memory)
+
+    AddressGeneration agu = new AddressGeneration(registers, memory)
+
+    StackEngine stackEngine = new StackEngine(registers, memory)
+
+    GraphicsProcessing gpu = new GraphicsProcessing(registers, memory)
+
+    ControlUnit cu = new ControlUnit(registers, memory, alu, agu, stackEngine, gpu)
 
     def "should clear the screen"() {
         given:
@@ -34,7 +42,7 @@ class ProcessingUnitIT extends Specification {
         instruction[0].set(Ox00E0.opcode())
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         for (short addr = graphicsSegment; addr < graphicsSegment + graphicsSize; addr++) {
@@ -55,7 +63,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x0123)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getIndex().getAsInt() == 0x0123
@@ -72,7 +80,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x0045)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getData(3).get() == 0x45 as byte
@@ -91,7 +99,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x0054)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getData(4).get() == 0xFE as byte
@@ -109,7 +117,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x0345)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x345 as short
@@ -126,7 +134,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x4)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getIndex().get() == 0x0211 as short
@@ -146,7 +154,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x45)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -164,7 +172,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x46)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -182,7 +190,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x400)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x400 as short
@@ -203,7 +211,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x0004)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getData(3).get() == 0x56 as byte
@@ -223,7 +231,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0xA)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -242,7 +250,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0xA)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -268,7 +276,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x2)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -295,7 +303,7 @@ class ProcessingUnitIT extends Specification {
         instruction[0].set(Ox00EE.opcode())
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short //pc should be incremented here to prevent infinite loop
@@ -311,7 +319,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x6)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getDelay().get() == 0xAB as byte
@@ -327,7 +335,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x6)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getData(0x6).get() == 0x12 as byte
@@ -353,7 +361,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x402 as short
@@ -374,7 +382,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x502 as short
@@ -395,7 +403,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x502 as short
@@ -417,7 +425,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0xA)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -436,7 +444,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0xA)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -455,7 +463,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -478,7 +486,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -501,7 +509,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -524,7 +532,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -546,7 +554,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x46)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -564,7 +572,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x45)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -583,7 +591,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x402 as short
@@ -601,7 +609,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x6)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getSound().get() == 0xAB as byte
@@ -618,7 +626,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x7)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getKeyWait().get() != 0x0 as byte
@@ -638,7 +646,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x7)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getKeyWait().get() == 0x0 as byte
@@ -657,7 +665,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x208 as short
@@ -681,7 +689,7 @@ class ProcessingUnitIT extends Specification {
         def spriteSize = 5 //bytes
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x20A as short
@@ -698,7 +706,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0x56)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x20C as short
@@ -714,7 +722,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x400)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         thrown(RuntimeException)
@@ -733,7 +741,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -752,7 +760,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -771,7 +779,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x402 as short
@@ -796,7 +804,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x2)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -823,7 +831,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -846,7 +854,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xD)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x324 as short
@@ -869,7 +877,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x204 as short
@@ -888,7 +896,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
@@ -905,7 +913,7 @@ class ProcessingUnitIT extends Specification {
         instruction[1].set(0x0345)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x3AC as short
@@ -923,7 +931,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x502 as short
@@ -944,7 +952,7 @@ class ProcessingUnitIT extends Specification {
         instruction[2].set(0xB)
 
         when:
-        pu.execute()
+        cu.execute()
 
         then:
         registers.getProgramCounter().get() == 0x502 as short
