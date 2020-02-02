@@ -3,7 +3,6 @@ package net.novaware.chip8.core.cpu.unit
 import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
-import spock.lang.Ignore
 import spock.lang.Specification
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
@@ -83,7 +82,7 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getData(3).get() == 0x45 as byte
+        registers.getVariable(3).get() == 0x45 as byte
 
         registers.getProgramCounter().get() == 0x2 as short
     }
@@ -91,7 +90,7 @@ class ControlUnitIT extends Specification {
     def "should increment register V with number from instruction"() {
         given:
 
-        registers.getData(4).set(0xAA as byte)
+        registers.getVariable(4).set(0xAA as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox7XKK.opcode())
@@ -102,7 +101,7 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getData(4).get() == 0xFE as byte
+        registers.getVariable(4).get() == 0xFE as byte
 
         registers.getProgramCounter().get() == 0x2 as short
     }
@@ -127,7 +126,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getIndex().set(0x0123)
-        registers.getData(4).set(0xEE as byte)
+        registers.getVariable(4).set(0xEE as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX1E.opcode())
@@ -146,7 +145,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox3XKK.opcode())
@@ -164,7 +163,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox3XKK.opcode())
@@ -202,8 +201,8 @@ class ControlUnitIT extends Specification {
     def "should populate register Vx with number from register Vy"() {
         given:
 
-        registers.getData(3).set(0x12 as byte)
-        registers.getData(4).set(0x56 as byte)
+        registers.getVariable(3).set(0x12 as byte)
+        registers.getVariable(4).set(0x56 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY0.opcode())
@@ -214,15 +213,15 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getData(3).get() == 0x56 as byte
-        registers.getData(4).get() == 0x56 as byte
+        registers.getVariable(3).get() == 0x56 as byte
+        registers.getVariable(4).get() == 0x56 as byte
     }
 
     def "should skip next instruction if key with value of Vx is NOT pressed"() {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x8 as byte)
+        registers.getVariable(0xA).set(0x8 as byte)
 
         registers.getKeyState().set(0x7)
 
@@ -241,7 +240,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x8 as byte)
+        registers.getVariable(0xA).set(0x8 as byte)
 
         registers.getKeyState().set(0x101)
 
@@ -260,10 +259,10 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0x0).set(0 as byte)
-        registers.getData(0x1).set(0 as byte)
-        registers.getData(0x2).set(0 as byte)
-        registers.getData(0x3).set(0x11 as byte)
+        registers.getVariable(0x0).set(0 as byte)
+        registers.getVariable(0x1).set(0 as byte)
+        registers.getVariable(0x2).set(0 as byte)
+        registers.getVariable(0x3).set(0x11 as byte)
 
         registers.getIndex().set(0xFFD)
 
@@ -281,10 +280,10 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x202 as short
 
-        registers.getData(0x0).get() == 0x98 as byte
-        registers.getData(0x1).get() == 0x76 as byte
-        registers.getData(0x2).get() == 0x54 as byte
-        registers.getData(0x3).get() == 0x11 as byte
+        registers.getVariable(0x0).get() == 0x98 as byte
+        registers.getVariable(0x1).get() == 0x76 as byte
+        registers.getVariable(0x2).get() == 0x54 as byte
+        registers.getVariable(0x3).get() == 0x11 as byte
 
         registers.getIndex().getAsInt() == 0xFFD //no change
     }
@@ -312,7 +311,7 @@ class ControlUnitIT extends Specification {
 
     def "should set delay timer to given value" () {
         given:
-        registers.getData(6).set(0xAB as byte)
+        registers.getVariable(6).set(0xAB as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX15.opcode())
@@ -338,7 +337,7 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getData(0x6).get() == 0x12 as byte
+        registers.getVariable(0x6).get() == 0x12 as byte
         registers.getProgramCounter().get() == 0x2 as short
     }
 
@@ -346,8 +345,8 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x400)
 
-        registers.getData(0xA).set(0x34 as byte)
-        registers.getData(0xB).set(0x56 as byte)
+        registers.getVariable(0xA).set(0x34 as byte)
+        registers.getVariable(0xB).set(0x56 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY2.opcode())
@@ -360,15 +359,15 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x402 as short
 
-        registers.getData(0xA).getAsInt() == 0x14
-        registers.getData(0xB).getAsInt() == 0x56
+        registers.getVariable(0xA).getAsInt() == 0x14
+        registers.getVariable(0xB).getAsInt() == 0x56
     }
 
     def "should properly shift Vx right (legacy mode) with overflow"() {
         given:
         registers.getProgramCounter().set(0x500)
 
-        registers.getData(0xA).set(0x35 as byte)
+        registers.getVariable(0xA).set(0x35 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY6.opcode())
@@ -381,15 +380,15 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x502 as short
 
-        registers.getData(0xA).getAsInt() == 0x1A
-        registers.getData(0xF).getAsInt() == 0x01
+        registers.getVariable(0xA).getAsInt() == 0x1A
+        registers.getVariable(0xF).getAsInt() == 0x01
     }
 
     def "should properly shift Vx right (legacy mode) no overflow"() {
         given:
         registers.getProgramCounter().set(0x500)
 
-        registers.getData(0xA).set(0x36 as byte)
+        registers.getVariable(0xA).set(0x36 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY6.opcode())
@@ -402,15 +401,15 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x502 as short
 
-        registers.getData(0xA).getAsInt() == 0x1B
-        registers.getData(0xF).getAsInt() == 0x00
+        registers.getVariable(0xA).getAsInt() == 0x1B
+        registers.getVariable(0xF).getAsInt() == 0x00
     }
 
     def "should skip next instruction if key with value of Vx is pressed"() {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x3 as byte)
+        registers.getVariable(0xA).set(0x3 as byte)
 
         registers.getKeyState().set(0x8)
 
@@ -429,7 +428,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x10 as byte)
+        registers.getVariable(0xA).set(0x10 as byte)
 
         registers.getKeyState().set(0x8)
 
@@ -448,8 +447,8 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0x34 as byte)
-        registers.getData(0xD).set(0x56 as byte)
+        registers.getVariable(0xC).set(0x34 as byte)
+        registers.getVariable(0xD).set(0x56 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY4.opcode())
@@ -462,17 +461,17 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0x8A
-        registers.getData(0xD).getAsInt() == 0x56
-        registers.getData(0xF).getAsInt() == 0x00
+        registers.getVariable(0xC).getAsInt() == 0x8A
+        registers.getVariable(0xD).getAsInt() == 0x56
+        registers.getVariable(0xF).getAsInt() == 0x00
     }
 
     def "should properly ADD (with carry) value of Vy into Vx (overflow)"() {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0xAA as byte)
-        registers.getData(0xD).set(0xBB as byte)
+        registers.getVariable(0xC).set(0xAA as byte)
+        registers.getVariable(0xD).set(0xBB as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY4.opcode())
@@ -485,17 +484,17 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0x65
-        registers.getData(0xD).getAsInt() == 0xBB
-        registers.getData(0xF).getAsInt() == 0x01
+        registers.getVariable(0xC).getAsInt() == 0x65
+        registers.getVariable(0xD).getAsInt() == 0xBB
+        registers.getVariable(0xF).getAsInt() == 0x01
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (no borrow)"() {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0x56 as byte)
-        registers.getData(0xD).set(0x34 as byte)
+        registers.getVariable(0xC).set(0x56 as byte)
+        registers.getVariable(0xD).set(0x34 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY5.opcode())
@@ -508,17 +507,17 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0x22
-        registers.getData(0xD).getAsInt() == 0x34
-        registers.getData(0xF).getAsInt() == 0x01
+        registers.getVariable(0xC).getAsInt() == 0x22
+        registers.getVariable(0xD).getAsInt() == 0x34
+        registers.getVariable(0xF).getAsInt() == 0x01
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (borrow)"() {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0xAA as byte)
-        registers.getData(0xD).set(0xBB as byte)
+        registers.getVariable(0xC).set(0xAA as byte)
+        registers.getVariable(0xD).set(0xBB as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY5.opcode())
@@ -531,16 +530,16 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0xEF
-        registers.getData(0xD).getAsInt() == 0xBB
-        registers.getData(0xF).getAsInt() == 0x00
+        registers.getVariable(0xC).getAsInt() == 0xEF
+        registers.getVariable(0xD).getAsInt() == 0xBB
+        registers.getVariable(0xF).getAsInt() == 0x00
     }
 
     def "should skip next instruction if V is NOT equal to number in instruction (SNE)"() {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox4XKK.opcode())
@@ -558,7 +557,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox4XKK.opcode())
@@ -576,8 +575,8 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x400)
 
-        registers.getData(0xA).set(0x34 as byte)
-        registers.getData(0xB).set(0x56 as byte)
+        registers.getVariable(0xA).set(0x34 as byte)
+        registers.getVariable(0xB).set(0x56 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY3.opcode())
@@ -590,13 +589,13 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x402 as short
 
-        registers.getData(0xA).getAsInt() == 0x62
-        registers.getData(0xB).getAsInt() == 0x56
+        registers.getVariable(0xA).getAsInt() == 0x62
+        registers.getVariable(0xB).getAsInt() == 0x56
     }
 
     def "should set sound timer to given value" () {
         given:
-        registers.getData(6).set(0xAB as byte)
+        registers.getVariable(6).set(0xAB as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX18.opcode())
@@ -613,7 +612,7 @@ class ControlUnitIT extends Specification {
     def "should wait for key press, when none is pressed"() {
         given:
         registers.getProgramCounter().set(0x204)
-        registers.getData(7).set(0x0 as byte)
+        registers.getVariable(7).set(0x0 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX0A.opcode())
@@ -631,7 +630,7 @@ class ControlUnitIT extends Specification {
     def "should NOT wait for key press, when one is already pressed"() {
         given:
         registers.getProgramCounter().set(0x204)
-        registers.getData(7).set(0x0 as byte)
+        registers.getVariable(7).set(0x0 as byte)
         registers.getKeyState().set(0x3) //keys 0 and 1 pressed together
         registers.getKeyValue().set((byte)0x2) // 1 was registered last
 
@@ -644,14 +643,14 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getKeyWait().get() == 0x0 as byte
-        registers.getData(0x7).getAsInt() == 0x2
+        registers.getVariable(0x7).getAsInt() == 0x2
         registers.getProgramCounter().get() == 0x206 as short // move forward
     }
 
     def "should store BCD representation of a number"() {
         given:
         registers.getProgramCounter().set(0x206)
-        registers.getData(0xB).set((byte)123)
+        registers.getVariable(0xB).set((byte)123)
         registers.getIndex().set(0xE90)
 
         def instruction = registers.getDecodedInstruction()
@@ -673,7 +672,7 @@ class ControlUnitIT extends Specification {
     def "should load address of the font sprite"() {
         given:
         registers.getProgramCounter().set(0x208)
-        registers.getData(0xC).set((byte)9)
+        registers.getVariable(0xC).set((byte)9)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX29.opcode())
@@ -692,7 +691,7 @@ class ControlUnitIT extends Specification {
 
     def "should generate random number from 0 - 255"() { //TODO: provide random abstraction in this test
         registers.getProgramCounter().set(0x20A)
-        registers.getData(0xD).set((byte)123)
+        registers.getVariable(0xD).set((byte)123)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxCXKK.opcode())
@@ -704,7 +703,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x20C as short
-        byte random = registers.getData(0xD).get()
+        byte random = registers.getVariable(0xD).get()
         random >= (byte)(0x56 & 0x0)
         random <= (byte)(0x56 & 0xFF)
     }
@@ -726,8 +725,8 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
-        registers.getData(0xB).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
+        registers.getVariable(0xB).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox5XY0.opcode())
@@ -745,8 +744,8 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
-        registers.getData(0xB).set(0x46 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
+        registers.getVariable(0xB).set(0x46 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox5XY0.opcode())
@@ -764,8 +763,8 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x400)
 
-        registers.getData(0xA).set(0x34 as byte)
-        registers.getData(0xB).set(0x56 as byte)
+        registers.getVariable(0xA).set(0x34 as byte)
+        registers.getVariable(0xB).set(0x56 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY1.opcode())
@@ -778,18 +777,18 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x402 as short
 
-        registers.getData(0xA).getAsInt() == 0x76
-        registers.getData(0xB).getAsInt() == 0x56
+        registers.getVariable(0xA).getAsInt() == 0x76
+        registers.getVariable(0xB).getAsInt() == 0x56
     }
 
     def "should store registers V0 - VX with data from memory starting at I"() {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0x0).set(0x12 as byte)
-        registers.getData(0x1).set(0x34 as byte)
-        registers.getData(0x2).set(0x56 as byte)
-        registers.getData(0x3).set(0x11 as byte)
+        registers.getVariable(0x0).set(0x12 as byte)
+        registers.getVariable(0x1).set(0x34 as byte)
+        registers.getVariable(0x2).set(0x56 as byte)
+        registers.getVariable(0x3).set(0x11 as byte)
 
         registers.getIndex().set(0x400)
 
@@ -816,8 +815,8 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0x56 as byte)
-        registers.getData(0xD).set(0x34 as byte)
+        registers.getVariable(0xC).set(0x56 as byte)
+        registers.getVariable(0xD).set(0x34 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY7.opcode())
@@ -830,17 +829,17 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0xDE
-        registers.getData(0xD).getAsInt() == 0x34
-        registers.getData(0xF).getAsInt() == 0x00
+        registers.getVariable(0xC).getAsInt() == 0xDE
+        registers.getVariable(0xD).getAsInt() == 0x34
+        registers.getVariable(0xF).getAsInt() == 0x00
     }
 
     def "should properly SUB (with borrow) Vx = Vy - Vx (no borrow)"() {
         given:
         registers.getProgramCounter().set(0x322)
 
-        registers.getData(0xC).set(0xAA as byte)
-        registers.getData(0xD).set(0xBB as byte)
+        registers.getVariable(0xC).set(0xAA as byte)
+        registers.getVariable(0xD).set(0xBB as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY7.opcode())
@@ -853,17 +852,17 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x324 as short
 
-        registers.getData(0xC).getAsInt() == 0x11
-        registers.getData(0xD).getAsInt() == 0xBB
-        registers.getData(0xF).getAsInt() == 0x01
+        registers.getVariable(0xC).getAsInt() == 0x11
+        registers.getVariable(0xD).getAsInt() == 0xBB
+        registers.getVariable(0xF).getAsInt() == 0x01
     }
 
     def "should skip next instruction if Vx is NOT equal to Vy (SNE)"() {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
-        registers.getData(0xB).set(0x46 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
+        registers.getVariable(0xB).set(0x46 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox9XY0.opcode())
@@ -881,8 +880,8 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getData(0xA).set(0x45 as byte)
-        registers.getData(0xB).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
+        registers.getVariable(0xB).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox9XY0.opcode())
@@ -900,7 +899,7 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x0123)
-        registers.getData(0x0).set(0x67 as byte)
+        registers.getVariable(0x0).set(0x67 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxBMMM.opcode())
@@ -917,7 +916,7 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x500)
 
-        registers.getData(0xA).set(0x85 as byte)
+        registers.getVariable(0xA).set(0x85 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XYE.opcode())
@@ -930,15 +929,15 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x502 as short
 
-        registers.getData(0xA).getAsInt() == 0x0A
-        registers.getData(0xF).getAsInt() == 0x01
+        registers.getVariable(0xA).getAsInt() == 0x0A
+        registers.getVariable(0xF).getAsInt() == 0x01
     }
 
     def "should properly shift Vx left (legacy mode) no overflow"() {
         given:
         registers.getProgramCounter().set(0x500)
 
-        registers.getData(0xA).set(0x45 as byte)
+        registers.getVariable(0xA).set(0x45 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XYE.opcode())
@@ -951,8 +950,8 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x502 as short
 
-        registers.getData(0xA).getAsInt() == 0x8A
-        registers.getData(0xF).getAsInt() == 0x00
+        registers.getVariable(0xA).getAsInt() == 0x8A
+        registers.getVariable(0xF).getAsInt() == 0x00
     }
 
 }

@@ -49,8 +49,8 @@ public class GraphicsProcessing {
 
         registers.redraw = true;
 
-        byte xVal = registers.getData(x).get();
-        byte yVal = registers.getData(y).get();
+        byte xVal = registers.getVariable(x).get();
+        byte yVal = registers.getVariable(y).get();
 
         //TODO: test wrapping of full sprites
         xVal %= 64;
@@ -118,7 +118,7 @@ public class GraphicsProcessing {
             }
         }
 
-        registers.getData(0xF).set(collision);
+        registers.getVariable(0xF).set(collision);
     }
 
     private void dumpSprite(short height, byte[] sprite) {

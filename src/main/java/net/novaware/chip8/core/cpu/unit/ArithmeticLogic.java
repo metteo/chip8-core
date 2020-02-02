@@ -29,35 +29,35 @@ public class ArithmeticLogic {
     // Load operations --------------------------
 
     /* package */ void loadValueIntoRegister(final short x, final short value) {
-        registers.getData(x).set(value);
+        registers.getVariable(x).set(value);
     }
 
     /* package */ void copyRegisterIntoRegister(final short x, final short y) {
-        final byte yValue = registers.getData(y).get();
+        final byte yValue = registers.getVariable(y).get();
 
-        registers.getData(x).set(yValue);
+        registers.getVariable(x).set(yValue);
     }
 
     // Arithmetic operations --------------------
 
     /* package */ void addValueToRegister(final short x, final short value) {
-        int xValue = registers.getData(x).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
 
         xValue += toUnsignedInt(value);
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
     }
 
     /* package */ void addRegisterToRegister(final short x, final short y) {
-        int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         xValue += yValue;
 
         final int overflow = xValue >>> 8;
         final int carry = overflow > 0 ? 0b1 : 0;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
         registers.getStatus().set(carry);
     }
 
@@ -65,8 +65,8 @@ public class ArithmeticLogic {
      * target = x - y where target may be x or y:
      */
     /* package */ void subtractRegisterFromRegister(final short target, final short x, final short y) {
-        final int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
         int targetValue = xValue;
 
         byte borrow = 0b1;
@@ -78,7 +78,7 @@ public class ArithmeticLogic {
 
         targetValue -= yValue;
 
-        registers.getData(target).set(targetValue);
+        registers.getVariable(target).set(targetValue);
         registers.getStatus().set(borrow);
     }
 
@@ -86,12 +86,12 @@ public class ArithmeticLogic {
      * Effectively divide by 2
      */
     /* package */ void shiftRightRegisterIntoRegister(final short x, final short y) {
-        final int yValue = registers.getData(y).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         final byte leastSignificantBit = (byte)(0b1 & yValue);
         final int xValue = yValue >>> 1;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
         registers.getStatus().set(leastSignificantBit);
     }
 
@@ -99,12 +99,12 @@ public class ArithmeticLogic {
      * Effectively multiply by 2
      */
     /* package */ void shiftLeftRegisterIntoRegister(final short x, final short y) {
-        final int yValue = registers.getData(y).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         final byte mostSignificantBit = (byte)((0x80 & yValue) >>> 7);
         final int xValue = yValue << 1;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
         registers.getStatus().set(mostSignificantBit);
     }
 
@@ -114,7 +114,7 @@ public class ArithmeticLogic {
      * @return true if equal
      */
     /* package */ boolean compareValueWithRegister(final short x, final short value) {
-        final int xValue = registers.getData(x).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
 
         return xValue == toUnsignedInt(value);
     }
@@ -123,8 +123,8 @@ public class ArithmeticLogic {
      * @return true if equal
      */
     /* package */ boolean compareRegisterWithRegister(final short x, final short y) {
-        final int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         return xValue == yValue;
     }
@@ -132,36 +132,36 @@ public class ArithmeticLogic {
     // Logical operations -----------------------
 
     /* package */ void andRegisterToRegister(final short x, final short y) {
-        int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         xValue &= yValue;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
     }
 
     /* package */ void orRegisterToRegister(final short x, final short y) {
-        int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         xValue |= yValue;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
     }
 
     /* package */ void xorRegisterToRegister(final short x, final short y) {
-        int xValue = registers.getData(x).getAsInt();
-        final int yValue = registers.getData(y).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
+        final int yValue = registers.getVariable(y).getAsInt();
 
         xValue ^= yValue;
 
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
     }
 
     // Special operations -----------------------
 
     /* package */ void bcdRegisterToMemory(final short x) {
-        final int xValue = registers.getData(x).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
         final int address = registers.getIndex().getAsInt();
 
         final byte hundreds = (byte)(xValue / 100);
@@ -183,7 +183,7 @@ public class ArithmeticLogic {
         random = r.nextInt(256);
 
         xValue = kkValue & random;
-        registers.getData(x).set(xValue);
+        registers.getVariable(x).set(xValue);
     }
 
 

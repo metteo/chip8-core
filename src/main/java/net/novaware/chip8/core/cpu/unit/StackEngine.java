@@ -36,7 +36,7 @@ public class StackEngine {
     }
 
     /* package */ void jump(final short address, final short offset) {
-        final int offsetValue = registers.getData(offset).getAsInt();
+        final int offsetValue = registers.getVariable(offset).getAsInt();
         int newPc = toUnsignedInt(address);
 
         newPc += offsetValue;

@@ -13,7 +13,7 @@ public class Registers {
     /**
      * General data registers (V0 - VF)
      */
-    private final ByteRegister[] data = new ByteRegister[16];
+    private final ByteRegister[] variable = new ByteRegister[16];
 
     private final TribbleRegister index = new TribbleRegister("I");
 
@@ -70,8 +70,8 @@ public class Registers {
 
     @Inject
     public Registers() {
-        for(int i = 0; i < data.length; ++i) {
-            data[i] = new ByteRegister("V" + i);
+        for(int i = 0; i < variable.length; ++i) {
+            variable[i] = new ByteRegister("V" + i);
         }
 
         for(int i = 0; i < decodedInstruction.length; ++i) {
@@ -79,16 +79,16 @@ public class Registers {
         }
     }
 
-    public ByteRegister getData(int i) {
-        return data[i];
+    public ByteRegister getVariable(int i) {
+        return variable[i];
     }
 
-    public ByteRegister getData(short i) {
-        return getData(Short.toUnsignedInt(i));
+    public ByteRegister getVariable(short i) {
+        return getVariable(Short.toUnsignedInt(i));
     }
 
     public ByteRegister getStatus() {
-        return getData(0xF);
+        return getVariable(0xF);
     }
 
     public TribbleRegister getIndex() {

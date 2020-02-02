@@ -25,6 +25,7 @@ public class ByteRegister extends Register<ByteRegister> {
         fireCallback();
     }
 
+    //TODO: when setting value using bigger types, optionally log if data was truncated in the process
     public void set(short data) {
         set((byte) data);
     }

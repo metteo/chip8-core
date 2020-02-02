@@ -38,4 +38,15 @@ class TribbleRegisterSpec extends Specification {
         expect:
         register.getAsInt() == 0xBCD
     }
+
+    def "should support decrement properly when close to 0"() {
+        given:
+        register.set(0x1)
+
+        when:
+        register.increment(-3)
+
+        then:
+        register.getAsInt() == 0xFFE
+    }
 }

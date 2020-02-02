@@ -68,8 +68,6 @@ public class ControlUnit {
         final WordRegister[] di = registers.getDecodedInstruction();
         final TribbleRegister pc = registers.getProgramCounter();
 
-        int x;
-
         final InstructionType instructionType = InstructionType.valueOf(di[0].get());
 
         int increment = 2; // instructions are always 2 bytes long
@@ -129,7 +127,7 @@ public class ControlUnit {
      */
     private boolean checkIfKeyPressed(short x) {
         if (registers.getKeyState().getAsInt() > 0) { //some keys are pressed
-            registers.getData(x).set(registers.getKeyValue().get());
+            registers.getVariable(x).set(registers.getKeyValue().get());
             registers.getKeyWait().set(0x0);
             return true;
         } else {
@@ -140,16 +138,16 @@ public class ControlUnit {
 
     private void loadTimerIntoRegister(short x, ByteRegister timer) {
         byte currentDelay = timer.get();
-        registers.getData(x).set(currentDelay);
+        registers.getVariable(x).set(currentDelay);
     }
 
     private void loadRegisterIntoTimer(short x, ByteRegister timer) {
-        byte delay = registers.getData(x).get();
+        byte delay = registers.getVariable(x).get();
         timer.set(delay);
     }
 
     private void loadFontAddressIntoRegister(final short x) {
-        final int xValue = registers.getData(x).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
         final int fontSegment = MemoryMap.INTERPRETER_START; //TODO: replace with call to font segment register
 
         final int fontAddress = fontSegment +  xValue * 5;
@@ -163,7 +161,7 @@ public class ControlUnit {
     private boolean compareKeyStateWithRegister(final short x) { //TODO: refactor more
         short keys = registers.getKeyState().get();
 
-        byte key = registers.getData(x).get();
+        byte key = registers.getVariable(x).get();
 
         if (DUMP_KEYS) System.out.printf("Key: %01X\n", key);
 
@@ -183,7 +181,7 @@ public class ControlUnit {
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {
             final byte data = memory.getByte((short) iValue);
-            registers.getData(i).set(data);
+            registers.getVariable(i).set(data);
         }
 
         //registers.getIndex().set(iValue); //TODO: support modern mode
@@ -194,7 +192,7 @@ public class ControlUnit {
         int iValue = registers.getIndex().getAsInt();
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {
-            final byte data = registers.getData(i).get();
+            final byte data = registers.getVariable(i).get();
             memory.setByte((short)iValue, data);
         }
 

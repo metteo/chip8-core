@@ -29,7 +29,7 @@ public class AddressGeneration {
     }
 
     /* package */ void addRegisterIntoIndex(final short x) {
-        final int xValue = registers.getData(x).getAsInt();
+        final int xValue = registers.getVariable(x).getAsInt();
         int iValue = registers.getIndex().getAsInt();
 
         iValue += xValue;
