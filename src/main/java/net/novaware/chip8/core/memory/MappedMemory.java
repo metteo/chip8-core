@@ -3,7 +3,7 @@ package net.novaware.chip8.core.memory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MappedMemory implements Memory {
+public class MappedMemory extends AbstractMemory implements Memory {
 
     private static final boolean LOG = false;
 
@@ -21,7 +21,9 @@ public class MappedMemory implements Memory {
 
     private final List<Entry> entries;
 
-    public MappedMemory(List<Entry> entries) {
+    public MappedMemory(final String name, final List<Entry> entries) {
+        super(name);
+
         this.entries = new ArrayList<>(entries);
 
         short currentStart = 0x0000;
@@ -40,11 +42,6 @@ public class MappedMemory implements Memory {
 
             currentStart = (short)(end + 1);
         }
-    }
-
-    @Override
-    public String getName() {
-        return "CPU"; //TODO: add to constructor
     }
 
     @Override

@@ -3,6 +3,8 @@ package net.novaware.chip8.core.cpu.register;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+
 /**
  * Register file containing all the register references
  *
@@ -13,7 +15,7 @@ public class Registers {
     /**
      * General data registers (V0 - VF)
      */
-    private final ByteRegister[] variable = new ByteRegister[16];
+    private final ByteRegister[] variables = new ByteRegister[16];
 
     private final TribbleRegister index = new TribbleRegister("I");
 
@@ -70,8 +72,8 @@ public class Registers {
 
     @Inject
     public Registers() {
-        for(int i = 0; i < variable.length; ++i) {
-            variable[i] = new ByteRegister("V" + i);
+        for(int i = 0; i < variables.length; ++i) {
+            variables[i] = new ByteRegister("V" + i);
         }
 
         for(int i = 0; i < decodedInstruction.length; ++i) {
@@ -79,12 +81,16 @@ public class Registers {
         }
     }
 
+    public ByteRegister[] getVariables() {
+        return variables;
+    }
+
     public ByteRegister getVariable(int i) {
-        return variable[i];
+        return variables[i];
     }
 
     public ByteRegister getVariable(short i) {
-        return getVariable(Short.toUnsignedInt(i));
+        return getVariable(uint(i));
     }
 
     public ByteRegister getStatus() {

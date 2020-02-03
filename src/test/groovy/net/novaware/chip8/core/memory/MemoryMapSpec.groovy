@@ -1,12 +1,16 @@
 package net.novaware.chip8.core.memory
 
+import net.novaware.chip8.core.cpu.register.Registers
 import spock.lang.Shared
 import spock.lang.Specification
 
 class MemoryMapSpec extends Specification {
 
     @Shared
-    MemoryMap instance = new MemoryMap()
+    Registers registers = new Registers()
+
+    @Shared
+    MemoryMap instance = new MemoryMap(registers.getVariables())
 
     def "should properly size memory segments" () {
         expect:
@@ -14,7 +18,7 @@ class MemoryMapSpec extends Specification {
         instance.getProgram().getSize() == MemoryMap.PROGRAM_SIZE
         instance.getStack().getSize() == MemoryMap.STACK_SIZE
         instance.getInterpreterRam().getSize() == MemoryMap.INTERPRETER_RAM_SIZE
-        instance.getDataRegisters().getSize() == MemoryMap.DATA_REGISTERS_SIZE
+        instance.getVariables().getSize() == MemoryMap.VARIABLES_SIZE
         instance.getDisplayIo().getSize() == MemoryMap.DISPLAY_IO_SIZE
         instance.getCpuMemory().getSize() == 4096
     }

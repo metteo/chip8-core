@@ -12,8 +12,8 @@ class CpuIT extends Specification {
     Memory memory
 
     void setup() {
-        memory = new MemoryMap().getCpuMemory()
         def registers = new Registers()
+        memory = new MemoryMap(registers.getVariables()).getCpuMemory()
 
         cpu = new Cpu(memory, registers)
         cpu.initialize()

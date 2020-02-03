@@ -2,9 +2,8 @@ package net.novaware.chip8.core.memory;
 
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
-public class PhysicalMemory implements Memory {
+public class PhysicalMemory extends AbstractMemory implements Memory {
 
-    private String name;
     private byte[] memory;
 
     /**
@@ -12,13 +11,9 @@ public class PhysicalMemory implements Memory {
      * @param size in bytes
      */
     public PhysicalMemory(final String name, final int size) {
-        this.name = name;
-        this.memory = new byte[size];
-    }
+        super(name);
 
-    @Override
-    public String getName() {
-        return name;
+        this.memory = new byte[size];
     }
 
     @Override
@@ -53,6 +48,8 @@ public class PhysicalMemory implements Memory {
     @Override
     public short getWord(short address) {
         int arrayIndex = getArrayIndex(address);
+
+        //FIXME getting / setting word at the last byte should be forbidden
 
         byte instrHi = memory[arrayIndex];
         byte instrLo = memory[arrayIndex + 1];

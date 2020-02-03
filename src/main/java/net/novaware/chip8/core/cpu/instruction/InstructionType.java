@@ -277,6 +277,10 @@ public enum InstructionType {
      * Set I = I + VX.
      *
      * The values of I and Vx are added, and the results are stored in I.
+     *
+     * NOTE: If the operation results in an overflow carry=1 otherwise 0
+     *      (quirk for Spacefight 2091!, legacy applications didn't use it)
+     *
      */
     OxFX1E (0xF01E, OxF0FF.value()),
 
