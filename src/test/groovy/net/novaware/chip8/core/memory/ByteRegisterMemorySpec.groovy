@@ -47,11 +47,11 @@ class ByteRegisterMemorySpec extends Specification {
         register.set(0xAB)
 
         when:
-        Memory memory = new ByteRegisterMemory("V Register", register)
+        Memory memory = new ByteRegisterMemory("V Registers", register)
 
         then:
         memory.getByte(0 as short) == 0xAB as byte
-        memory.getName() == "V Register"
+        memory.getName() == "V Registers"
         memory.getSize() == 1
 
         and: "allow updates using memory"
@@ -59,5 +59,18 @@ class ByteRegisterMemorySpec extends Specification {
         register.getAsInt() == 0xCD
     }
 
-    //TODO: cases for throwing exception, word, byte array
+    def "should throw when storing using too high address"() {
+        given:
+        ByteRegister register1 = new ByteRegister("V0")
+        register1.set(0xAB as byte)
+
+        when:
+        Memory memory = new ByteRegisterMemory("V Registers", register1)
+        memory.setByte(1 as short, 0xCD as byte)
+
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    //TODO: cases for word, byte array
 }

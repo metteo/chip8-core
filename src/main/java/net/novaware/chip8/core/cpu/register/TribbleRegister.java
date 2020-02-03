@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.cpu.register;
 
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
@@ -13,7 +14,7 @@ public class TribbleRegister extends Register<TribbleRegister> {
     public static final int TRIBBLE_MASK = 0xFFF;
     private short data;
 
-    protected TribbleRegister(String name) {
+    public TribbleRegister(String name) {
         super(name);
     }
 
@@ -29,8 +30,9 @@ public class TribbleRegister extends Register<TribbleRegister> {
         int udata = uint(data);
 
         if (udata > TRIBBLE_MASK) {
-            System.err.println("Attempt to set " + getName() + " to " + data + ", truncating to 12 bits");
-            data = ushort(udata & TRIBBLE_MASK);
+            short truncated = ushort(udata & TRIBBLE_MASK);
+            System.err.println("Attempt to set " + getName() + " to " + toHexString(data) + ", truncating to " + toHexString(truncated));
+            data = truncated;
         }
 
         this.data = data;

@@ -8,7 +8,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
- * Uses Registers as a backend
+ * Uses Byte Registers as a backend
  */
 public class ByteRegisterMemory extends AbstractMemory {
 

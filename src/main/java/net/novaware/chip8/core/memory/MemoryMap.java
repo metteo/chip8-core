@@ -1,6 +1,7 @@
 package net.novaware.chip8.core.memory;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
+import net.novaware.chip8.core.cpu.register.TribbleRegister;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,7 +41,7 @@ public class MemoryMap {
 
     private final PhysicalMemory interpreter;
     private final PhysicalMemory program;
-    private final PhysicalMemory stack;
+    private final TribbleRegisterMemory stack;
     private final PhysicalMemory interpreterRam;
     private final ByteRegisterMemory variables;
     private final PhysicalMemory displayIo;
@@ -51,9 +52,15 @@ public class MemoryMap {
     public MemoryMap(@Named("variables") ByteRegister[] variables) {
         assert variables.length == VARIABLES_SIZE : "variables.length should be " + VARIABLES_SIZE;
 
+        TribbleRegister[] stackRegisters = new TribbleRegister[STACK_SIZE / 2];
+        for(int i = 0; i < STACK_SIZE / 2; ++i) {
+            stackRegisters[i] = new TribbleRegister("S" + i);
+        }
+
+
         interpreter    = new PhysicalMemory("Interpreter ROM", INTERPRETER_SIZE);
         program        = new PhysicalMemory("Program R[OA]M",  PROGRAM_SIZE);
-        stack          = new PhysicalMemory("Stack",           STACK_SIZE);
+        stack          = new TribbleRegisterMemory("Stack",    stackRegisters);
         interpreterRam = new PhysicalMemory("Interpreter RAM", INTERPRETER_RAM_SIZE);
         this.variables = new ByteRegisterMemory("Variables",   variables);
         displayIo      = new PhysicalMemory("Display IO",      DISPLAY_IO_SIZE);
