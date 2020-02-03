@@ -57,7 +57,7 @@ public class SplittableMemory implements Memory {
 
     @Override
     public void setBytes(short address, byte[] source, int length) {
-        if (isRom(address) || isRom(ushort(uint(address) + length))) {
+        if (isRom(address)) {
             throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
         }
 
@@ -98,7 +98,7 @@ public class SplittableMemory implements Memory {
 
     @Override
     public void setWord(short address, short word) {
-        if (isRom(address) || isRom(ushort(uint(address) + 1))) {
+        if (isRom(address)) {
             throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
         }
 

@@ -9,9 +9,9 @@ public interface Memory {
 
     int getSize();
 
-    void getBytes(short address, byte[] destination, int length);
+    void getBytes(short address, byte[] destination, int length); //TODO: length should be positive (add checks)
 
-    byte getByte(short address);
+    byte getByte(short address); //TODO: address should be 0x0 - 0xFFF, add checks
 
     void setBytes(short address, byte[] source, int length);
 
