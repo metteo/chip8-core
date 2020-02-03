@@ -15,9 +15,9 @@ public interface Memory {
 
     void setBytes(short address, byte[] source, int length);
 
-    void setByte(short address, byte source);
+    void setByte(short address, byte value);
 
     short getWord(short address);
 
-    void setWord(short address, short word);
+    void setWord(short address, short value);
 }

@@ -39,8 +39,8 @@ public class MemoryMap {
     public static final short DISPLAY_IO_END          = 0x0FFF;
     public static final int   DISPLAY_IO_SIZE         = 256;
 
-    private final PhysicalMemory interpreter;
-    private final PhysicalMemory program;
+    private final ReadOnlyMemory interpreter;
+    private final SplittableMemory program;
     private final TribbleRegisterMemory stack;
     private final PhysicalMemory interpreterRam;
     private final ByteRegisterMemory variables;
@@ -58,8 +58,13 @@ public class MemoryMap {
         }
 
 
-        interpreter    = new PhysicalMemory("Interpreter ROM", INTERPRETER_SIZE);
-        program        = new PhysicalMemory("Program R[OA]M",  PROGRAM_SIZE);
+        final PhysicalMemory interpreterRom = new PhysicalMemory("Interpreter ROM", INTERPRETER_SIZE);
+        interpreter = new ReadOnlyMemory(interpreterRom);
+
+        final PhysicalMemory programMemory =
+                         new PhysicalMemory("Program",  PROGRAM_SIZE);
+        program        = new SplittableMemory(programMemory);
+
         stack          = new TribbleRegisterMemory("Stack",    stackRegisters);
         interpreterRam = new PhysicalMemory("Interpreter RAM", INTERPRETER_RAM_SIZE);
         this.variables = new ByteRegisterMemory("Variables",   variables);
@@ -76,31 +81,31 @@ public class MemoryMap {
         cpuMemory = new MappedMemory("CPU", entries);
     }
 
-    public Memory getInterpreter() {
+    public ReadOnlyMemory getInterpreter() {
         return interpreter;
     }
 
-    public Memory getProgram() {
+    public SplittableMemory getProgram() {
         return program;
     }
 
-    public Memory getStack() {
+    public TribbleRegisterMemory getStack() {
         return stack;
     }
 
-    public Memory getInterpreterRam() {
+    public PhysicalMemory getInterpreterRam() {
         return interpreterRam;
     }
 
-    public Memory getVariables() {
+    public ByteRegisterMemory getVariables() {
         return variables;
     }
 
-    public Memory getDisplayIo() {
+    public PhysicalMemory getDisplayIo() {
         return displayIo;
     }
 
-    public Memory getCpuMemory() {
+    public MappedMemory getCpuMemory() {
         return cpuMemory;
     }
 }

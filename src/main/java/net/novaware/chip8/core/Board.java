@@ -4,6 +4,7 @@ import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.Timer;
 import net.novaware.chip8.core.memory.MemoryMap;
+import net.novaware.chip8.core.memory.SplittableMemory;
 import net.novaware.chip8.core.port.*;
 
 import javax.inject.Inject;
@@ -42,6 +43,7 @@ public class Board {
 
         byte[] font = new Loader().loadFont();
         memoryMap.getInterpreter().setBytes((short) 0x0, font, font.length);
+        memoryMap.getInterpreter().setReadOnly(true);
 
         cpu.initialize();
 
@@ -136,7 +138,9 @@ public class Board {
         return new StoragePort() {
             @Override
             public void load(byte[] data) {
-                memoryMap.getProgram().setBytes((short) 0x0, data, data.length);
+                SplittableMemory programMemory = memoryMap.getProgram();
+                programMemory.setBytes((short) 0x0, data, data.length);
+                programMemory.setSplit(data.length);
             }
 
             @Override
