@@ -122,7 +122,7 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x345 as short
     }
 
-    def "should increment register I with value of register X"() {
+    def "should increment register I with value of register X (no carry)"() {
         given:
 
         registers.getIndex().set(0x0123)
@@ -137,8 +137,31 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getIndex().get() == 0x0211 as short
-
         registers.getProgramCounter().get() == 0x2 as short
+
+        registers.getStatus().getAsInt() == 0x00
+        registers.getStatusType().get() == Registers.VF_CARRY
+    }
+
+    def "should increment register I with value of register X (carry)"() {
+        given:
+
+        registers.getIndex().set(0x0FF9)
+        registers.getVariable(4).set(0xEE as byte)
+
+        def instruction = registers.getDecodedInstruction()
+        instruction[0].set(OxFX1E.opcode())
+        instruction[1].set(0x4)
+
+        when:
+        cu.execute()
+
+        then:
+        registers.getIndex().get() == 0x0E7 as short
+        registers.getProgramCounter().get() == 0x2 as short
+
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_CARRY
     }
 
     def "should skip next instruction if V is equal to number in instruction"() {
@@ -381,7 +404,8 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x502 as short
 
         registers.getVariable(0xA).getAsInt() == 0x1A
-        registers.getVariable(0xF).getAsInt() == 0x01
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_LSB
     }
 
     def "should properly shift Vx right (legacy mode) no overflow"() {
@@ -402,7 +426,8 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x502 as short
 
         registers.getVariable(0xA).getAsInt() == 0x1B
-        registers.getVariable(0xF).getAsInt() == 0x00
+        registers.getStatus().getAsInt() == 0x00
+        registers.getStatusType().get() == Registers.VF_LSB
     }
 
     def "should skip next instruction if key with value of Vx is pressed"() {
@@ -463,7 +488,8 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xC).getAsInt() == 0x8A
         registers.getVariable(0xD).getAsInt() == 0x56
-        registers.getVariable(0xF).getAsInt() == 0x00
+        registers.getStatus().getAsInt() == 0x00
+        registers.getStatusType().get() == Registers.VF_CARRY
     }
 
     def "should properly ADD (with carry) value of Vy into Vx (overflow)"() {
@@ -486,7 +512,8 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xC).getAsInt() == 0x65
         registers.getVariable(0xD).getAsInt() == 0xBB
-        registers.getVariable(0xF).getAsInt() == 0x01
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_CARRY
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (no borrow)"() {
@@ -509,7 +536,8 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xC).getAsInt() == 0x22
         registers.getVariable(0xD).getAsInt() == 0x34
-        registers.getVariable(0xF).getAsInt() == 0x01
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_NO_BORROW
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (borrow)"() {
@@ -532,7 +560,8 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xC).getAsInt() == 0xEF
         registers.getVariable(0xD).getAsInt() == 0xBB
-        registers.getVariable(0xF).getAsInt() == 0x00
+        registers.getStatus().getAsInt() == 0x00
+        registers.getStatusType().get() == Registers.VF_NO_BORROW
     }
 
     def "should skip next instruction if V is NOT equal to number in instruction (SNE)"() {
@@ -930,7 +959,8 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x502 as short
 
         registers.getVariable(0xA).getAsInt() == 0x0A
-        registers.getVariable(0xF).getAsInt() == 0x01
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_MSB
     }
 
     def "should properly shift Vx left (legacy mode) no overflow"() {
@@ -951,7 +981,8 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().get() == 0x502 as short
 
         registers.getVariable(0xA).getAsInt() == 0x8A
-        registers.getVariable(0xF).getAsInt() == 0x00
+        registers.getStatus().getAsInt() == 0x00
+        registers.getStatusType().get() == Registers.VF_MSB
     }
 
 }

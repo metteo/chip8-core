@@ -25,7 +25,7 @@ public class SplittableMemory implements Memory {
      * split ... memory.getSize() - 1 = RAM
      * @param split
      */
-    public void setSplit(int split) {
+    public void setSplit(int split) { //TODO: activate only when strict mode is active
         System.out.println("<0x0000, " + toHexString(ushort(split)) + ") " + getName() + " ROM");
         System.out.println("<" + toHexString(ushort(split)) + ", " + toHexString(ushort(getSize())) + ") " + getName() +" RAM");
         this.split = split;

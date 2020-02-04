@@ -1,7 +1,7 @@
 package net.novaware.chip8.core.memory;
 
 /**
- * Allows blocking of writes
+ * Allows blocking of writes if RO mode is active
  * TODO: write missing tests
  */
 public class ReadOnlyMemory implements Memory {

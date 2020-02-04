@@ -6,6 +6,7 @@ import net.novaware.chip8.core.memory.Memory;
 import java.util.Random;
 
 import static java.lang.Short.toUnsignedInt;
+import static net.novaware.chip8.core.cpu.register.Registers.*;
 
 /**
  * Arithmetic Logic Unit (ALU)
@@ -58,7 +59,9 @@ public class ArithmeticLogic {
         final int carry = overflow > 0 ? 0b1 : 0;
 
         registers.getVariable(x).set(xValue);
+
         registers.getStatus().set(carry);
+        registers.getStatusType().set(VF_CARRY);
     }
 
     /**
@@ -79,7 +82,9 @@ public class ArithmeticLogic {
         targetValue -= yValue;
 
         registers.getVariable(target).set(targetValue);
+
         registers.getStatus().set(borrow);
+        registers.getStatusType().set(VF_NO_BORROW);
     }
 
     /**
@@ -92,7 +97,9 @@ public class ArithmeticLogic {
         final int xValue = yValue >>> 1;
 
         registers.getVariable(x).set(xValue);
+
         registers.getStatus().set(leastSignificantBit);
+        registers.getStatusType().set(VF_LSB);
     }
 
     /**
@@ -105,7 +112,9 @@ public class ArithmeticLogic {
         final int xValue = yValue << 1;
 
         registers.getVariable(x).set(xValue);
+
         registers.getStatus().set(mostSignificantBit);
+        registers.getStatusType().set(VF_MSB);
     }
 
     // Comparison operations --------------------

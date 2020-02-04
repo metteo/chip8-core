@@ -3,6 +3,8 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
 
+import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION;
+
 /**
  * GPU
  */
@@ -33,21 +35,22 @@ public class GraphicsProcessing {
     }
 
     public void clearScreen() {
-        registers.redraw = true;
-
         short addr = registers.getGraphicSegment().get();
 
         for (short i = addr; i < addr + (32 * 64 / 8); i++) {
             memory.setByte(i, (byte) 0x0);
         }
+
+        registers.getStatus().set(0x1);
+        registers.getStatusType().set(VF_COLLISION);
+
+        registers.getGraphicChange().set(Registers.GC_ERASE);
     }
 
     //FIXME: needs to be rewriten & fixed and tested!
 
     public void drawSprite(int x, int y, short height) {
         final short addr = registers.getIndex().get();
-
-        registers.redraw = true;
 
         byte xVal = registers.getVariable(x).get();
         byte yVal = registers.getVariable(y).get();
@@ -66,6 +69,9 @@ public class GraphicsProcessing {
         if (DUMP_SPRITE) dumpSprite(height, sprite);
 
         byte collision = 0;
+
+        boolean drawingOnly = true;
+        boolean erasingOnly = true;
 
         for (int i = 0; i < height; i++) { //y axis
             int yPixel = Byte.toUnsignedInt(yVal) + i;
@@ -113,12 +119,34 @@ public class GraphicsProcessing {
 
                 if (currPixel == 1 && finalPixel == 0) {
                     collision = (byte) 0x01;
+                    drawingOnly = false;
 
+                }
+
+                if (currPixel == 0 && finalPixel == 1) {
+                    erasingOnly = false;
                 }
             }
         }
 
-        registers.getVariable(0xF).set(collision);
+        registers.getStatus().set(collision);
+        registers.getStatusType().set(VF_COLLISION);
+
+        byte gc = Registers.GC_NOOP;
+
+        if (drawingOnly && !erasingOnly) {
+            gc = Registers.GC_DRAW;
+        }
+
+        if (!drawingOnly && erasingOnly) {
+            gc = Registers.GC_ERASE;
+        }
+
+        if (!drawingOnly && !erasingOnly) {
+            gc = Registers.GC_MIX;
+        }
+
+        registers.getGraphicChange().set(gc);
     }
 
     private void dumpSprite(short height, byte[] sprite) {

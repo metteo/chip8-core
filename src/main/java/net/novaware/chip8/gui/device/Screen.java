@@ -1,7 +1,11 @@
 package net.novaware.chip8.gui.device;
 
+import net.novaware.chip8.core.cpu.register.Registers;
+
 import javax.swing.*;
 import java.awt.*;
+
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
  * Display device
@@ -10,8 +14,10 @@ public class Screen extends JComponent {
 
     private boolean[][] model = new boolean[64][32];
 
-    private static final boolean REDRAW_HEURISTIC = !false;
-    private boolean drawing = true; //TODO: improve and use timers which repaint even earlier if next erase happens long after last draw (like game over screen)
+    private static final boolean REDRAW_HEURISTIC = false;
+
+    private Integer prevChange = uint(Registers.GC_DRAW);
+    private Integer lastChange = uint(Registers.GC_DRAW); //TODO: improve and use timers which repaint even earlier if next erase happens long after last draw (like game over screen)
 
     private long lastPaint;
     private int fps; //calculate average from 3 frames?
@@ -52,22 +58,31 @@ public class Screen extends JComponent {
         model[x][y] = value;
     }
 
-    public void draw(boolean erasing, byte[] data) { //TODO: make dumps of images with annotation if something was drawn /erased etc to figure out the sequence and effects
+    public void draw(Integer currentChange, byte[] data) {
         if (REDRAW_HEURISTIC) {
-            if (/*was*/drawing && /*now*/ erasing) {
+            //if (prevChange != uint(GC_ERASE) && lastChange != uint(GC_ERASE) && currentChange == uint(GC_ERASE)) { //TODO: catch cases on the graph where there is multiple deletions interrupted by single draw, they should be all treated as erase and no repaint should happen?
+            if ((lastChange != uint(Registers.GC_ERASE) && currentChange == uint(Registers.GC_ERASE)) || currentChange == uint(Registers.GC_MIX)) { //this works for games, above works nice for invaders menu screen
+                //System.out.println("-----");
                 calculateFps();
                 SwingUtilities.invokeLater(this::repaint); //FIXME deferred in the future so even though called before updateModel may execute after...
             } else {
                 updateModel(data);
             }
 
+            //System.out.println(padLeft("|", currentChange));
 
-            drawing = !erasing;
+            prevChange = lastChange;
+            lastChange = currentChange;
         } else {
             updateModel(data);
             calculateFps();
             SwingUtilities.invokeLater(this::repaint);
         }
+    }
+
+
+    public static String padLeft(String s, int n) {
+        return String.format("%" + n + "s", s);
     }
 
     private void updateModel(byte[] data) {

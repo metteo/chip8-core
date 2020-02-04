@@ -4,6 +4,6 @@ import java.util.function.BiConsumer;
 
 public interface DisplayPort extends OutputPort {
 
-    void attach(BiConsumer<Boolean, byte[]> receiver);
+    void attach(BiConsumer<Integer, byte[]> receiver);
 
 }

@@ -34,6 +34,12 @@ public class AddressGeneration {
 
         iValue += xValue;
 
+        final int overflow = iValue >>> 12;
+        final int carry = overflow > 0 ? 0b1 : 0;
+
         registers.getIndex().set(iValue);
+
+        registers.getStatus().set(carry);
+        registers.getStatusType().set(Registers.VF_CARRY);
     }
 }

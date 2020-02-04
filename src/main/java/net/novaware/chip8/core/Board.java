@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
+
 @Singleton
 public class Board {
 
@@ -28,7 +30,7 @@ public class Board {
 
     //private DisplayPort display;
     private byte[] displayBuffer = new byte[MemoryMap.DISPLAY_IO_SIZE];
-    private BiConsumer<Boolean, byte[]> displayReceiver;
+    private BiConsumer<Integer, byte[]> displayReceiver;
 
     private AudioPort audio;
     private Consumer<Boolean> audioReceiver;
@@ -51,6 +53,20 @@ public class Board {
 
         Timer delay = new Timer(registers.getDelay(), null);
         Timer sound = new Timer(registers.getSound(), buzz -> {if (audioReceiver != null) audioReceiver.accept(buzz);});
+
+        registers.getGraphicChange().setCallback(gc -> {
+            int change = gc.getAsInt();
+
+            if (change > 0) {
+                memoryMap.getDisplayIo().getBytes((short) 0x0, displayBuffer, displayBuffer.length);
+
+                if (displayReceiver != null) {
+                    displayReceiver.accept(change, displayBuffer);
+                }
+
+                gc.set(GC_IDLE);
+            }
+        });
     }
 
     public void reset() {
@@ -63,17 +79,6 @@ public class Board {
         while (cycle < maxCycles) {
 
             cpu.cycle();
-
-            if (cpu.getRegisters().redraw) {
-                memoryMap.getDisplayIo().getBytes((short) 0x0, displayBuffer, displayBuffer.length);
-
-                if (displayReceiver != null) {
-                    boolean erasing = cpu.getRegisters().getStatus().getAsInt() > 0;
-                    displayReceiver.accept(erasing, displayBuffer);
-                }
-
-                cpu.getRegisters().redraw = false;
-            }
 
             sleepNanos(640_000); // 1000Hz, original used 500 Hz~ == 2ms but with 1ms it's much smoother
 //            sleepNanos(2_200_000);
@@ -108,7 +113,7 @@ public class Board {
         } while (timeLeft > 0);
 
         long diff = System.nanoTime() - end;
-        if (diff > 50_000) System.out.println("sleepNanos not that good");
+        //if (diff > 50_000) System.out.println("sleepNanos not that good");
         //System.out.println(count + "    "); //TODO: happens 1k times for sleep of 640 uS
     }
 
@@ -140,6 +145,7 @@ public class Board {
             public void load(byte[] data) {
                 SplittableMemory programMemory = memoryMap.getProgram();
                 programMemory.setBytes((short) 0x0, data, data.length);
+                //TODO: game HIDDEN tries to dump registers into ROM memory
                 programMemory.setSplit(data.length);
             }
 
