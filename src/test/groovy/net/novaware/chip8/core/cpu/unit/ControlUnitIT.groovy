@@ -5,6 +5,8 @@ import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 
+import java.util.function.IntUnaryOperator
+
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 
 class ControlUnitIT extends Specification {
@@ -13,7 +15,9 @@ class ControlUnitIT extends Specification {
 
     Registers registers = new Registers()
 
-    ArithmeticLogic alu = new ArithmeticLogic(registers, memory)
+    IntUnaryOperator randomSource = Mock()
+
+    ArithmeticLogic alu = new ArithmeticLogic(randomSource, registers, memory)
 
     AddressGeneration agu = new AddressGeneration(registers, memory)
 
@@ -718,7 +722,8 @@ class ControlUnitIT extends Specification {
         registers.getIndex().getAsInt() == fontStartAddress + 9 * spriteSize
     }
 
-    def "should generate random number from 0 - 255"() { //TODO: provide random abstraction in this test
+    def "should generate random number from 0 - 255"() {
+        given:
         registers.getProgramCounter().set(0x20A)
         registers.getVariable(0xD).set((byte)123)
 
@@ -727,14 +732,17 @@ class ControlUnitIT extends Specification {
         instruction[1].set(0xD)
         instruction[2].set(0x56)
 
+
+
         when:
         cu.execute()
 
         then:
+        1 * randomSource.applyAsInt(_) >> 123
+
         registers.getProgramCounter().get() == 0x20C as short
         byte random = registers.getVariable(0xD).get()
-        random >= (byte)(0x56 & 0x0)
-        random <= (byte)(0x56 & 0xFF)
+        random == (byte)(0x56 & 123)
     }
 
     def "should call system instruction with given address"() {

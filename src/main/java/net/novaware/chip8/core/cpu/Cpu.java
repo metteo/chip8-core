@@ -8,6 +8,7 @@ import net.novaware.chip8.core.memory.MemoryMap;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Random;
 
 /**
  * Central Processing Unit (CPU)
@@ -38,7 +39,7 @@ public class Cpu {
         this.memory = memory;
         this.registers = registers;
 
-        alu = new ArithmeticLogic(registers, memory);
+        alu = new ArithmeticLogic(new Random()::nextInt, registers, memory);
         agu = new AddressGeneration(registers, memory);
         stackEngine = new StackEngine(registers, memory);
         gpu = new GraphicsProcessing(registers, memory);

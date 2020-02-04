@@ -3,17 +3,18 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
 
-import java.util.Random;
+import java.util.function.IntUnaryOperator;
 
 import static java.lang.Short.toUnsignedInt;
 import static net.novaware.chip8.core.cpu.register.Registers.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
  * Arithmetic Logic Unit (ALU)
  */
 public class ArithmeticLogic {
 
-    private Random r = new Random();
+    private final IntUnaryOperator randomSource;
     
     // Accessible -------------------------------
 
@@ -21,7 +22,9 @@ public class ArithmeticLogic {
 
     private final Memory memory;
 
-    public ArithmeticLogic(Registers registers, Memory memory) {
+    public ArithmeticLogic(IntUnaryOperator randomSource, Registers registers, Memory memory) {
+        this.randomSource = randomSource;
+
         this.registers = registers;
 
         this.memory = memory;
@@ -183,17 +186,11 @@ public class ArithmeticLogic {
     }
 
     /* package */ void andRandomToRegister(final short x, final short value) {
-        int xValue;
-        int kkValue = toUnsignedInt(value);
+        int kkValue = uint(value);
+        int random = randomSource.applyAsInt(256);
 
-        int random = 4; //chosen by fair dice roll.
-                        //guaranteed to be random.
+        int xValue = kkValue & random;
 
-        random = r.nextInt(256);
-
-        xValue = kkValue & random;
         registers.getVariable(x).set(xValue);
     }
-
-
 }
