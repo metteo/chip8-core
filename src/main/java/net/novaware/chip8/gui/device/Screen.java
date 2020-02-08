@@ -14,7 +14,7 @@ public class Screen extends JComponent {
 
     private boolean[][] model = new boolean[64][32];
 
-    private static final boolean REDRAW_HEURISTIC = false;
+    private static final boolean REDRAW_HEURISTIC = !false;
 
     private Integer prevChange = uint(Registers.GC_DRAW);
     private Integer lastChange = uint(Registers.GC_DRAW); //TODO: improve and use timers which repaint even earlier if next erase happens long after last draw (like game over screen)

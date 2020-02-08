@@ -8,6 +8,7 @@ import spock.lang.Specification
 import java.util.function.IntUnaryOperator
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
+import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION
 
 class ControlUnitIT extends Specification {
 
@@ -56,6 +57,11 @@ class ControlUnitIT extends Specification {
         memory.getByte(end) == 0xFF as byte
 
         registers.getProgramCounter().get() == 0x2 as short
+
+        registers.getStatus().getAsInt() == 0x1
+        registers.getStatusType().get() == VF_COLLISION
+
+        registers.getGraphicChange().get() == Registers.GC_ERASE
     }
 
     def "should populate I register with address from instruction"() {

@@ -34,6 +34,8 @@ public class ControlUnit {
 
     private final GraphicsProcessing gpu;
 
+    private final GraphicsProcessingOld oldGpu;
+
     public ControlUnit(
             final Registers registers,
             final Memory memory,
@@ -50,6 +52,7 @@ public class ControlUnit {
         this.agu = agu;
         this.stackEngine = stackEngine;
         this.gpu = gpu;
+        this.oldGpu = new GraphicsProcessingOld(registers, memory); //TODO: remove when new one is functional
     }
 
     public void fetch() {
@@ -81,7 +84,7 @@ public class ControlUnit {
 
             case Ox1MMM: stackEngine.jump(di[1].get()); increment = 0; break;
             case Ox2MMM: stackEngine.call(di[1].get()); increment = 0; break;
-            case Ox3XKK: increment = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 4 : 2; break;
+            case Ox3XKK: increment = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 4 : increment; break;
             case Ox4XKK: increment = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? increment : 4; break;
             case Ox5XY0: increment = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 4 : increment; break;
             case Ox6XKK: alu.loadValueIntoRegister(di[1].get(), di[2].get()); break;
@@ -101,7 +104,7 @@ public class ControlUnit {
             case OxAMMM: agu.loadAddressIntoIndex(di[1].get()); break;
             case OxBMMM: stackEngine.jump(di[1].get(), (short) 0x0); increment = 0; break;
             case OxCXKK: alu.andRandomToRegister(di[1].get(), di[2].get()); break;
-            case OxDXYK: gpu.drawSprite(di[1].getAsInt(), di[2].getAsInt(), di[3].get()); break;
+            case OxDXYK: oldGpu.drawSprite(di[1].get(), di[2].get(), di[3].get()); break; //TODO: switch to new gpu
 
             case OxEX9E: increment = compareKeyStateWithRegister(di[1].get()) ? 4 : increment; break;
             case OxEXA1: increment = compareKeyStateWithRegister(di[1].get()) ? increment : 4; break;
