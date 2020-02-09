@@ -201,22 +201,20 @@ class GraphicsProcessingSpec extends Specification {
         instance.paintBuffer = bg;
 
         when:
-        instance.xorBuffers(0, 0, 2)
+        byte xorResult = instance.xorBuffers(0, 0, 2) //TODO: clipping
 
         then:
         assertBufferContent(instance.resultBuffer, result as byte[], 2)
-        registers.getStatusType().get() == Registers.VF_COLLISION
-        registers.getStatus().getAsInt() == collision
-        registers.getGraphicChange().get() == gfxChange
+        xorResult == gfxChange
 
         where:
-        sprite       | bg           || result       | collision | gfxChange | title
-        [0x12, 0x34] | [0x56, 0x78] || [0x44, 0x4C] | 0x01      | GC_MIX    | "mixed"
-        [0x00, 0x00] | [0xFF, 0xFF] || [0xFF, 0xFF] | 0x00      | GC_NOOP   | "no collision 1"
-        [0x00, 0x00] | [0x00, 0x00] || [0x00, 0x00] | 0x00      | GC_NOOP   | "no collision 2"
-        [0xFF, 0xFF] | [0x00, 0x00] || [0xFF, 0xFF] | 0x00      | GC_DRAW   | "no collision 3"
-        [0x00, 0x01] | [0xFF, 0xFF] || [0xFF, 0xFE] | 0x01      | GC_ERASE  | "single collision"
-        [0xFF, 0xFF] | [0xFF, 0xFF] || [0x00, 0x00] | 0x01      | GC_ERASE  | "all collision"
+        sprite       | bg           || result       | gfxChange | title
+        [0x12, 0x34] | [0x56, 0x78] || [0x44, 0x4C] | GC_MIX    | "mixed"
+        [0x00, 0x00] | [0xFF, 0xFF] || [0xFF, 0xFF] | GC_NOOP   | "no collision 1"
+        [0x00, 0x00] | [0x00, 0x00] || [0x00, 0x00] | GC_NOOP   | "no collision 2"
+        [0xFF, 0xFF] | [0x00, 0x00] || [0xFF, 0xFF] | GC_DRAW   | "no collision 3"
+        [0x00, 0x01] | [0xFF, 0xFF] || [0xFF, 0xFE] | GC_ERASE  | "single collision"
+        [0xFF, 0xFF] | [0xFF, 0xFF] || [0x00, 0x00] | GC_ERASE  | "all collision"
     }
 
     void dumpGraphicsSegment() {

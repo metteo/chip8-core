@@ -68,8 +68,13 @@ public class GraphicsProcessing {
 
         fillSpriteBuffer(spriteAddress, spriteBuffer, spriteHeight);
         fillPaintBuffer(xBit, yBit, paintBuffer, spriteHeight);
-        xorBuffers(xBit, yBit, spriteHeight);
+        byte gc = xorBuffers(xBit, yBit, spriteHeight);
         storePaintBuffer(xBit, yBit, resultBuffer, spriteHeight);
+
+        registers.getStatus().set((gc == GC_ERASE || gc == GC_MIX) ? 0x1 : 0x0);
+        registers.getStatusType().set(VF_COLLISION);
+
+        registers.getGraphicChange().set(gc); // must be last because triggers redraw
     }
 
     /* package */ void fillSpriteBuffer(final short address, final byte[] buffer, final int height) {
@@ -123,7 +128,7 @@ public class GraphicsProcessing {
     }
 
     //TODO: handle clipping in xor method
-    /* package */ void xorBuffers(int xBit, int yBit, final int height) {
+    /* package */ byte xorBuffers(int xBit, int yBit, final int height) {
         boolean erasing = false;
         boolean drawing = false;
 
@@ -135,21 +140,20 @@ public class GraphicsProcessing {
 
             final @Unsigned int resultRow = uint(resultBuffer[y]);
 
-            // inverse logical consequence ~(p => q) <=> ~(~p v q) <=> p ^ ~q
+            // inverse logical consequence ~(p => q) <=> ~(~p | q) <=> p & ~q
+            // 1->0 = 1, the rest is 0
             if ((paintRow & ~resultRow) > 0) {
                 erasing = true;
             }
 
             // special ~p & q
+            // 0->1 = 1, the rest is 0
             if ((~paintRow & resultRow) > 0) {
                 drawing = true;
             }
         }
 
-        registers.getStatus().set(erasing ? 0x1 : 0x0);
-        registers.getStatusType().set(VF_COLLISION);
-
-        registers.getGraphicChange().set(getGraphicChange(erasing, drawing));
+        return getGraphicChange(erasing, drawing);
     }
 
     private byte getGraphicChange(boolean erasing, boolean drawing) {
