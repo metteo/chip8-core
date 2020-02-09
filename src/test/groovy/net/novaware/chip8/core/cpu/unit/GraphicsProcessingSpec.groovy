@@ -5,6 +5,10 @@ import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 import spock.lang.Unroll
 
+import static net.novaware.chip8.core.cpu.register.Registers.GC_DRAW
+import static net.novaware.chip8.core.cpu.register.Registers.GC_ERASE
+import static net.novaware.chip8.core.cpu.register.Registers.GC_MIX
+import static net.novaware.chip8.core.cpu.register.Registers.GC_NOOP
 import static net.novaware.chip8.core.cpu.unit.GraphicsProcessing.MAX_SPRITE_HEIGHT
 import static net.novaware.chip8.core.util.HexUtil.toHexString
 
@@ -188,6 +192,31 @@ class GraphicsProcessingSpec extends Specification {
         assertBufferContent(buffer, sprite, height)
 
         if (DUMP_MEMORY) dumpBuffer(buffer, height)
+    }
+
+    @Unroll
+    def "should xor buffers properly in a #title case"() {
+        given:
+        instance.spriteBuffer = sprite;
+        instance.paintBuffer = bg;
+
+        when:
+        instance.xorBuffers(0, 0, 2)
+
+        then:
+        assertBufferContent(instance.resultBuffer, result as byte[], 2)
+        registers.getStatusType().get() == Registers.VF_COLLISION
+        registers.getStatus().getAsInt() == collision
+        registers.getGraphicChange().get() == gfxChange
+
+        where:
+        sprite       | bg           || result       | collision | gfxChange | title
+        [0x12, 0x34] | [0x56, 0x78] || [0x44, 0x4C] | 0x01      | GC_MIX    | "mixed"
+        [0x00, 0x00] | [0xFF, 0xFF] || [0xFF, 0xFF] | 0x00      | GC_NOOP   | "no collision 1"
+        [0x00, 0x00] | [0x00, 0x00] || [0x00, 0x00] | 0x00      | GC_NOOP   | "no collision 2"
+        [0xFF, 0xFF] | [0x00, 0x00] || [0xFF, 0xFF] | 0x00      | GC_DRAW   | "no collision 3"
+        [0x00, 0x01] | [0xFF, 0xFF] || [0xFF, 0xFE] | 0x01      | GC_ERASE  | "single collision"
+        [0xFF, 0xFF] | [0xFF, 0xFF] || [0x00, 0x00] | 0x01      | GC_ERASE  | "all collision"
     }
 
     void dumpGraphicsSegment() {

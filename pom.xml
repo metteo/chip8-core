@@ -68,6 +68,7 @@
                         ${jpms.opens}.cpu.register=ALL-UNNAMED
                         ${jpms.opens}.cpu.unit=ALL-UNNAMED
                         ${jpms.opens}.memory=ALL-UNNAMED
+                        ${jpms.opens}.util=ALL-UNNAMED
                     </argLine>
                 </configuration>
                 <dependencies>

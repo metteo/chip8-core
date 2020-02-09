@@ -2,10 +2,13 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.util.ViewPort;
+import net.novaware.chip8.core.util.ViewPort.Index;
+import org.checkerframework.checker.signedness.qual.Unsigned;
 
-import static net.novaware.chip8.core.cpu.register.Registers.GC_ERASE;
-import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION;
+import static net.novaware.chip8.core.cpu.register.Registers.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
+import static net.novaware.chip8.core.util.ViewPort.Bit;
 
 /**
  * GPU
@@ -13,16 +16,21 @@ import static net.novaware.chip8.core.util.UnsignedUtil.*;
 public class GraphicsProcessing {
 
     public static final int MAX_SPRITE_HEIGHT = 0x10;
-    public static final int MAX_HEIGHT = 32; //bits
-    public static final int MAX_WIDTH = 64; //bits
 
     private final Registers registers;
 
     private final Memory memory;
 
-    private final byte[] spriteBuffer;
+    private final ViewPort viewPort = new ViewPort();
 
-    private final byte[] paintBuffer;
+    private byte[] spriteBuffer;
+
+    private byte[] paintBuffer;
+
+    private byte[] resultBuffer;
+
+    final boolean wrapping = true; //TODO: make configurable
+    final boolean clipping = false; //TODO: make configurable
 
     public GraphicsProcessing(Registers registers, Memory memory) {
         this.registers = registers;
@@ -30,6 +38,7 @@ public class GraphicsProcessing {
 
         spriteBuffer = new byte[MAX_SPRITE_HEIGHT];
         paintBuffer = new byte[MAX_SPRITE_HEIGHT];
+        resultBuffer = new byte[MAX_SPRITE_HEIGHT];
     }
 
     public void clearScreen() {
@@ -49,13 +58,18 @@ public class GraphicsProcessing {
         final int xBit = registers.getVariable(x).getAsInt();
         final int yBit = registers.getVariable(y).getAsInt();
 
+        if (viewPort.isOutOfBounds(xBit, yBit) && !wrapping) {
+            //TODO: handle no wrapping scenario: do not read from memory
+            return;
+        }
+
         final short spriteAddress = registers.getIndex().get();
         final int spriteHeight = uint(height);
 
         fillSpriteBuffer(spriteAddress, spriteBuffer, spriteHeight);
-        fillPaintBuffer(xBit, yBit, paintBuffer, height);
-        xorBuffers();
-        storePaintBuffer();
+        fillPaintBuffer(xBit, yBit, paintBuffer, spriteHeight);
+        xorBuffers(xBit, yBit, spriteHeight);
+        storePaintBuffer(xBit, yBit, resultBuffer, spriteHeight);
     }
 
     /* package */ void fillSpriteBuffer(final short address, final byte[] buffer, final int height) {
@@ -63,67 +77,97 @@ public class GraphicsProcessing {
     }
 
     /* package */ void fillPaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
-        final boolean wrapping = true; //TODO: make configurable
-        final boolean clipping = false; //TODO: make configurable
-
-        if (wrapping) {
-            yBit %= MAX_HEIGHT;
-            xBit %= MAX_WIDTH;
-        } else {
-            //TODO: handle no wrapping scenario: do not draw anything
-        }
+        final Bit bit = new Bit(xBit, yBit);
+        final Index idx1 = new Index(); // for byte aligned memory access
+        final Index idx2 = new Index(); // additional, for misaligned case
 
         final int graphicSegment = registers.getGraphicSegment().getAsInt();
 
         for (int row = 0; row < height; ++row) {
             int currentYBit = yBit + row;
 
-            if (!clipping) {
-                currentYBit %= MAX_HEIGHT;
-            } else {
-                //TODO: handle y clipping
-            }
+            bit.x = xBit;
+            bit.y = currentYBit;
 
-            int memorySegmentYByte = graphicSegment + (currentYBit * MAX_WIDTH / 8);
-            int memorySegmentXByte1 = xBit / 8;
-            int memorySegmentXByte2 = memorySegmentXByte1 + 1;
-
-            if (!clipping) {
-                memorySegmentXByte2 %= MAX_WIDTH / 8;
-            } else {
-                //TODO: handle x clipping
-            }
-
-            int byteIndex = xBit % 8;
+            viewPort.toIndex(bit, idx1, true);
 
             byte rowData;
-            if (byteIndex == 0) { // byte aligned
-                short rowIndex = ushort(memorySegmentYByte + memorySegmentXByte1);
-                rowData = memory.getByte(rowIndex);
+            if (idx1.byteBit == 0) { // byte aligned
+                rowData = getRowData(graphicSegment, idx1);
             } else { // misaligned
-                short rowIndex1 = ushort(memorySegmentYByte + memorySegmentXByte1);
-                short rowIndex2 = ushort(memorySegmentYByte + memorySegmentXByte2);
-
-                byte rowData1 = memory.getByte(rowIndex1);
-                byte rowData2 = memory.getByte(rowIndex2);
-
-                int rowData1Aligned = uint(rowData1) << byteIndex;
-                int rowData2Aligned = uint(rowData2) >>> (8 - byteIndex);
-
-                rowData = ubyte(rowData1Aligned | rowData2Aligned);
+                bit.x += 8;
+                viewPort.toIndex(bit, idx2, true);
+                rowData = getRowData(graphicSegment, idx1, idx2);
             }
 
             buffer[row] = rowData;
-
         }
     }
 
-    /* package */ void xorBuffers() {
+    private byte getRowData(int graphicSegment, Index idx1) {
+        short rowIndex = ushort(graphicSegment + idx1.arrayByte);
+        return memory.getByte(rowIndex);
+    }
 
+    private byte getRowData(int graphicSegment, Index idx1, Index idx2) {
+        short rowIndex1 = ushort(graphicSegment + idx1.arrayByte);
+        short rowIndex2 = ushort(graphicSegment + idx2.arrayByte);
+
+        byte rowData1 = memory.getByte(rowIndex1);
+        byte rowData2 = memory.getByte(rowIndex2);
+
+        int rowData1Aligned = uint(rowData1) << idx1.byteBit;
+        int rowData2Aligned = uint(rowData2) >>> (8 - idx1.byteBit);
+
+        return ubyte(rowData1Aligned | rowData2Aligned);
+    }
+
+    //TODO: handle clipping in xor method
+    /* package */ void xorBuffers(int xBit, int yBit, final int height) {
+        boolean erasing = false;
+        boolean drawing = false;
+
+        for (int y = 0; y < height; ++y) {
+            final @Unsigned int spriteRow = uint(spriteBuffer[y]);
+            final @Unsigned int paintRow = uint(paintBuffer[y]);
+
+            resultBuffer[y] = ubyte(spriteRow ^ paintRow);
+
+            final @Unsigned int resultRow = uint(resultBuffer[y]);
+
+            // inverse logical consequence ~(p => q) <=> ~(~p v q) <=> p ^ ~q
+            if ((paintRow & ~resultRow) > 0) {
+                erasing = true;
+            }
+
+            // special ~p & q
+            if ((~paintRow & resultRow) > 0) {
+                drawing = true;
+            }
+        }
+
+        registers.getStatus().set(erasing ? 0x1 : 0x0);
+        registers.getStatusType().set(VF_COLLISION);
+
+        registers.getGraphicChange().set(getGraphicChange(erasing, drawing));
+    }
+
+    private byte getGraphicChange(boolean erasing, boolean drawing) {
+        byte gc;
+        if (drawing && erasing) {
+            gc = GC_MIX;
+        } else if (drawing) {
+            gc = GC_DRAW;
+        } else if (erasing) {
+            gc = GC_ERASE;
+        } else {
+            gc = GC_NOOP;
+        }
+        return gc;
     }
 
 
-    /* package */ void storePaintBuffer() {
+    /* package */ void storePaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
 
     }
 }
