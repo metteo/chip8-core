@@ -31,6 +31,7 @@ public class GraphicsProcessing {
 
     final boolean wrapping = true; //TODO: make configurable
     final boolean clipping = false; //TODO: make configurable
+    final boolean dump = false; //TODO: debugging UI
 
     public GraphicsProcessing(Registers registers, Memory memory) {
         this.registers = registers;
@@ -79,9 +80,12 @@ public class GraphicsProcessing {
 
     /* package */ void fillSpriteBuffer(final short address, final byte[] buffer, final int height) {
         memory.getBytes(address, buffer, height);
+
+        if (dump) dumpBuffer("sprite", ushort(height), buffer);
     }
 
     /* package */ void fillPaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
+        //TODO: get rid of these instantiations from emulator loop, maybe use pooling
         final Bit bit = new Bit(xBit, yBit);
         final Index idx1 = new Index(); // for byte aligned memory access
         final Index idx2 = new Index(); // additional, for misaligned case
@@ -107,6 +111,8 @@ public class GraphicsProcessing {
 
             buffer[row] = rowData;
         }
+
+        if (dump) dumpBuffer("paint " + xBit + ", " + yBit + " ", ushort(height), buffer);
     }
 
     private byte getRowData(int graphicSegment, Index idx1) {
@@ -153,6 +159,8 @@ public class GraphicsProcessing {
             }
         }
 
+        if (dump) dumpBuffer("result", ushort(height), resultBuffer);
+
         return getGraphicChange(erasing, drawing);
     }
 
@@ -170,8 +178,58 @@ public class GraphicsProcessing {
         return gc;
     }
 
-
+    //TODO: refactor when covered with more tests
     /* package */ void storePaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
+        //TODO: get rid of these instantiations from emulator loop, maybe use pooling
+        final Bit bit = new Bit(xBit, yBit);
+        final Index idx1 = new Index(); // for byte aligned memory access
+        final Index idx2 = new Index(); // additional, for misaligned case
 
+        final int graphicSegment = registers.getGraphicSegment().getAsInt();
+
+        for (int row = 0; row < height; ++row) {
+            int currentYBit = yBit + row;
+
+            bit.x = xBit;
+            bit.y = currentYBit;
+
+            viewPort.toIndex(bit, idx1, true);
+
+            if (idx1.byteBit == 0) { // byte aligned
+                memory.setByte(ushort(graphicSegment + idx1.arrayByte), buffer[row]);
+            } else { // misaligned
+                bit.x += 8;
+                viewPort.toIndex(bit, idx2, true);
+
+                short rowIndex1 = ushort(graphicSegment + idx1.arrayByte);
+                short rowIndex2 = ushort(graphicSegment + idx2.arrayByte);
+
+                //TODO: maybe store this part of memory on hand when filling so it's available here?
+                int rowData1 = uint(memory.getByte(rowIndex1));
+                int rowData2 = uint(memory.getByte(rowIndex2));
+
+                int mask1 = (1 << (8 - idx1.byteBit)) - 1 ;
+                int mask2 = uint(ubyte(~mask1)); // cut off unneeded 1s on the front
+
+                rowData1 = (rowData1 & mask2) | (uint(buffer[row]) >>> idx1.byteBit);
+                rowData2 = (rowData2 & mask1) | (uint(buffer[row]) << (8 - idx1.byteBit));
+
+                memory.setByte(rowIndex1, ubyte(rowData1));
+                memory.setByte(rowIndex2, ubyte(rowData2));
+            }
+        }
+    }
+
+    private void dumpBuffer(String title, short height, byte[] buffer) {
+        System.out.println(title);
+        for (int i = 0; i < height; i++) { //y
+            for (int j = 7; j >= 0; j--) { //x
+                int mask = 0x1 << j;
+                int pixel = (uint(buffer[i]) & mask) >>> j;
+
+                System.out.print(pixel != 0 ? "█" : "░");
+            }
+            System.out.println();
+        }
     }
 }

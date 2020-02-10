@@ -9,12 +9,14 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
  * Display device
+ * use with {@link net.novaware.chip8.core.cpu.unit.GraphicsProcessingOld}
  */
-public class Screen extends JComponent {
+@Deprecated(forRemoval = true)
+public class ScreenOld extends JComponent {
 
-    private boolean[][] model = new boolean[32][64]; // [y][x]
+    private boolean[][] model = new boolean[64][32];
 
-    private static final boolean REDRAW_HEURISTIC = !false;
+    private static final boolean REDRAW_HEURISTIC = false;
 
     private Integer prevChange = uint(Registers.GC_DRAW);
     private Integer lastChange = uint(Registers.GC_DRAW); //TODO: improve and use timers which repaint even earlier if next erase happens long after last draw (like game over screen)
@@ -22,7 +24,7 @@ public class Screen extends JComponent {
     private long lastPaint;
     private int fps; //calculate average from 3 frames?
 
-    public Screen() {
+    public ScreenOld() {
         setPreferredSize(new Dimension(640, 320));
     }
 
@@ -33,7 +35,7 @@ public class Screen extends JComponent {
 
         for(int y = 0; y < 32; y++) {
             for (int x = 0; x < 64; x++) {
-                if (model[y][x]) {
+                if (model[x][y]) {
                     g.setColor(Color.WHITE);
                 } else {
                     g.setColor(Color.BLACK);
@@ -55,7 +57,7 @@ public class Screen extends JComponent {
     }
 
     public void setModelValue(int x, int y, boolean value) {
-        model[y][x] = value;
+        model[x][y] = value;
     }
 
     public void draw(Integer currentChange, byte[] data) {
@@ -97,8 +99,8 @@ public class Screen extends JComponent {
                 short gfxIndex = (short) (gfxStart + gfxOffset);
 
                 byte frame = data[gfxIndex];
-                int mask = 0x1 << 7 - localBit;
-                int pixel = (Byte.toUnsignedInt(frame) & mask) >>> 7 - localBit;
+                int mask = 0x1 << localBit;
+                int pixel = (Byte.toUnsignedInt(frame) & mask) >>> localBit;
 
                 setModelValue(xCoord, yCoord, pixel != 0);
             }

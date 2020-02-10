@@ -217,6 +217,81 @@ class GraphicsProcessingSpec extends Specification {
         [0xFF, 0xFF] | [0xFF, 0xFF] || [0x00, 0x00] | GC_ERASE  | "all collision"
     }
 
+    //TODO: add cases with preexisting data (check if it's preserved)
+    @Unroll
+    def "should properly store painted area in memory (byte aligned: #xBit, #yBit, #height)"() {
+        given:
+
+        byte[] paintedBuffer = [0x12, 0x34]
+
+        when:
+        instance.storePaintBuffer(xBit, yBit, paintedBuffer, height)
+
+        then:
+        if (DUMP_MEMORY) dumpGraphicsSegment()
+
+        for (int i in 0 .. memory.getSize() - 1) {
+            if (i == 0) {
+                assert memory.getByte(i as short) == 0x12 as byte
+            } else if (i == 8) {
+                assert memory.getByte(i as short) == 0x34 as byte
+            } else {
+                assert memory.getByte(i as short) == 0x0 as byte
+            }
+        }
+
+        where:
+        xBit | yBit | height
+        0    | 0    | 2
+    }
+
+    //TODO: add cases with preexisting data (check if it's preserved)
+    def "should properly store painted area in memory (x 5/8)"() {
+        given:
+        int xBit = 6 * 8 + 5
+        int yBit = 32 - 3
+        int height = 3
+
+        byte[] buffer = [0x12, 0x34, 0x56]
+
+        when:
+        instance.storePaintBuffer(xBit, yBit, buffer, height)
+
+        then:
+        if (DUMP_MEMORY) dumpGraphicsSegment()
+
+        for (int i in 0 .. memory.getSize() - 1) {
+
+            if (i == 29 * 8 + 6) {
+                // 0x1200 >> 5 first byte
+                assert memory.getByte(i as short) == 0x00 as byte
+
+            } else if (i == 29 * 8 + 7) {
+                // 0x1200 >> 5 second byte
+                assert memory.getByte(i as short) == 0x90 as byte
+
+            } else if (i == 30 * 8 + 6) {
+                // 0x3400 >> 5 first byte
+                assert memory.getByte(i as short) == 0x01 as byte
+
+            } else if (i == 30 * 8 + 7) {
+                // 0x3400 >> 5 second byte
+                assert memory.getByte(i as short) == 0xA0 as byte
+
+            } else if (i == 31 * 8 + 6) {
+                // 0x5600 >> 5 first byte
+                assert memory.getByte(i as short) == 0x02 as byte
+
+            } else if (i == 31 * 8 + 7) {
+                // 0x5600 >> 5 second byte
+                assert memory.getByte(i as short) == 0xB0 as byte
+
+            } else {
+                assert memory.getByte(i as short) == 0x0 as byte
+            }
+        }
+    }
+
     void dumpGraphicsSegment() {
         for (int i = 0; i < 256; ++i) {
             print toHexString(memory.getByte(i as short)) + " "
