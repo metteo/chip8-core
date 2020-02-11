@@ -55,6 +55,7 @@ public class GraphicsProcessing {
         registers.getGraphicChange().set(GC_ERASE);
     }
 
+    //TODO: write a combined test
     public void drawSprite(short x, short y, short height) {
         final int xBit = registers.getVariable(x).getAsInt();
         final int yBit = registers.getVariable(y).getAsInt();
