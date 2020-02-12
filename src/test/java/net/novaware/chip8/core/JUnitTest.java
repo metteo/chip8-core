@@ -1,8 +1,8 @@
-package net.novaware.chip8.gui;
+package net.novaware.chip8.core;
 
 import org.junit.Test;
 
-public class Chip8GuiTest {
+public class JUnitTest {
 
     @Test
     public void proofJunitWorksWithoutAddOpens() {
