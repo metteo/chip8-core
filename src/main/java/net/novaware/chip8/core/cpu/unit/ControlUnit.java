@@ -8,13 +8,17 @@ import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
 
 /**
  * Control Unit (CU)
  */
 public class ControlUnit {
 
-    public static final boolean DUMP_KEYS = false;
+    private static final Logger LOG = LogManager.getLogger();
 
     // Contains ---------------------------------
 
@@ -163,7 +167,7 @@ public class ControlUnit {
 
         byte key = registers.getVariable(x).get();
 
-        if (DUMP_KEYS) System.out.printf("Key: %01X\n", key);
+        LOG.debug(() -> "Key " + toHexString(key) + " checked");
 
         int keyMask = 1 << key;
 

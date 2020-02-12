@@ -1,5 +1,8 @@
 package net.novaware.chip8.core.memory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +10,7 @@ import static net.novaware.chip8.core.util.HexUtil.toHexString;
 
 public class MappedMemory extends AbstractMemory implements Memory {
 
-    private static final boolean LOG = false;
+    private static final Logger LOG = LogManager.getLogger();
 
     public static class Entry {
         public final short start;
@@ -83,7 +86,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
 
         assert segment.ref.getSize() >= length : "getting data across segments is not supported"; //TODO: maybe implement?
 
-        if (LOG) System.out.println(segment.ref.getName() + " get " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         segment.ref.getBytes(localAddress, destination, length);
     }
@@ -93,7 +96,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        if (LOG) System.out.println(segment.ref.getName() + " get (byte) " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         return segment.ref.getByte(localAddress);
     }
@@ -105,7 +108,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
 
         assert segment.ref.getSize() >= length : "getting data across segments is not supported"; //TODO: maybe implement?
 
-        if (LOG) System.out.println(segment.ref.getName() + " set " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         segment.ref.setBytes(localAddress, source, length);
     }
@@ -115,7 +118,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        if (LOG) System.out.println(segment.ref.getName() + " set (byte) " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         segment.ref.setByte(localAddress, source);
     }
@@ -126,7 +129,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        if (LOG) System.out.println(segment.ref.getName() + " getWord " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         return segment.ref.getWord(localAddress);
     }
@@ -136,7 +139,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        if (LOG) System.out.println(segment.ref.getName() + " setWord " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
         segment.ref.setWord(localAddress, instruction);
     }

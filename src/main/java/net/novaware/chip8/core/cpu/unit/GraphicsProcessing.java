@@ -4,6 +4,8 @@ import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.ViewPort;
 import net.novaware.chip8.core.util.ViewPort.Index;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import static net.novaware.chip8.core.cpu.register.Registers.*;
@@ -14,6 +16,8 @@ import static net.novaware.chip8.core.util.ViewPort.Bit;
  * GPU
  */
 public class GraphicsProcessing {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     public static final int MAX_SPRITE_HEIGHT = 0x10;
 
@@ -31,7 +35,7 @@ public class GraphicsProcessing {
 
     final boolean wrapping = true; //TODO: make configurable
     final boolean clipping = false; //TODO: make configurable
-    final boolean dump = false; //TODO: debugging UI
+    final boolean dump = true; //TODO: debugging UI
 
     public GraphicsProcessing(Registers registers, Memory memory) {
         this.registers = registers;
@@ -222,15 +226,17 @@ public class GraphicsProcessing {
     }
 
     private void dumpBuffer(String title, short height, byte[] buffer) {
-        System.out.println(title);
+        LOG.debug("buffer: " + title);
         for (int i = 0; i < height; i++) { //y
+            StringBuilder sb = new StringBuilder();
+
             for (int j = 7; j >= 0; j--) { //x
                 int mask = 0x1 << j;
                 int pixel = (uint(buffer[i]) & mask) >>> j;
 
-                System.out.print(pixel != 0 ? "█" : "░");
+                sb.append(pixel != 0 ? "█" : "░");
             }
-            System.out.println();
+            LOG.debug(sb);
         }
     }
 }

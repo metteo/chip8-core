@@ -1,5 +1,8 @@
 package net.novaware.chip8.core.memory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
@@ -9,7 +12,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
  */
 public class SplittableMemory implements Memory {
 
-    private static final boolean LOG = false;
+    private static final Logger LOG = LogManager.getLogger();
 
     private final Memory memory;
 
@@ -25,9 +28,10 @@ public class SplittableMemory implements Memory {
      * split ... memory.getSize() - 1 = RAM
      * @param split
      */
-    public void setSplit(int split) { //TODO: activate only when strict mode is active
-        System.out.println("<0x0000, " + toHexString(ushort(split)) + ") " + getName() + " ROM");
-        System.out.println("<" + toHexString(ushort(split)) + ", " + toHexString(ushort(getSize())) + ") " + getName() +" RAM");
+    public void setSplit(int split) {
+        LOG.debug(() -> "<0x0000, " + toHexString(ushort(split)) + ") " + getName() + " ROM");
+        LOG.debug(() -> "<" + toHexString(ushort(split)) + ", " + toHexString(ushort(getSize())) + ") " + getName() +" RAM");
+
         this.split = split;
     }
 
@@ -43,14 +47,14 @@ public class SplittableMemory implements Memory {
 
     @Override
     public void getBytes(short address, byte[] destination, int length) {
-        if (LOG) System.out.println(memory.getName() + " " + getSubName(address) + " getBytes " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
 
         memory.getBytes(address, destination, length);
     }
 
     @Override
     public byte getByte(short address) {
-        if (LOG) System.out.println(memory.getName() + " " + getSubName(address) + " getByte " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
 
         return memory.getByte(address);
     }
@@ -61,18 +65,18 @@ public class SplittableMemory implements Memory {
             throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
         }
 
-        if (LOG) System.out.println(memory.getName() + " RAM setBytes " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " RAM setBytes " + toHexString(address));
 
         memory.setBytes(address, source, length);
     }
 
     @Override
     public void setByte(short address, byte value) {
-        if (isRom(address)) {
+        if (isRom(address)) { //TODO: enforce only when strict mode is active (other set methods as well)
             throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
         }
 
-        if (LOG) System.out.println(memory.getName() + " RAM setByte " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " RAM setByte " + toHexString(address));
 
         memory.setByte(address, value);
     }
@@ -87,7 +91,7 @@ public class SplittableMemory implements Memory {
 
     @Override
     public short getWord(short address) {
-        if (LOG) System.out.println(memory.getName() + " " + getSubName(address) + " getWord " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
 
         return memory.getWord(address);
     }
@@ -102,7 +106,7 @@ public class SplittableMemory implements Memory {
             throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
         }
 
-        if (LOG) System.out.println(memory.getName() + " RAM setWord " + toHexString(address)); //TODO: replace with logging
+        LOG.trace(() -> memory.getName() + " RAM @ " + toHexString(address));
 
         memory.setWord(address, word);
     }

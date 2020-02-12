@@ -6,6 +6,8 @@ import net.novaware.chip8.core.cpu.unit.Timer;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.memory.SplittableMemory;
 import net.novaware.chip8.core.port.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,6 +19,8 @@ import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
 
 @Singleton
 public class Board {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     private final MemoryMap memoryMap;
 
@@ -42,6 +46,7 @@ public class Board {
     }
 
     public void init() {
+        LOG.traceEntry();
 
         byte[] font = new Loader().loadFont();
         memoryMap.getInterpreter().setBytes((short) 0x0, font, font.length);
@@ -67,6 +72,8 @@ public class Board {
                 gc.set(GC_IDLE);
             }
         });
+
+        LOG.traceExit();
     }
 
     public void reset() {
@@ -88,7 +95,7 @@ public class Board {
             ++cycle;
         }
 
-        System.err.println("Reached maxCycles: " + maxCycles);
+        LOG.warn("Reached maxCycles: {}", maxCycles);
     }
 
     private static final long SLEEP_PRECISION = TimeUnit.MILLISECONDS.toNanos(2);
@@ -103,8 +110,8 @@ public class Board {
             if (timeLeft > SLEEP_PRECISION)
                 Thread.sleep (1);
             else
-
                 Thread.sleep (0); // Thread.yield();
+
             timeLeft = end - System.nanoTime();
 
             if (Thread.interrupted())
@@ -113,8 +120,12 @@ public class Board {
         } while (timeLeft > 0);
 
         long diff = System.nanoTime() - end;
-        //if (diff > 50_000) System.out.println("sleepNanos not that good");
-        //System.out.println(count + "    "); //TODO: happens 1k times for sleep of 640 uS
+        if (diff > 50_000) LOG.warn("sleepNanos not that good");
+
+        //TODO: happens 1k times for sleep of 640 uS
+        if (count > 100) {
+            LOG.debug("Sleep nanos tries to sleep {} times to wait for {}", count, nanoDuration);
+        }
     }
 
     public AudioPort getAudioPort() {

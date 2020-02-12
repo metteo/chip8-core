@@ -7,6 +7,8 @@ module net.novaware.chip8.core {
     requires org.checkerframework.checker.qual;
     requires jsr305; //automatic
 
+    requires org.apache.logging.log4j;
+
     exports net.novaware.chip8.core;
     exports net.novaware.chip8.core.port;
 
