@@ -5,6 +5,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.util.ViewPort;
 
 import java.io.IOException;
 
@@ -23,6 +24,14 @@ public class Screen {
     private TerminalScreen terminalScreen;
 
     private TextGraphics tg;
+
+    private ViewPort viewPort = new ViewPort();
+
+    private ViewPort.Bit bit = new ViewPort.Bit();
+
+    private ViewPort.Index idx = new ViewPort.Index();
+
+    private int lowerBlockPos = 0;
 
     public Screen(TerminalScreen terminalScreen) throws IOException {
         this.terminalScreen = terminalScreen;
@@ -57,39 +66,51 @@ public class Screen {
         final TerminalSize terminalReSize = terminalScreen.doResizeIfNecessary();
         terminalSize = terminalReSize == null ? terminalSize : terminalReSize;
 
-        for (int y = 0; y < Math.min(32, terminalSize.getRows()); ++y) {
-            for (int x = 0; x < Math.min(128, terminalSize.getColumns()); x+=2) {
-                tg.putString(x, y, model[y][x/2] ? "█" : " ");//"░");
-                tg.putString(x+1, y, model[y][x/2] ? "█" : " ");//"░");
+        for (int y = 0; y < Math.min(32 - 1, terminalSize.getRows() * 2); y+=2) {
+            for (int x = 0; x < Math.min(64, terminalSize.getColumns()); ++x) {
+                boolean upperPixel = model[y][x];
+                boolean lowerPixel = model[y+1][x];
+
+                String s = "░";
+                if (upperPixel && lowerPixel) {
+                    s = "█";
+                } else if (upperPixel) {
+                    s = "▀";
+                } else if (lowerPixel) {
+                    s = "▄";
+                } else {
+                    s = " ";
+                }
+
+                tg.putString(x, y/2, s);
             }
         }
 
+        //visualize redraw
+        tg.putString(lowerBlockPos, 16, "░");
+        lowerBlockPos = (lowerBlockPos + 1) % 64;
+        tg.putString(lowerBlockPos, 16, "█");
         try {
             terminalScreen.refresh();
         } catch (IOException e) {
             e.printStackTrace(); //TODO: handle exception
         }
     }
-
-
     public static String padLeft(String s, int n) {
         return String.format("%" + n + "s", s);
     }
 
     private void updateModel(byte[] data) {
-        final int gfxStart = 0x0;
+        for (int yCoord  = 0; yCoord < 32; ++yCoord) {
+            for (int xCoord  = 0; xCoord < 64; ++xCoord) {
+                bit.x = xCoord;
+                bit.y = yCoord;
 
-        for (int yCoord  = 0; yCoord < 32; yCoord++) {
-            for (int xCoord  = 0; xCoord < 64; xCoord++) {
-                int globalBit = yCoord * 64 + xCoord;
-                int gfxOffset = globalBit / 8;
-                int localBit = globalBit % 8;
+                viewPort.toIndex(bit, idx, false);
 
-                short gfxIndex = (short) (gfxStart + gfxOffset);
-
-                byte frame = data[gfxIndex];
-                int mask = 0x1 << 7 - localBit;
-                int pixel = (Byte.toUnsignedInt(frame) & mask) >>> 7 - localBit;
+                byte frame = data[idx.arrayByte];
+                int mask = 0x1 << 7 - idx.byteBit;
+                int pixel = (uint(frame) & mask) >>> 7 - idx.byteBit;
 
                 setModelValue(xCoord, yCoord, pixel != 0);
             }
