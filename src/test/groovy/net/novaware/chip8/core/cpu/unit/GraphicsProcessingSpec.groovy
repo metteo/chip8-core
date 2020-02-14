@@ -245,7 +245,6 @@ class GraphicsProcessingSpec extends Specification {
         0    | 0    | 2
     }
 
-    //TODO: add cases with preexisting data (check if it's preserved)
     def "should properly store painted area in memory (x 5/8)"() {
         given:
         int xBit = 6 * 8 + 5
@@ -288,6 +287,58 @@ class GraphicsProcessingSpec extends Specification {
 
             } else {
                 assert memory.getByte(i as short) == 0x0 as byte
+            }
+        }
+    }
+
+    def "should properly store painted area in memory (x 5/8) preserving what it already contained"() {
+        given:
+        int xBit = 6 * 8 + 5
+        int yBit = 32 - 3
+        int height = 3
+
+        byte[] buffer = [0x12, 0x34, 0x56]
+
+        for (int i in 0 .. memory.getSize() - 1) {
+            memory.setByte(i as short, 0b01010101 as byte)
+        }
+
+        if (DUMP_MEMORY) dumpGraphicsSegment()
+
+        when:
+        instance.storePaintBuffer(xBit, yBit, buffer, height)
+
+        then:
+        if (DUMP_MEMORY) dumpGraphicsSegment()
+
+        for (int i in 0 .. memory.getSize() - 1) {
+
+            if (i == 29 * 8 + 6) {
+                // 0x1200 >> 5 first byte
+                assert memory.getByte(i as short) == 0x50 as byte
+
+            } else if (i == 29 * 8 + 7) {
+                // 0x1200 >> 5 second byte
+                assert memory.getByte(i as short) == 0x95 as byte
+
+            } else if (i == 30 * 8 + 6) {
+                // 0x3400 >> 5 first byte
+                assert memory.getByte(i as short) == 0x51 as byte
+
+            } else if (i == 30 * 8 + 7) {
+                // 0x3400 >> 5 second byte
+                assert memory.getByte(i as short) == 0xA5 as byte
+
+            } else if (i == 31 * 8 + 6) {
+                // 0x5600 >> 5 first byte
+                assert memory.getByte(i as short) == 0x52 as byte
+
+            } else if (i == 31 * 8 + 7) {
+                // 0x5600 >> 5 second byte
+                assert memory.getByte(i as short) == 0xB5 as byte
+
+            } else {
+                assert memory.getByte(i as short) == 0x55 as byte
             }
         }
     }

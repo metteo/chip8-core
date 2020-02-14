@@ -29,6 +29,8 @@ public class GraphicsProcessing {
 
     private byte[] spriteBuffer;
 
+    private short[] memoryBuffer; //optimizes misaligned memory access
+
     private byte[] paintBuffer;
 
     private byte[] resultBuffer;
@@ -42,6 +44,7 @@ public class GraphicsProcessing {
         this.memory = memory;
 
         spriteBuffer = new byte[MAX_SPRITE_HEIGHT];
+        memoryBuffer = new short[MAX_SPRITE_HEIGHT];
         paintBuffer = new byte[MAX_SPRITE_HEIGHT];
         resultBuffer = new byte[MAX_SPRITE_HEIGHT];
     }
@@ -107,11 +110,15 @@ public class GraphicsProcessing {
 
             byte rowData;
             if (idx1.byteBit == 0) { // byte aligned
-                rowData = getRowData(graphicSegment, idx1);
+                rowData = memory.getByte(ushort(graphicSegment + idx1.arrayByte));
             } else { // misaligned
                 bit.x += 8;
                 viewPort.toIndex(bit, idx2, true);
-                rowData = getRowData(graphicSegment, idx1, idx2);
+
+                short word = getRowAsWord(graphicSegment, idx1, idx2);
+                memoryBuffer[row] = word;
+
+                rowData = ubyte(uint(word) >>> (8 - idx1.byteBit));
             }
 
             buffer[row] = rowData;
@@ -120,22 +127,14 @@ public class GraphicsProcessing {
         if (dump) dumpBuffer("paint " + xBit + ", " + yBit + " ", ushort(height), buffer);
     }
 
-    private byte getRowData(int graphicSegment, Index idx1) {
-        short rowIndex = ushort(graphicSegment + idx1.arrayByte);
-        return memory.getByte(rowIndex);
-    }
-
-    private byte getRowData(int graphicSegment, Index idx1, Index idx2) {
+    private short getRowAsWord(int graphicSegment, Index idx1, Index idx2) {
         short rowIndex1 = ushort(graphicSegment + idx1.arrayByte);
         short rowIndex2 = ushort(graphicSegment + idx2.arrayByte);
 
         byte rowData1 = memory.getByte(rowIndex1);
         byte rowData2 = memory.getByte(rowIndex2);
 
-        int rowData1Aligned = uint(rowData1) << idx1.byteBit;
-        int rowData2Aligned = uint(rowData2) >>> (8 - idx1.byteBit);
-
-        return ubyte(rowData1Aligned | rowData2Aligned);
+        return ushort((uint(rowData1) << 8) | uint(rowData2));
     }
 
     //TODO: handle clipping in xor method
