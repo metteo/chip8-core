@@ -16,6 +16,15 @@ import java.util.Random;
 @Singleton
 public class Cpu {
 
+    // https://www.golinuxhub.com/2018/06/what-cpu-c-states-check-cpu-core-linux.html
+    public enum State {
+        OPERATING,
+        HALT,
+        STOP_CLOCK,
+        SLEEP,
+        ;
+    }
+
     // Contains ---------------------------------
 
     private final Registers registers;
