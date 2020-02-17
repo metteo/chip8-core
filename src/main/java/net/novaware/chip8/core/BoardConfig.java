@@ -5,15 +5,15 @@ package net.novaware.chip8.core;
  */
 public class BoardConfig {
 
-    private int cpuFrequency;
+    private int cpuFrequency = 1500; // Hz, ~60fps in Invaders
 
-    private int delayTimerFrequency;
+    private int delayTimerFrequency = 60; // Hz
 
-    private int soundTimerFrequency;
+    private int soundTimerFrequency = 60; // Hz
 
     private boolean strictMode;
 
-    private boolean enforceMemoryRoRwState; //strict
+    private boolean enforceMemoryRoRwState = true; //strict
 
     private boolean enforceStackSize; //strict
 
@@ -35,4 +35,32 @@ public class BoardConfig {
     private boolean logging; // ??
 
     private boolean debugging; // ??
+
+    public boolean isEnforceMemoryRoRwState() {
+        return enforceMemoryRoRwState;
+    }
+
+    public int getCpuFrequency() {
+        return cpuFrequency;
+    }
+
+    public void setCpuFrequency(int cpuFrequency) {
+        this.cpuFrequency = cpuFrequency;
+    }
+
+    public int getDelayTimerFrequency() {
+        return delayTimerFrequency;
+    }
+
+    public void setDelayTimerFrequency(int delayTimerFrequency) {
+        this.delayTimerFrequency = delayTimerFrequency;
+    }
+
+    public int getSoundTimerFrequency() {
+        return soundTimerFrequency;
+    }
+
+    public void setSoundTimerFrequency(int soundTimerFrequency) {
+        this.soundTimerFrequency = soundTimerFrequency;
+    }
 }

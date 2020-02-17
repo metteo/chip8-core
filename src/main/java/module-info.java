@@ -12,6 +12,8 @@ module net.novaware.chip8.core {
     exports net.novaware.chip8.core;
     exports net.novaware.chip8.core.port;
 
-    exports net.novaware.chip8.core.util; //TODO: should be part of chip8-jvm or sth?
+    exports net.novaware.chip8.core.cpu;
     exports net.novaware.chip8.core.cpu.register; //TODO: internal, expose part as public API
+    exports net.novaware.chip8.core.memory;
+    exports net.novaware.chip8.core.util; //TODO: should be part of chip8-jvm or sth?
 }

@@ -16,15 +16,18 @@ public class Timer {
     //TODO: abstract this away so it can be replaced for other platforms
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> future;
+    private int delay;
 
     private Consumer<Boolean> buzzer;
     boolean buzzing = false; //TODO: buzzing should start when ST > 1 and end when ST < 1 (sounds shorter than 1 don't take effect)
 
     private ByteRegister register;
 
-    public Timer(ByteRegister register, Consumer<Boolean> buzzer) {
+    public Timer(ByteRegister register, Consumer<Boolean> buzzer, int frequency) {
         this.register = register;
         this.buzzer = buzzer;
+
+        delay = (int) (1_000d / frequency);
 
         executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Timer-" + register.getName()));
 
@@ -56,8 +59,8 @@ public class Timer {
         if (future != null) {
             return;
         }
-        // 60Hz == 60 times a second == 1000ms / 60 == 16.(6) miliseconds
-        future = executor.scheduleAtFixedRate(this::maybeDecrementValue, 16, 16, TimeUnit.MILLISECONDS);
+
+        future = executor.scheduleAtFixedRate(this::maybeDecrementValue, delay, delay, TimeUnit.MILLISECONDS);
     }
 
     private void stop() {

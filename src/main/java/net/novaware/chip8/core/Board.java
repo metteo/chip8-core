@@ -22,9 +22,11 @@ public class Board {
 
     private static final Logger LOG = LogManager.getLogger();
 
+    private final BoardConfig config;
+
     private final MemoryMap memoryMap;
 
-    private Cpu cpu;
+    private final Cpu cpu;
 
     //private Clock clock;
 
@@ -40,7 +42,8 @@ public class Board {
     private Consumer<Boolean> audioReceiver;
 
     @Inject
-    public Board(final MemoryMap memoryMap, final Cpu cpu) {
+    public Board(final BoardConfig config, final MemoryMap memoryMap, final Cpu cpu) {
+        this.config = config;
         this.memoryMap = memoryMap;
         this.cpu = cpu;
     }
@@ -56,8 +59,14 @@ public class Board {
 
         final Registers registers = cpu.getRegisters();
 
-        Timer delay = new Timer(registers.getDelay(), null);
-        Timer sound = new Timer(registers.getSound(), buzz -> {if (audioReceiver != null) audioReceiver.accept(buzz);});
+        Timer delay = new Timer(registers.getDelay(), null, config.getDelayTimerFrequency());
+        Timer sound = new Timer(
+                registers.getSound(),
+                buzz -> {
+                    if (audioReceiver != null) audioReceiver.accept(buzz);
+                },
+                config.getSoundTimerFrequency()
+        );
 
         registers.getGraphicChange().setCallback(gc -> {
             int change = gc.getAsInt();
@@ -81,16 +90,15 @@ public class Board {
 
     public void run(int maxCycles) throws InterruptedException {
 
+        final long sleepTime = (long) (1_000_000_000d / config.getCpuFrequency());
+
         int cycle = 0;
 
         while (cycle < maxCycles) {
 
             cpu.cycle();
 
-            sleepNanos(640_000); // 1000Hz, original used 500 Hz~ == 2ms but with 1ms it's much smoother
-//            sleepNanos(2_200_000);
-
-            //for pong 1ms base is too fast, make configurable using Hz
+            sleepNanos(sleepTime);
 
             ++cycle;
         }
@@ -157,7 +165,9 @@ public class Board {
                 SplittableMemory programMemory = memoryMap.getProgram();
                 programMemory.setBytes((short) 0x0, data, data.length);
                 //TODO: game HIDDEN tries to dump registers into ROM memory
-                programMemory.setSplit(data.length);
+                if (config.isEnforceMemoryRoRwState()) {
+                    programMemory.setSplit(data.length);
+                }
             }
 
             @Override

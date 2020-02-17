@@ -7,7 +7,7 @@ class TimerSpec extends Specification {
 
     ByteRegister delay = new ByteRegister("DT")
 
-    Timer timer = new Timer(delay, null)
+    Timer timer = new Timer(delay, null, 60)
 
     def "should not decrement the timer when 0"() {
         when:

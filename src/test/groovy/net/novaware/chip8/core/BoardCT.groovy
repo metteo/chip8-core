@@ -11,7 +11,7 @@ class BoardCT extends Specification {
 
     def "should be created and run few cycles without exceptions" () {
         given:
-        def factory = newBoardFactory()
+        def factory = newBoardFactory(new BoardConfig())
 
         byte[] infiniteLoop = [0x12, 0x00] //jump to 0x200
 
