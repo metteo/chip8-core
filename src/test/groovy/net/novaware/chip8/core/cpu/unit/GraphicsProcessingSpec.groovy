@@ -343,6 +343,22 @@ class GraphicsProcessingSpec extends Specification {
         }
     }
 
+    def "should properly draw byte sprite" () {
+        given:
+        memory.setByte(0x0 as short, 0xAA as byte)
+        memory.setByte(0x10 as short, 0xAB as byte)
+        registers.getIndex().set(0x10)
+
+        when:
+        instance.drawSprite(0 as short, 0 as short, 1 as short)
+
+        then:
+        registers.getStatus().getAsInt() == 0x01
+        registers.getStatusType().get() == Registers.VF_COLLISION
+
+        registers.getGraphicChange().get() == GC_MIX
+    }
+
     void dumpGraphicsSegment() {
         for (int i = 0; i < 256; ++i) {
             print toHexString(memory.getByte(i as short)) + " "
