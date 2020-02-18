@@ -8,11 +8,13 @@ import spock.lang.Specification
 
 class ControlUnitSpec extends Specification {
 
+    ControlUnit.Config config = Mock()
+
     Registers registers = new Registers()
 
     Memory memory = new PhysicalMemory("test", 4096)
 
-    ControlUnit cu = new ControlUnit(registers, memory, null, null, null, null)
+    ControlUnit cu = new ControlUnit(config, registers, memory, null, null, null, null)
 
     def "should fetch instruction from memory pointed by PC"() {
         given:

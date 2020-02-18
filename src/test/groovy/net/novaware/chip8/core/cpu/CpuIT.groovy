@@ -7,6 +7,8 @@ import spock.lang.Specification
 
 class CpuIT extends Specification {
 
+    Cpu.Config config = Mock()
+
     Cpu cpu
 
     Memory memory
@@ -15,7 +17,7 @@ class CpuIT extends Specification {
         def registers = new Registers()
         memory = new MemoryMap(registers.getVariables()).getCpuMemory()
 
-        cpu = new Cpu(memory, registers)
+        cpu = new Cpu(config, memory, registers)
         cpu.initialize()
     }
 

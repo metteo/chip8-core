@@ -5,13 +5,13 @@ package net.novaware.chip8.core;
  */
 public class BoardConfig {
 
-    private int cpuFrequency = 1500; // Hz, ~60fps in Invaders
+    private int cpuFrequency = 500; // Hz
 
     private int delayTimerFrequency = 60; // Hz
 
     private int soundTimerFrequency = 60; // Hz
 
-    private boolean strictMode;
+    private boolean strictMode = true;
 
     private boolean enforceMemoryRoRwState = true; //strict
 
@@ -20,11 +20,22 @@ public class BoardConfig {
     // e.g. can't write to stack and gpu in the same call
     private boolean disallowCrossingMemoryBoundaries; //strict
 
-    private boolean shiftQuirk;
+    private boolean legacyMode = true;
 
-    private boolean loadStoreQuirk;
+    /**
+     * If true, uses Y instead of X during as source during shifting
+     */
+    private boolean legacyShift = true;
 
-    private boolean addressSumOverflowQuirk;
+    /**
+     * If true, increments I during load and store operations
+     */
+    private boolean legacyLoadStore = true;
+
+    /**
+     * If true, adding register value to index that causes overflow is reported using VF
+     */
+    private boolean legacyAddressSum = true;
 
     private boolean haltOnInfJump;
 
@@ -38,6 +49,10 @@ public class BoardConfig {
 
     public boolean isEnforceMemoryRoRwState() {
         return enforceMemoryRoRwState;
+    }
+
+    public void setEnforceMemoryRoRwState(boolean enforceMemoryRoRwState) {
+        this.enforceMemoryRoRwState = enforceMemoryRoRwState;
     }
 
     public int getCpuFrequency() {
@@ -62,5 +77,29 @@ public class BoardConfig {
 
     public void setSoundTimerFrequency(int soundTimerFrequency) {
         this.soundTimerFrequency = soundTimerFrequency;
+    }
+
+    public boolean isLegacyShift() {
+        return legacyShift;
+    }
+
+    public void setLegacyShift(boolean legacyShift) {
+        this.legacyShift = legacyShift;
+    }
+
+    public boolean isLegacyLoadStore() {
+        return legacyLoadStore;
+    }
+
+    public void setLegacyLoadStore(boolean legacyLoadStore) {
+        this.legacyLoadStore = legacyLoadStore;
+    }
+
+    public boolean isLegacyAddressSum() {
+        return legacyAddressSum;
+    }
+
+    public void setLegacyAddressSum(boolean legacyAddressSum) {
+        this.legacyAddressSum = legacyAddressSum;
     }
 }

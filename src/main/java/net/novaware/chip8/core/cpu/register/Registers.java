@@ -20,10 +20,11 @@ public class Registers {
 
     public static final byte VF_EMPTY = 0x00;
     public static final byte VF_CARRY = 0x01;
-    public static final byte VF_NO_BORROW= 0x02;
-    public static final byte VF_LSB = 0x03;
-    public static final byte VF_MSB = 0x04;
-    public static final byte VF_COLLISION = 0x05;
+    public static final byte VF_CARRY_I = 0x02;
+    public static final byte VF_NO_BORROW= 0x03;
+    public static final byte VF_LSB = 0x04;
+    public static final byte VF_MSB = 0x05;
+    public static final byte VF_COLLISION = 0x06;
 
     /**
      * General data registers (V0 - VF)

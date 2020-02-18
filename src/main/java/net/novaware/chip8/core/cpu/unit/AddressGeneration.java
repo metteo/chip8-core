@@ -28,7 +28,7 @@ public class AddressGeneration {
         registers.getIndex().set(address);
     }
 
-    /* package */ void addRegisterIntoIndex(final short x) {
+    /* package */ void addRegisterIntoIndex(final short x, boolean overflowI) {
         final int xValue = registers.getVariable(x).getAsInt();
         int iValue = registers.getIndex().getAsInt();
 
@@ -39,7 +39,9 @@ public class AddressGeneration {
 
         registers.getIndex().set(iValue);
 
-        registers.getStatus().set(carry);
-        registers.getStatusType().set(Registers.VF_CARRY);
+        if (overflowI) {
+            registers.getStatus().set(carry);
+            registers.getStatusType().set(Registers.VF_CARRY_I);
+        }
     }
 }

@@ -4,6 +4,7 @@ import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import java.util.function.IntUnaryOperator
 
@@ -11,6 +12,8 @@ import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION
 
 class ControlUnitIT extends Specification {
+
+    ControlUnit.Config config = Mock()
 
     Memory memory = new PhysicalMemory("test", 4096)
 
@@ -26,7 +29,7 @@ class ControlUnitIT extends Specification {
 
     GraphicsProcessing gpu = new GraphicsProcessing(registers, memory)
 
-    ControlUnit cu = new ControlUnit(registers, memory, alu, agu, stackEngine, gpu)
+    ControlUnit cu = new ControlUnit(config, registers, memory, alu, agu, stackEngine, gpu)
 
     def "should clear the screen"() {
         given:
@@ -134,6 +137,7 @@ class ControlUnitIT extends Specification {
 
     def "should increment register I with value of register X (no carry)"() {
         given:
+        config.isLegacyAddressSum() >> overflowI
 
         registers.getIndex().set(0x0123)
         registers.getVariable(4).set(0xEE as byte)
@@ -149,12 +153,18 @@ class ControlUnitIT extends Specification {
         registers.getIndex().get() == 0x0211 as short
         registers.getProgramCounter().get() == 0x2 as short
 
-        registers.getStatus().getAsInt() == 0x00
-        registers.getStatusType().get() == Registers.VF_CARRY
+        if (overflowI) {
+            registers.getStatus().getAsInt() == 0x00
+            registers.getStatusType().get() == Registers.VF_CARRY_I
+        }
+
+        where:
+        overflowI << [true, false]
     }
 
     def "should increment register I with value of register X (carry)"() {
         given:
+        config.isLegacyAddressSum() >> overflowI
 
         registers.getIndex().set(0x0FF9)
         registers.getVariable(4).set(0xEE as byte)
@@ -170,8 +180,13 @@ class ControlUnitIT extends Specification {
         registers.getIndex().get() == 0x0E7 as short
         registers.getProgramCounter().get() == 0x2 as short
 
-        registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == Registers.VF_CARRY
+        if (overflowI) {
+            registers.getStatus().getAsInt() == 0x01
+            registers.getStatusType().get() == Registers.VF_CARRY_I
+        }
+
+        where:
+        overflowI << [true, false]
     }
 
     def "should skip next instruction if V is equal to number in instruction"() {
@@ -290,6 +305,7 @@ class ControlUnitIT extends Specification {
 
     def "should fill registers V0 - VX with memory starting at I"() {
         given:
+        config.isLegacyLoadStore() >> incrementI
 
         registers.getProgramCounter().set(0x200)
         registers.getVariable(0x0).set(0 as byte)
@@ -318,7 +334,12 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0x2).get() == 0x54 as byte
         registers.getVariable(0x3).get() == 0x11 as byte
 
-        registers.getIndex().getAsInt() == 0xFFD //no change
+        registers.getIndex().getAsInt() == iVal
+
+        where:
+        incrementI | iVal
+        false      | 0xFFD
+        true       | 0x0 //overflow to interpreter (0xFFD + 0x3)
     }
 
     def "should return from instruction call"() {
@@ -396,11 +417,15 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0xB).getAsInt() == 0x56
     }
 
-    def "should properly shift Vx right (legacy mode) with overflow"() {
+    @Unroll
+    def "should properly shift #reg right #overflow overflow"() {
         given:
+        config.isLegacyShift() >> useY
+
         registers.getProgramCounter().set(0x500)
 
-        registers.getVariable(0xA).set(0x35 as byte)
+        registers.getVariable(0xA).set(xVal as byte)
+        registers.getVariable(0xB).set(yVal as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox8XY6.opcode())
@@ -413,31 +438,16 @@ class ControlUnitIT extends Specification {
         then:
         registers.getProgramCounter().get() == 0x502 as short
 
-        registers.getVariable(0xA).getAsInt() == 0x1A
-        registers.getStatus().getAsInt() == 0x01
+        registers.getVariable(0xA).getAsInt() == result
+        registers.getStatus().getAsInt() == carry
         registers.getStatusType().get() == Registers.VF_LSB
-    }
 
-    def "should properly shift Vx right (legacy mode) no overflow"() {
-        given:
-        registers.getProgramCounter().set(0x500)
-
-        registers.getVariable(0xA).set(0x36 as byte)
-
-        def instruction = registers.getDecodedInstruction()
-        instruction[0].set(Ox8XY6.opcode())
-        instruction[1].set(0xA)
-        instruction[2].set(0xB)
-
-        when:
-        cu.execute()
-
-        then:
-        registers.getProgramCounter().get() == 0x502 as short
-
-        registers.getVariable(0xA).getAsInt() == 0x1B
-        registers.getStatus().getAsInt() == 0x00
-        registers.getStatusType().get() == Registers.VF_LSB
+        where:
+        useY  | xVal | yVal || result | carry | reg  | overflow
+        false | 0x35 | 0x40 || 0x1A   | 0x01  | "Vx" | "with"
+        false | 0x36 | 0x40 || 0x1B   | 0x00  | "Vx" | "no"
+        true  | 0x40 | 0x35 || 0x1A   | 0x01  | "Vy" | "with"
+        true  | 0x40 | 0x36 || 0x1B   | 0x00  | "Vy" | "no"
     }
 
     def "should skip next instruction if key with value of Vx is pressed"() {
@@ -826,6 +836,7 @@ class ControlUnitIT extends Specification {
 
     def "should store registers V0 - VX with data from memory starting at I"() {
         given:
+        config.isLegacyLoadStore() >> incrementI
 
         registers.getProgramCounter().set(0x200)
         registers.getVariable(0x0).set(0x12 as byte)
@@ -844,6 +855,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
+        registers.getIndex().getAsInt() == iVal
 
         byte[] data = new byte[4]
         memory.getBytes(0x400 as short, data, 4)
@@ -852,6 +864,12 @@ class ControlUnitIT extends Specification {
         data[1] == 0x34 as byte
         data[2] == 0x56 as byte
         data[3] == 0x00 as byte //not 0x11
+
+        where:
+
+        incrementI | iVal
+        false      | 0x400
+        true       | 0x403
     }
 
     def "should properly SUB (with borrow) Vx = Vy - Vx (borrow)"() {

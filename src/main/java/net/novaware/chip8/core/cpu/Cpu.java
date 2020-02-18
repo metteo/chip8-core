@@ -25,7 +25,17 @@ public class Cpu {
         ;
     }
 
+    public interface Config {
+        boolean isLegacyShift();
+
+        boolean isLegacyLoadStore();
+
+        boolean isLegacyAddressSum();
+    }
+
     // Contains ---------------------------------
+
+    private final Config config;
 
     private final Registers registers;
 
@@ -44,7 +54,8 @@ public class Cpu {
     private final Memory memory;
 
     @Inject
-    public Cpu(@Named("cpu") final Memory memory, final Registers registers) {
+    public Cpu(final Config config, @Named("cpu") final Memory memory, final Registers registers) {
+        this.config = config;
         this.memory = memory;
         this.registers = registers;
 
@@ -53,7 +64,13 @@ public class Cpu {
         stackEngine = new StackEngine(registers, memory);
         gpu = new GraphicsProcessing(registers, memory);
 
-        controlUnit = new ControlUnit(registers, this.memory, alu, agu, stackEngine, gpu);
+        ControlUnit.Config cuConfig = new ControlUnit.Config() {
+            @Override public boolean isLegacyShift()      { return config.isLegacyShift(); }
+            @Override public boolean isLegacyLoadStore()  { return config.isLegacyLoadStore(); }
+            @Override public boolean isLegacyAddressSum() { return config.isLegacyAddressSum(); }
+        };
+
+        controlUnit = new ControlUnit(cuConfig, registers, this.memory, alu, agu, stackEngine, gpu);
     }
 
     public void initialize() { //TODO: move it to interpreter and start from 0x0000

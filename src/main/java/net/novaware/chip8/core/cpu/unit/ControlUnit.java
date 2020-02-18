@@ -20,7 +20,17 @@ public class ControlUnit {
 
     private static final Logger LOG = LogManager.getLogger();
 
+    public interface Config {
+        boolean isLegacyShift();
+
+        boolean isLegacyLoadStore();
+
+        boolean isLegacyAddressSum();
+    }
+
     // Contains ---------------------------------
+
+    private final Config config;
 
     private final InstructionDecoder decoder;
 
@@ -39,6 +49,7 @@ public class ControlUnit {
     private final GraphicsProcessing gpu;
 
     public ControlUnit(
+            final Config config,
             final Registers registers,
             final Memory memory,
             final ArithmeticLogic alu,
@@ -46,6 +57,7 @@ public class ControlUnit {
             final StackEngine stackEngine,
             final GraphicsProcessing gpu
     ) {
+        this.config = config;
         this.decoder = new InstructionDecoder(registers);
 
         this.registers = registers;
@@ -76,6 +88,10 @@ public class ControlUnit {
 
         int increment = 2; // instructions are always 2 bytes long
 
+        final boolean useY = config.isLegacyShift();
+        final boolean incrementI = config.isLegacyLoadStore();
+        final boolean overflowI = config.isLegacyAddressSum();
+
         //FIXME: ugly, but compact, figure out how to make it nicer, but still compact and fast
 
         switch (instructionType) {
@@ -97,9 +113,9 @@ public class ControlUnit {
             case Ox8XY3: alu.xorRegisterToRegister(di[1].get(), di[2].get()); break;
             case Ox8XY4: alu.addRegisterToRegister(di[1].get(), di[2].get()); break;
             case Ox8XY5: alu.subtractRegisterFromRegister(di[1].get(), di[1].get(), di[2].get()); break;
-            case Ox8XY6: alu.shiftRightRegisterIntoRegister(di[1].get(), di[1].get()); break;
+            case Ox8XY6: alu.shiftRightRegisterIntoRegister(di[1].get(), useY ? di[2].get() : di[1].get()); break;
             case Ox8XY7: alu.subtractRegisterFromRegister(di[1].get(), di[2].get(), di[1].get()); break;
-            case Ox8XYE: alu.shiftLeftRegisterIntoRegister(di[1].get(), di[1].get()); break;
+            case Ox8XYE: alu.shiftLeftRegisterIntoRegister(di[1].get(), useY ? di[2].get() : di[1].get()); break;
 
             case Ox9XY0: increment = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? increment : 4; break;
             case OxAMMM: agu.loadAddressIntoIndex(di[1].get()); break;
@@ -114,11 +130,11 @@ public class ControlUnit {
             case OxFX0A: increment = checkIfKeyPressed(di[1].get()) ? increment : 0; break;
             case OxFX15: loadRegisterIntoTimer(di[1].get(), registers.getDelay()); break;
             case OxFX18: loadRegisterIntoTimer(di[1].get(), registers.getSound()); break;
-            case OxFX1E: agu.addRegisterIntoIndex(di[1].get()); break;
+            case OxFX1E: agu.addRegisterIntoIndex(di[1].get(), overflowI); break;
             case OxFX29: loadFontAddressIntoRegister(di[1].get()); break;
             case OxFX33: alu.bcdRegisterToMemory(di[1].get()); break;
-            case OxFX55: loadRegistersIntoMemory(di[1].get()); break;
-            case OxFX65: loadMemoryIntoRegisters(di[1].get()); break;
+            case OxFX55: loadRegistersIntoMemory(di[1].get(), incrementI); break;
+            case OxFX65: loadMemoryIntoRegisters(di[1].get(), incrementI); break;
 
             default: throw new RuntimeException("Unknown instruction: " + di[0].get());
         }
@@ -178,7 +194,7 @@ public class ControlUnit {
 
     //TODO: special unit for handling transfers between memory and registers? registers are memory mapped BTW...
 
-    private void loadMemoryIntoRegisters(final short x) {
+    private void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
         int xIndex = Short.toUnsignedInt(x);
         int iValue = registers.getIndex().getAsInt();
 
@@ -188,10 +204,12 @@ public class ControlUnit {
             registers.getVariable(i).set(data);
         }
 
-        //registers.getIndex().set(iValue); //TODO: support modern mode
+        if (incrementI) {
+            registers.getIndex().set(iValue);
+        }
     }
 
-    private void loadRegistersIntoMemory(final short x) {
+    private void loadRegistersIntoMemory(final short x, final boolean incrementI) {
         int xIndex = Short.toUnsignedInt(x);
         int iValue = registers.getIndex().getAsInt();
 
@@ -200,6 +218,8 @@ public class ControlUnit {
             memory.setByte((short)iValue, data);
         }
 
-        //registers.getIndex().set(iValue); //TODO: support modern mode
+        if (incrementI) {
+            registers.getIndex().set(iValue);
+        }
     }
 }
