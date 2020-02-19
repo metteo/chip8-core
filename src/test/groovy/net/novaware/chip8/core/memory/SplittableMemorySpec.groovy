@@ -2,6 +2,8 @@ package net.novaware.chip8.core.memory
 
 import spock.lang.Specification
 
+import java.util.function.Supplier
+
 import static net.novaware.chip8.core.util.UnsignedUtil.uint
 
 class SplittableMemorySpec extends Specification {
@@ -11,6 +13,7 @@ class SplittableMemorySpec extends Specification {
     def "should save and retrieve byte of data"() {
         given:
         memory = new SplittableMemory(new PhysicalMemory("test", 2))
+        memory.setStrict({_ -> true} as Supplier)
 
         short address = 0x000
         byte data = 64
@@ -37,6 +40,7 @@ class SplittableMemorySpec extends Specification {
         and:
         memory.getName() == "test"
         memory.getSize() == 2
+        memory.isStrict()
     }
 
     def "should save and retrieve byte of data (end of large memory)"() {
@@ -129,7 +133,7 @@ class SplittableMemorySpec extends Specification {
         memory.setByte(0 as short, 0xAB as byte)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(IllegalStateException)
     }
 
     def "should fail when storing word in ROM"() {
@@ -141,7 +145,7 @@ class SplittableMemorySpec extends Specification {
         memory.setWord(addr as short, 0xABCD as short)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(IllegalStateException)
 
         where:
         addr << [0, 1]
@@ -156,9 +160,27 @@ class SplittableMemorySpec extends Specification {
         memory.setBytes(addr as short, [0xAB as byte, 0xCD as byte] as byte[], 2)
 
         then:
-        thrown(IllegalArgumentException)
+        thrown(IllegalStateException)
 
         where:
         addr << [0, 1]
+    }
+
+    def "should not fail when writing to ROM when in lenient mode"() {
+        given:
+        memory = new SplittableMemory(new PhysicalMemory("test", 4))
+        memory.setSplit(4)
+        memory.setStrict(false)
+
+        when:
+        memory.setByte(0 as short, 0xAB as byte)
+        memory.setWord(1 as short, 0xCDEF as short)
+        memory.setBytes(3 as short, [0x01 as byte] as byte[], 1)
+
+        then:
+        noExceptionThrown()
+
+        memory.getWord(0 as short) == 0xABCD as short
+        memory.getWord(2 as short) == 0xEF01 as short
     }
 }

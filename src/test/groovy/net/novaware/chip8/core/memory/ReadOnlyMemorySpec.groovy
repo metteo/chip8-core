@@ -2,12 +2,14 @@ package net.novaware.chip8.core.memory
 
 import spock.lang.Specification
 
+import java.util.function.Supplier
+
 class ReadOnlyMemorySpec extends Specification {
 
     def "should block byte writes when readonly"() {
         given:
         def instance = new ReadOnlyMemory(new PhysicalMemory("test", 1))
-        instance.setReadOnly(true)
+        instance.setReadOnly({_ -> true} as Supplier)
 
         when:
         instance.setByte(0 as short, 0xAB as byte)

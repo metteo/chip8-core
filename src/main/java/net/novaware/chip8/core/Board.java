@@ -53,7 +53,7 @@ public class Board {
 
         byte[] font = new Loader().loadFont();
         memoryMap.getInterpreter().setBytes((short) 0x0, font, font.length);
-        memoryMap.getInterpreter().setReadOnly(true);
+        memoryMap.getInterpreter().setReadOnly(config::isEnforceMemoryRoRwState);
 
         cpu.initialize();
 
@@ -164,10 +164,8 @@ public class Board {
             public void load(byte[] data) {
                 SplittableMemory programMemory = memoryMap.getProgram();
                 programMemory.setBytes((short) 0x0, data, data.length);
-                //TODO: game HIDDEN tries to dump registers into ROM memory
-                if (config.isEnforceMemoryRoRwState()) {
-                    programMemory.setSplit(data.length);
-                }
+                programMemory.setSplit(data.length);
+                programMemory.setStrict(config::isEnforceMemoryRoRwState);
             }
 
             @Override

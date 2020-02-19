@@ -3,23 +3,27 @@ package net.novaware.chip8.core.memory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.function.Supplier;
+
+import static net.novaware.chip8.core.util.AssertUtil.assertState;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
  * Splits Memory into ROM and RAM region
+ * When in strict mode, writes to ROM trigger exception
  */
-public class SplittableMemory implements Memory {
+public class SplittableMemory extends MemoryDecorator implements Memory {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private final Memory memory;
-
     private int split = 0; //start with whole memory being RW
 
-    protected SplittableMemory(Memory memory) {
-        this.memory = memory;
+    private Supplier<Boolean> strict = () -> true;
+
+    public SplittableMemory(Memory memory) {
+        super(memory);
     }
 
     /**
@@ -35,79 +39,90 @@ public class SplittableMemory implements Memory {
         this.split = split;
     }
 
-    @Override
-    public String getName() {
-        return memory.getName();
+    public boolean isStrict() {
+        return strict.get();
     }
 
-    @Override
-    public int getSize() {
-        return memory.getSize();
+    public void setStrict(boolean strict) {
+        this.strict = () -> strict;
     }
 
-    @Override
-    public void getBytes(short address, byte[] destination, int length) {
-        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
-
-        memory.getBytes(address, destination, length);
-    }
-
-    @Override
-    public byte getByte(short address) {
-        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
-
-        return memory.getByte(address);
-    }
-
-    @Override
-    public void setBytes(short address, byte[] source, int length) {
-        if (isRom(address)) {
-            throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
-        }
-
-        LOG.trace(() -> memory.getName() + " RAM setBytes " + toHexString(address));
-
-        memory.setBytes(address, source, length);
-    }
-
-    @Override
-    public void setByte(short address, byte value) {
-        if (isRom(address)) { //TODO: enforce only when strict mode is active (other set methods as well)
-            throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
-        }
-
-        LOG.trace(() -> memory.getName() + " RAM setByte " + toHexString(address));
-
-        memory.setByte(address, value);
-    }
-
-    private boolean isRom(short address) {
-        return !isRam(address);
+    public void setStrict(Supplier<Boolean> strict) {
+        this.strict = strict;
     }
 
     private boolean isRam(short address) {
         return uint(address) >= split;
     }
 
+    private boolean isRom(short address) {
+        return !isRam(address);
+    }
+
+    private String getSubName(short address) {
+        return isRom(address) ? "ROM" : "RAM";
+    }
+
+    @Override
+    public byte getByte(short address) {
+        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
+
+        return super.getByte(address);
+    }
+
+    @Override
+    public void setByte(short address, byte value) {
+        boolean rom = isRom(address);
+
+        if (rom) {
+            assertState(strict.get(), "can not write in ROM");
+            LOG.warn(() -> memory.getName() + " ROM setByte " + toHexString(address));
+        } else {
+            LOG.trace(() -> memory.getName() + " RAM setByte " + toHexString(address));
+        }
+
+        super.setByte(address, value);
+    }
+
     @Override
     public short getWord(short address) {
         LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
 
-        return memory.getWord(address);
-    }
-
-    private String getSubName(short address) {
-        return isRom(address) ? "ROM" : "RAM"; //TODO: cover case when read crosses the boundary
+        return super.getWord(address);
     }
 
     @Override
-    public void setWord(short address, short word) {
-        if (isRom(address)) {
-            throw new IllegalArgumentException("can not write in ROM"); //TODO: better exception type?
+    public void setWord(short address, short value) {
+        boolean rom = isRom(address);
+
+        if (rom) {
+            assertState(strict.get(), "can not write in ROM");
+            LOG.warn(() -> memory.getName() + " ROM setWord " + toHexString(address));
+        } else {
+            LOG.trace(() -> memory.getName() + " RAM setWord " + toHexString(address));
         }
 
-        LOG.trace(() -> memory.getName() + " RAM @ " + toHexString(address));
+        super.setWord(address, value);
+    }
 
-        memory.setWord(address, word);
+    @Override
+    public void getBytes(short address, byte[] destination, int length) {
+        LOG.trace(() -> memory.getName() + " " + getSubName(address) + " @ " + toHexString(address));
+
+        super.getBytes(address, destination, length);
+    }
+
+    @Override
+    public void setBytes(short address, byte[] source, int length) {
+        boolean rom = isRom(address);
+
+        if (rom) {
+            assertState(strict.get(), "can not write in ROM");
+            LOG.warn(() -> memory.getName() + " ROM setWord " + toHexString(address));
+        } else {
+            LOG.trace(() -> memory.getName() + " RAM setWord " + toHexString(address));
+        }
+
+        super.setBytes(address, source, length);
     }
 }

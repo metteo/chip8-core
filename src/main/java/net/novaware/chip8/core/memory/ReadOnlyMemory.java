@@ -1,5 +1,7 @@
 package net.novaware.chip8.core.memory;
 
+import java.util.function.Supplier;
+
 import static net.novaware.chip8.core.util.AssertUtil.assertState;
 
 /**
@@ -7,37 +9,41 @@ import static net.novaware.chip8.core.util.AssertUtil.assertState;
  */
 public class ReadOnlyMemory extends MemoryDecorator implements Memory {
 
-    private boolean readOnly = false;
+    private Supplier<Boolean> readOnly = () -> false;
 
     public ReadOnlyMemory(Memory memory) {
         super(memory);
     }
 
-    public void setReadOnly(boolean readOnly) {
+    public void setReadOnly(Supplier<Boolean> readOnly) {
         this.readOnly = readOnly;
     }
 
+    public void setReadOnly(final boolean readOnly) {
+        this.readOnly = () -> readOnly;
+    }
+
     public boolean isReadOnly() {
-        return readOnly;
+        return readOnly.get();
     }
 
     @Override
     public void setByte(short address, byte value) {
-        assertState(readOnly, getName() + " is in RO mode");
+        assertState(readOnly.get(), getName() + " is in RO mode");
 
         super.setByte(address, value);
     }
 
     @Override
     public void setWord(short address, short word) {
-        assertState(readOnly, getName() + " is in RO mode");
+        assertState(readOnly.get(), getName() + " is in RO mode");
 
         super.setWord(address, word);
     }
 
     @Override
     public void setBytes(short address, byte[] source, int length) {
-        assertState(readOnly, getName() + " is in RO mode");
+        assertState(readOnly.get(), getName() + " is in RO mode");
 
         super.setBytes(address, source, length);
     }
