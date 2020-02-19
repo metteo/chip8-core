@@ -1,58 +1,60 @@
 package net.novaware.chip8.core.memory;
 
+import static java.lang.System.arraycopy;
+import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
+/**
+ * byte[] memory implementation
+ */
 public class PhysicalMemory extends AbstractMemory implements Memory {
 
-    private byte[] memory;
+    private final byte[] array;
+    private final int size;
 
-    /**
-     *
-     * @param size in bytes
-     */
     public PhysicalMemory(final String name, final int size) {
         super(name);
 
-        this.memory = new byte[size];
+        this.array = new byte[size];
+        this.size = size;
     }
 
     @Override
     public int getSize() {
-        return memory.length;
+        return size;
     }
 
-    @Override
-    public void getBytes(short address, byte[] destination, int length) {
-        final int arrayIndex = getArrayIndex(address);
+    private void checkArgument(final boolean condition, final String message) {
+        if (condition) {
+            throw new IllegalArgumentException(message);
+        }
+    }
 
-        System.arraycopy(memory, arrayIndex, destination, 0, length);
+    private int getArrayIndex(short address) {
+        int arrayIndex = uint(address);
+
+        checkArgument(arrayIndex >= size, "address is outside memory limits");
+
+        return arrayIndex;
     }
 
     @Override
     public byte getByte(short address) {
-        return memory[getArrayIndex(address)];
+        return array[getArrayIndex(address)];
     }
 
     @Override
-    public void setBytes(short address, byte[] source, int length) {
-        final int arrayIndex = getArrayIndex(address);
-
-        System.arraycopy(source, 0, memory, arrayIndex, length);
-    }
-
-    @Override
-    public void setByte(short address, byte source) {
-        memory[getArrayIndex(address)] = source;
+    public void setByte(short address, byte value) {
+        array[getArrayIndex(address)] = value;
     }
 
     @Override
     public short getWord(short address) {
-        int arrayIndex = getArrayIndex(address);
+        int arrayIndex1 = getArrayIndex(address);
+        int arrayIndex2 = getArrayIndex(ushort(uint(address) + 1)); // checks address + 1
 
-        //FIXME getting / setting word at the last byte should be forbidden
-
-        byte instrHi = memory[arrayIndex];
-        byte instrLo = memory[arrayIndex + 1];
+        byte instrHi = array[arrayIndex1];
+        byte instrLo = array[arrayIndex2];
 
         int instrHiUint =  uint(instrHi);
         int instrLoUint = uint(instrLo);
@@ -60,22 +62,35 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
         return ushort(instrHiUint << 8 | instrLoUint);
     }
 
-    private int getArrayIndex(short address) {
-        int arrayIndex = uint(address);
+    @Override
+    public void setWord(short address, short value) {
+        int arrayIndex1 = getArrayIndex(address);
+        int arrayIndex2 = getArrayIndex(ushort(uint(address) + 1)); // checks address + 1
 
-        assert arrayIndex < memory.length : "memory access outside limits";
+        byte instrHi = ubyte((value & 0xFF00) >>> 8);
+        byte instrLo = ubyte(value & 0x00FF);
 
-        return arrayIndex;
+        array[arrayIndex1] = instrHi;
+        array[arrayIndex2] = instrLo;
     }
 
     @Override
-    public void setWord(short address, short instruction) {
-        int arrayIndex = getArrayIndex(address);
+    public void getBytes(short address, byte[] destination, int length) {
+        requireNonNull(destination, "destination must not be null");
+        checkArgument(length < 0, "length must not be negative");
 
-        byte instrHi = ubyte((instruction & 0xFF00) >>> 8);
-        byte instrLo = ubyte(instruction & 0x00FF);
+        final int arrayIndex = getArrayIndex(address);
 
-        memory[arrayIndex] = instrHi;
-        memory[arrayIndex + 1] = instrLo;
+        arraycopy(array, arrayIndex, destination, 0, length);
+    }
+
+    @Override
+    public void setBytes(short address, byte[] source, int length) {
+        requireNonNull(source, "source must not be null");
+        checkArgument(length < 0, "length must not be negative");
+
+        final int arrayIndex = getArrayIndex(address);
+
+        arraycopy(source, 0, array, arrayIndex, length);
     }
 }

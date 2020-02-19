@@ -109,6 +109,17 @@ class PhysicalMemorySpec extends Specification {
         memory.getBytes(address, memoryPart, 2)
 
         then:
-        memoryPart == [(byte)0x12, (byte)0x34]
+        memoryPart == [(byte)0x12, (byte)0x34] as byte[]
+    }
+
+    def "should throw IAException when reading outside of boundaries" () {
+        given:
+        memory = new PhysicalMemory("test", 2)
+
+        when:
+        memory.getByte(0x2 as short)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 }
