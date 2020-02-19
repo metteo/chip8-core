@@ -29,16 +29,4 @@ class ControlUnitSpec extends Specification {
         then:
         registers.getFetchedInstruction().getAsInt() == 0x1234
     }
-
-    @Ignore("enable when strict / lenient mode is implemented")
-    def "should fail fast when PC overflows 12 bits"() {
-        given:
-        registers.getProgramCounter().set(0x1001)
-
-        when:
-        cu.fetch()
-
-        then:
-        thrown(AssertionError)
-    }
 }
