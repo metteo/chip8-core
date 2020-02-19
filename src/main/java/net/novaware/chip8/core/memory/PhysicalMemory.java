@@ -2,6 +2,7 @@ package net.novaware.chip8.core.memory;
 
 import static java.lang.System.arraycopy;
 import static java.util.Objects.requireNonNull;
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 /**
@@ -24,16 +25,10 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
         return size;
     }
 
-    private void checkArgument(final boolean condition, final String message) {
-        if (condition) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
     private int getArrayIndex(short address) {
         int arrayIndex = uint(address);
 
-        checkArgument(arrayIndex >= size, "address is outside memory limits");
+        assertArgument(arrayIndex >= size, "address is outside memory limits");
 
         return arrayIndex;
     }
@@ -77,7 +72,7 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
     @Override
     public void getBytes(short address, byte[] destination, int length) {
         requireNonNull(destination, "destination must not be null");
-        checkArgument(length < 0, "length must not be negative");
+        assertArgument(length < 0, "length must not be negative");
 
         final int arrayIndex = getArrayIndex(address);
 
@@ -87,7 +82,7 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
     @Override
     public void setBytes(short address, byte[] source, int length) {
         requireNonNull(source, "source must not be null");
-        checkArgument(length < 0, "length must not be negative");
+        assertArgument(length < 0, "length must not be negative");
 
         final int arrayIndex = getArrayIndex(address);
 
