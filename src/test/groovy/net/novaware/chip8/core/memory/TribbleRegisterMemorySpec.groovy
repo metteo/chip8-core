@@ -102,5 +102,51 @@ class TribbleRegisterMemorySpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    //TODO: cases for byte, byte array
+    def "should throw when storing byte"() {
+        given:
+        TribbleRegister register = new TribbleRegister("S0")
+        Memory memory = new TribbleRegisterMemory("Stack Registers", register)
+
+        when:
+        memory.setByte(0 as short, 0xCD as byte)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def "should throw when getting byte"() {
+        given:
+        TribbleRegister register = new TribbleRegister("S0")
+        Memory memory = new TribbleRegisterMemory("Stack Registers", register)
+
+        when:
+        memory.getByte(0 as short)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def "should throw when storing bytes"() {
+        given:
+        TribbleRegister register = new TribbleRegister("S0")
+        Memory memory = new TribbleRegisterMemory("Stack Registers", register)
+
+        when:
+        memory.setBytes(0 as short, [0xCD as byte] as byte[], 1)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def "should throw when getting bytes"() {
+        given:
+        TribbleRegister register = new TribbleRegister("S0")
+        Memory memory = new TribbleRegisterMemory("Stack Registers", register)
+
+        when:
+        memory.getBytes(0 as short, new byte[1], 1)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
 }

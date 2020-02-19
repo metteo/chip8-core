@@ -72,5 +72,39 @@ class ByteRegisterMemorySpec extends Specification {
         thrown(IllegalArgumentException)
     }
 
-    //TODO: cases for word, byte array
+    def "should throw when storing word"() {
+        given:
+        ByteRegister register = new ByteRegister("V0")
+        Memory memory = new ByteRegisterMemory("V Registers", register)
+
+        when:
+        memory.setWord(0 as short, 0xCDEF as short)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def "should throw when storing bytes"() {
+        given:
+        ByteRegister register = new ByteRegister("V0")
+        Memory memory = new ByteRegisterMemory("V Registers", register)
+
+        when:
+        memory.setBytes(0 as short, [0xCD as byte] as byte[], 1)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
+
+    def "should throw when getting bytes"() {
+        given:
+        ByteRegister register = new ByteRegister("V0")
+        Memory memory = new ByteRegisterMemory("V Registers", register)
+
+        when:
+        memory.getBytes(0 as short, new byte[1], 1)
+
+        then:
+        thrown(UnsupportedOperationException)
+    }
 }

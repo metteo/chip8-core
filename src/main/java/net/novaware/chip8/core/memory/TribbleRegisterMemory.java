@@ -4,6 +4,7 @@ import net.novaware.chip8.core.cpu.register.TribbleRegister;
 
 import java.util.Arrays;
 
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
@@ -24,13 +25,8 @@ public class TribbleRegisterMemory extends AbstractMemory {
         int arrayIndex = uint(address) / 2;
         boolean crossRegister = uint(address) % 2 != 0;
 
-        if (crossRegister) {
-            throw new IllegalArgumentException("register memory access unaligned");
-        }
-
-        if (arrayIndex >= registers.length) {
-            throw new IllegalArgumentException("register memory access outside limits");
-        }
+        assertArgument(crossRegister, "register memory access unaligned");
+        assertArgument(arrayIndex >= registers.length, "register memory access outside limits");
 
         return arrayIndex;
     }
@@ -46,10 +42,22 @@ public class TribbleRegisterMemory extends AbstractMemory {
     }
 
     @Override
+    public void setByte(short address, byte value) {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    @Override
     public short getWord(short address) {
         final int index = getArrayIndex(address);
 
         return registers[index].get();
+    }
+
+    @Override
+    public void setWord(short address, short word) {
+        final int index = getArrayIndex(address);
+
+        registers[index].set(word);
     }
 
     @Override
@@ -58,19 +66,7 @@ public class TribbleRegisterMemory extends AbstractMemory {
     }
 
     @Override
-    public void setByte(short address, byte value) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    @Override
     public void setBytes(short address, byte[] source, int length) {
         throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    @Override
-    public void setWord(short address, short word) {
-        final int index = getArrayIndex(address);
-
-        registers[index].set(word);
     }
 }

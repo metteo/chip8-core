@@ -4,13 +4,14 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 
 import java.util.Arrays;
 
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
  * Uses Byte Registers as a backend
  */
-public class ByteRegisterMemory extends AbstractMemory {
+public class ByteRegisterMemory extends AbstractMemory implements Memory {
 
     private ByteRegister[] registers;
 
@@ -24,9 +25,7 @@ public class ByteRegisterMemory extends AbstractMemory {
     private int getArrayIndex(short address) {
         int arrayIndex = uint(address);
 
-        if (arrayIndex >= registers.length) {
-            throw new IllegalArgumentException("register memory access outside limits");
-        }
+        assertArgument(arrayIndex >= registers.length, "register memory access outside limits");
 
         return arrayIndex;
     }
@@ -42,6 +41,11 @@ public class ByteRegisterMemory extends AbstractMemory {
     }
 
     @Override
+    public void setByte(short address, byte value) {
+        registers[getArrayIndex(address)].set(value);
+    }
+
+    @Override
     public short getWord(short address) {
         final int indexHi = getArrayIndex(address);
         final int indexLo = getArrayIndex(ushort(uint(address) + 1));
@@ -54,22 +58,17 @@ public class ByteRegisterMemory extends AbstractMemory {
     }
 
     @Override
+    public void setWord(short address, short word) {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    @Override
     public void getBytes(short address, byte[] destination, int length) {
         throw new UnsupportedOperationException("not implemented"); //TODO: implement
     }
 
     @Override
-    public void setByte(short address, byte value) {
-        registers[getArrayIndex(address)].set(value);
-    }
-
-    @Override
     public void setBytes(short address, byte[] source, int length) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    @Override
-    public void setWord(short address, short word) {
         throw new UnsupportedOperationException("not implemented"); //TODO: implement
     }
 }
