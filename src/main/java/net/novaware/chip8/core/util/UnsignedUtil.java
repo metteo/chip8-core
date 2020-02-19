@@ -2,17 +2,16 @@ package net.novaware.chip8.core.util;
 
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
-//TODO own implementation with tests instead of function calls
 public class UnsignedUtil {
 
     @Unsigned
-    public static int uint(@Unsigned short s) {
-        return Short.toUnsignedInt(s);
+    public static int uint(short s) {
+        return s & 0xFFFF;
     }
 
     @Unsigned
-    public static int uint(@Unsigned byte b) {
-        return Byte.toUnsignedInt(b);
+    public static int uint(byte b) {
+        return b & 0xFF;
     }
 
     @Unsigned
@@ -22,7 +21,7 @@ public class UnsignedUtil {
 
     @Unsigned
     public static short ushort(byte b) {
-        return (short) uint(b);
+        return (short) (b & 0xFF);
     }
 
     @Unsigned
