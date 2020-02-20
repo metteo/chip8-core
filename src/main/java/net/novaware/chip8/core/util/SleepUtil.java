@@ -19,7 +19,7 @@ public class SleepUtil {
 
     //TODO: use LockSupport.parkNanos() instead?
 
-    public static void sleepNanos (long nanoDuration) throws InterruptedException {
+    public static long sleepNanos(long nanoDuration) throws InterruptedException {
         final long end = System.nanoTime() + nanoDuration;
 
         long timeLeft = nanoDuration;
@@ -45,5 +45,7 @@ public class SleepUtil {
         if (diff > ACCURACY) {
             LOG.warn("sleepNanos not that good, diff: " + diff + " nanos");
         }
+
+        return diff;
     }
 }

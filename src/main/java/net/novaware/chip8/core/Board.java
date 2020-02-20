@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import static java.lang.System.nanoTime;
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
 import static net.novaware.chip8.core.util.SleepUtil.sleepNanos;
 
@@ -113,14 +114,17 @@ public class Board {
     public void run(int maxCycles) throws InterruptedException {
 
         final long sleepTime = (long) ((double) TimeUnit.SECONDS.toNanos(1) / config.getCpuFrequency());
-
         int cycle = 0;
+        long lastSleepDiff = 0; // compensate for previous sleepiness
 
         while (cycle < maxCycles) {
+            long cycleStart = nanoTime();
 
             cpu.cycle();
 
-            sleepNanos(sleepTime);
+            long cycleTime = nanoTime() - cycleStart;
+
+            lastSleepDiff = sleepNanos(sleepTime - cycleTime - lastSleepDiff);
 
             ++cycle;
         }
