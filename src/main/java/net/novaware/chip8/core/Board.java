@@ -16,6 +16,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
+import static net.novaware.chip8.core.util.SleepUtil.sleepNanos;
 
 @Singleton
 public class Board {
@@ -30,15 +31,36 @@ public class Board {
 
     //private Clock clock;
 
-    //private KeyPort keys;
+    private KeyPort keyPort = new KeyPort() {
+        @Override
+        public void updateKeyState(short state) {
+            cpu.getRegisters().getKeyState().set(state);
+        }
 
-    //private StoragePort storage;
+        @Override
+        public void keyPressed(byte key) {
+            cpu.getRegisters().getKeyValue().set(key);
+        }
+    };
 
-    //private DisplayPort display;
+    private StoragePort storagePort = new StoragePort() {
+        @Override
+        public void load(byte[] data) {
+            SplittableMemory programMemory = memoryMap.getProgram();
+            programMemory.setBytes((short) 0x0, data, data.length);
+            programMemory.setSplit(data.length);
+            programMemory.setStrict(config::isEnforceMemoryRoRwState);
+        }
+
+        @Override
+        public void setStoreCallback(Consumer<byte[]> callback) {
+            throw new UnsupportedOperationException("unimplemented");
+        }
+    };
+
     private byte[] displayBuffer = new byte[MemoryMap.DISPLAY_IO_SIZE];
     private BiConsumer<Integer, byte[]> displayReceiver;
 
-    private AudioPort audio;
     private Consumer<Boolean> audioReceiver;
 
     @Inject
@@ -90,7 +112,7 @@ public class Board {
 
     public void run(int maxCycles) throws InterruptedException {
 
-        final long sleepTime = (long) (1_000_000_000d / config.getCpuFrequency());
+        final long sleepTime = (long) ((double) TimeUnit.SECONDS.toNanos(1) / config.getCpuFrequency());
 
         int cycle = 0;
 
@@ -106,36 +128,6 @@ public class Board {
         LOG.warn("Reached maxCycles: {}", maxCycles);
     }
 
-    private static final long SLEEP_PRECISION = TimeUnit.MILLISECONDS.toNanos(2);
-
-    //TODO: use LockSupport.parkNanos() instead?
-    public static void sleepNanos (long nanoDuration) throws InterruptedException {
-        final long end = System.nanoTime() + nanoDuration;
-
-        long timeLeft = nanoDuration;
-        int count = 0;
-        do {
-            if (timeLeft > SLEEP_PRECISION)
-                Thread.sleep (1);
-            else
-                Thread.sleep (0); // Thread.yield();
-
-            timeLeft = end - System.nanoTime();
-
-            if (Thread.interrupted())
-                throw new InterruptedException();
-            ++count;
-        } while (timeLeft > 0);
-
-        long diff = System.nanoTime() - end;
-        if (diff > 50_000) LOG.warn("sleepNanos not that good");
-
-        //TODO: happens 1k times for sleep of 640 uS
-        if (count > 100) {
-            LOG.debug("Sleep nanos tries to sleep {} times to wait for {}", count, nanoDuration);
-        }
-    }
-
     public AudioPort getAudioPort() {
         return consumer -> audioReceiver = consumer;
     }
@@ -145,33 +137,10 @@ public class Board {
     }
 
     public KeyPort getKeyPort() {
-        return new KeyPort() {
-            @Override
-            public void updateKeyState(short state) {
-                cpu.getRegisters().getKeyState().set(state);
-            }
-
-            @Override
-            public void keyPressed(byte key) {
-                cpu.getRegisters().getKeyValue().set(key);
-            }
-        };
+        return keyPort;
     }
 
     public StoragePort getStoragePort() {
-        return new StoragePort() {
-            @Override
-            public void load(byte[] data) {
-                SplittableMemory programMemory = memoryMap.getProgram();
-                programMemory.setBytes((short) 0x0, data, data.length);
-                programMemory.setSplit(data.length);
-                programMemory.setStrict(config::isEnforceMemoryRoRwState);
-            }
-
-            @Override
-            public void setStoreCallback(Consumer<byte[]> callback) {
-                throw new UnsupportedOperationException("unimplemented");
-            }
-        };
+        return storagePort;
     }
 }

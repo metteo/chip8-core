@@ -28,7 +28,12 @@ class BoardCT extends Specification {
         when:
         def board = factory.newBoard()
         board.init()
+
         board.getStoragePort().load(infiniteLoop)
+        board.getKeyPort().keyPressed(0x0 as byte)
+        board.getAudioPort().attach({on -> println "sound on: " + on})
+        board.getDisplayPort().attach({ gc, buffer -> /* noop */})
+
         board.run(10)
 
         then:
