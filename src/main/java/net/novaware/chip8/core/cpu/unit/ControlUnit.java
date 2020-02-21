@@ -8,6 +8,8 @@ import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
+import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,24 +30,28 @@ public class ControlUnit {
         boolean isLegacyAddressSum();
     }
 
-    // Contains ---------------------------------
-
+    @Owns
     private final Config config;
 
+    @Owns
     private final InstructionDecoder decoder;
 
-    // Accessible -------------------------------
-
+    @Uses
     private final Registers registers;
 
+    @Uses
     private final Memory memory;
 
+    @Uses
     private final ArithmeticLogic alu;
 
+    @Uses
     private final AddressGeneration agu;
 
+    @Uses
     private final StackEngine stackEngine;
 
+    @Uses
     private final GraphicsProcessing gpu;
 
     public ControlUnit(

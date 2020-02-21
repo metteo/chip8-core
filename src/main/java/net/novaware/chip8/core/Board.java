@@ -6,6 +6,7 @@ import net.novaware.chip8.core.cpu.unit.Timer;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.memory.SplittableMemory;
 import net.novaware.chip8.core.port.*;
+import net.novaware.chip8.core.util.uml.Owns;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,8 +27,10 @@ public class Board {
 
     private final BoardConfig config;
 
+    @Owns
     private final MemoryMap memoryMap;
 
+    @Owns
     private final Cpu cpu;
 
     //private Clock clock;

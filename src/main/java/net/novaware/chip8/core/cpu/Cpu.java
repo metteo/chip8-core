@@ -4,6 +4,8 @@ import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
+import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Uses;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,24 +35,28 @@ public class Cpu {
         boolean isLegacyAddressSum();
     }
 
-    // Contains ---------------------------------
-
+    @Owns
     private final Config config;
 
+    @Owns
     private final Registers registers;
 
+    @Owns
     private final ControlUnit controlUnit;
 
+    @Owns
     private final ArithmeticLogic alu;
 
+    @Owns
     private final AddressGeneration agu;
 
+    @Owns
     private final StackEngine stackEngine;
 
+    @Owns
     private final GraphicsProcessing gpu;
 
-    // Accessible -------------------------------
-
+    @Uses
     private final Memory memory;
 
     @Inject
