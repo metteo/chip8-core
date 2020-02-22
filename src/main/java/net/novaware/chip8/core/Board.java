@@ -12,13 +12,15 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static java.lang.System.nanoTime;
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
-import static net.novaware.chip8.core.util.SleepUtil.sleepNanos;
 
 @Singleton
 public class Board {
@@ -34,6 +36,11 @@ public class Board {
     private final Cpu cpu;
 
     //private Clock clock;
+
+    private ScheduledExecutorService executor;
+    private volatile ScheduledFuture<?> future;
+
+    private long lastNanoTime; // ns
 
     private KeyPort keyPort = new KeyPort() {
         @Override
@@ -108,31 +115,43 @@ public class Board {
             }
         });
 
+        executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Board-Clock"));
+
         LOG.traceExit();
     }
 
     public void reset() {
     }
 
-    public void run(int maxCycles) throws InterruptedException {
+    public void runOnScheduler(int maxCycles) {
+        final long period = (long)((double)TimeUnit.SECONDS.toNanos(1) / config.getCpuFrequency());
 
-        final long sleepTime = (long) ((double) TimeUnit.SECONDS.toNanos(1) / config.getCpuFrequency());
-        int cycle = 0;
-        long lastSleepDiff = 0; // compensate for previous sleepiness
+        lastNanoTime = System.nanoTime();
 
-        while (cycle < maxCycles) {
-            long cycleStart = nanoTime();
+        final AtomicInteger cycles = new AtomicInteger();
+
+        future = executor.scheduleAtFixedRate(() -> {
+            long currentNanoTime = System.nanoTime();
+            final long actualPeriod = currentNanoTime - lastNanoTime;
+            double error = (double) Math.abs(period - actualPeriod) / period * 100;
+
+            lastNanoTime = currentNanoTime;
+
+            //LOG.info("SES error: " + String.format("%3.2f", error) + " % for " + period + " ns");
 
             cpu.cycle();
 
-            long cycleTime = nanoTime() - cycleStart;
+            if (maxCycles != Integer.MAX_VALUE) { // bypass counting
+                int currentCycles = cycles.incrementAndGet();
 
-            lastSleepDiff = sleepNanos(sleepTime - cycleTime - lastSleepDiff);
+                if (currentCycles >= maxCycles && future != null) {
+                    LOG.warn("Reached maxCycles: {}", maxCycles);
 
-            ++cycle;
-        }
-
-        LOG.warn("Reached maxCycles: {}", maxCycles);
+                    future.cancel(false);
+                    future = null;
+                }
+            }
+        }, period, period, TimeUnit.NANOSECONDS);
     }
 
     public AudioPort getAudioPort() {
@@ -149,5 +168,9 @@ public class Board {
 
     public StoragePort getStoragePort() {
         return storagePort;
+    }
+
+    public boolean isRunning() {
+        return future != null;
     }
 }

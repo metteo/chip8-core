@@ -1,6 +1,7 @@
 package net.novaware.chip8.core
 
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
 
 import static net.novaware.chip8.core.BoardFactory.newBoardFactory
 
@@ -11,6 +12,8 @@ class BoardCT extends Specification {
 
     def "should be created and run few cycles without exceptions" () {
         given:
+        def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
+
         BoardConfig config = new BoardConfig(
                 cpuFrequency: 600,
                 delayTimerFrequency: 61,
@@ -34,9 +37,13 @@ class BoardCT extends Specification {
         board.getAudioPort().attach({on -> println "sound on: " + on})
         board.getDisplayPort().attach({ gc, buffer -> /* noop */})
 
-        board.run(10)
+        board.runOnScheduler(10)
 
         then:
         noExceptionThrown()
+
+        conditions.eventually {
+            assert !board.isRunning()
+        }
     }
 }
