@@ -4,7 +4,6 @@ import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.cpu.unit.Timer;
 import net.novaware.chip8.core.memory.Loader;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.memory.SplittableMemory;
@@ -45,12 +44,12 @@ public class Board {
     private KeyPort keyPort = new KeyPort() {
         @Override
         public void updateKeyState(short state) {
-            cpu.getRegisters().getKeyState().set(state);
+            clock.schedule(() -> cpu.getRegisters().getKeyState().set(state));
         }
 
         @Override
         public void keyPressed(byte key) {
-            cpu.getRegisters().getKeyValue().set(key);
+            clock.schedule(() -> cpu.getRegisters().getKeyValue().set(key));
         }
     };
 
@@ -95,15 +94,6 @@ public class Board {
 
         final Registers registers = cpu.getRegisters();
 
-        Timer delay = new Timer(registers.getDelay(), null, config.getDelayTimerFrequency());
-        Timer sound = new Timer(
-                registers.getSound(),
-                buzz -> {
-                    if (audioReceiver != null) audioReceiver.accept(buzz);
-                },
-                config.getSoundTimerFrequency()
-        );
-
         registers.getGraphicChange().setCallback(gc -> {
             int change = gc.getAsInt();
 
@@ -116,6 +106,10 @@ public class Board {
 
                 gc.set(GC_IDLE);
             }
+        });
+
+        registers.getSoundOn().setCallback(so -> {
+            audioReceiver.accept(so.getAsInt() == 1);
         });
 
         LOG.traceExit();

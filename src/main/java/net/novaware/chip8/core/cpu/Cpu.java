@@ -57,11 +57,11 @@ public class Cpu {
     @Owns
     private final Gpu gpu;
 
-    @Owns //TODO: initialize
-    private final Timer delayTimer = null;
+    @Owns
+    private final Timer delayTimer;
 
-    @Owns //TODO: initialize
-    private final Timer soundTimer = null;
+    @Owns
+    private final Timer soundTimer;
 
     @Uses
     private final Memory memory;
@@ -84,6 +84,9 @@ public class Cpu {
         };
 
         controlUnit = new ControlUnit(cuConfig, registers, this.memory, alu, agu, stackEngine, gpu);
+
+        delayTimer = new Timer(registers.getDelay());
+        soundTimer = new Timer(registers.getSound(), registers.getSoundOn());
     }
 
     public void initialize() { //TODO: move it to interpreter and start from 0x0000
@@ -91,6 +94,9 @@ public class Cpu {
         registers.getStackPointer().set(MemoryMap.STACK_START);
         registers.getStackSegment().set(MemoryMap.STACK_START);
         registers.getGraphicSegment().set(MemoryMap.DISPLAY_IO_START);
+
+        delayTimer.init();
+        soundTimer.init();
     }
 
 
@@ -111,10 +117,10 @@ public class Cpu {
     }
 
     public void delayTick() {
-        //TODO: forward to timers
+        delayTimer.maybeDecrementValue();
     }
 
     public void soundTick() {
-        //TODO: forward to timers
+        soundTimer.maybeDecrementValue();
     }
 }

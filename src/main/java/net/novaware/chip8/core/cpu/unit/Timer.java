@@ -4,93 +4,51 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
- * Special unit attached to a timer register which decreases it / makes the sound
+ * Special unit attached to a timer register which decreases
  */
 public class Timer {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    //TODO: abstract this away so it can be replaced for other platforms
-    private ScheduledExecutorService executor;
-    private ScheduledFuture<?> future;
+    private final ByteRegister timerRegister; //TODO: rename to timerRegister
 
-    private long lastNanoTime; // ns
-    private int delay; // μs
+    @Nullable
+    private final ByteRegister outputRegister;
 
-    private Consumer<Boolean> buzzer;
-    boolean buzzing = false; //TODO: buzzing should start when ST > 1 and end when ST < 1 (sounds shorter than 1 don't take effect)
-
-    private ByteRegister register;
-
-    public Timer(ByteRegister register, Consumer<Boolean> buzzer, int frequency) {
-        this.register = register;
-        this.buzzer = buzzer;
-
-        delay = (int) (1_000_000d / frequency);
-
-        executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Timer-" + register.getName()));
-
-        register.setCallback(r -> {
-            int value = register.getAsInt();
-
-            if (value > 0) {
-                start();
-            }
-
-            if (value < 1) {
-                stop();
-            }
-
-            //TODO: rename it to callback, it can be sound or light
-            if (this.buzzer != null && !buzzing && value > 1) {
-                buzzing = true;
-                this.buzzer.accept(buzzing); //TODO: delegate to audio component
-            }
-
-            if (this.buzzer != null && buzzing && value < 1) {
-                buzzing = false;
-                this.buzzer.accept(buzzing);
-            }
-        });
+    public Timer(ByteRegister timerRegister, @Nullable ByteRegister outputRegister) {
+        this.timerRegister = timerRegister;
+        this.outputRegister = outputRegister;
     }
 
-    private void start() { //TODO: write integration test
-        if (future != null) {
-            return;
-        }
-
-        lastNanoTime = System.nanoTime();
-        future = executor.scheduleAtFixedRate(this::maybeDecrementValue, delay, delay, TimeUnit.MICROSECONDS);
+    public Timer(ByteRegister timerRegister) {
+        this(timerRegister, null);
     }
 
-    private void stop() {
-        if (future != null) {
-            future.cancel(false);
-            future = null;
+    public void init() {
+        if (outputRegister != null) {
+            timerRegister.setCallback(r -> {
+                final int timer = timerRegister.getAsInt();
+                final int state = outputRegister.getAsInt();
+
+                if (timer > 1 && state == 0) {
+                    outputRegister.set(1);
+                }
+
+                if (timer < 1 && state != 0) {
+                    outputRegister.set(0);
+                }
+            });
         }
     }
 
-    /* package */ void maybeDecrementValue() {
-        long currentNanoTime = System.nanoTime();
-        final int expectedDelay = delay * 1_000; // ns
-        final long actualDelay = currentNanoTime - lastNanoTime;
-        double error = (double) Math.abs(expectedDelay - actualDelay) / expectedDelay * 100;
-
-        lastNanoTime = currentNanoTime;
-
-        //LOG.info("SES error: " + String.format("%3.2f", error) + " % for " + delay + " μs");
-
-        int intValue = register.getAsInt();
+    public void maybeDecrementValue() {
+        int intValue = timerRegister.getAsInt();
 
         if (intValue > 0) {
-            register.set(intValue - 1); //FIXME: race condition!!!!!!!! cpu on main, timer on separate executor
+            timerRegister.set(intValue - 1);
         }
     }
 }

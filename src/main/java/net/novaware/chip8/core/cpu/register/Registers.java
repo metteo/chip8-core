@@ -82,6 +82,9 @@ public class Registers {
      */
     private ByteRegister sound = new ByteRegister("ST");
 
+    // TODO: figure out a better name
+    private ByteRegister soundOn = new ByteRegister("SO");
+
     /**
      * Currently fetched instruction
      */
@@ -175,5 +178,9 @@ public class Registers {
 
     public ByteRegister getKeyValue() {
         return keyValue;
+    }
+
+    public ByteRegister getSoundOn() {
+        return soundOn;
     }
 }
