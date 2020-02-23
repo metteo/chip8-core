@@ -2,18 +2,15 @@ package net.novaware.chip8.core.clock;
 
 public interface ClockGenerator {
 
-    /**
-     * @param frequency in Hz
-     */
-    void setFrequency(int frequency);
+    interface Handle {
+        boolean cancel(boolean mayInterrupt);
+    }
 
-    int getFrequency();
+    Handle schedule(Runnable target, int frequency);
 
-    void setTarget(Runnable target);
+    Handle schedule(Runnable target);
 
-    Runnable getTarget();
+    boolean isPaused();
 
-    void start();
-
-    void stop();
+    void setPaused(boolean paused);
 }

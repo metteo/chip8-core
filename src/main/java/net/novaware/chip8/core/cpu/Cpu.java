@@ -98,13 +98,23 @@ public class Cpu {
         return registers;
     }
 
+    /**
+     * Virtual Chip8 Processor cycle.
+     *
+     * On the original - CDP18S711, single virtual instruction could take
+     * multiple instructions / cycles to complete.
+     */
     public void cycle() {
         controlUnit.fetch();
         controlUnit.decode();
         controlUnit.execute();
     }
 
-    public void timerTick() {
+    public void delayTick() {
+        //TODO: forward to timers
+    }
+
+    public void soundTick() {
         //TODO: forward to timers
     }
 }

@@ -3,6 +3,7 @@ package net.novaware.chip8.core.clock;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 public class ClockGeneratorJvmImpl implements ClockGenerator {
 
@@ -10,56 +11,37 @@ public class ClockGeneratorJvmImpl implements ClockGenerator {
 
     private ScheduledExecutorService executor;
 
-    private int frequency;
-    private Runnable target;
-
-    private int delay;
-    private ScheduledFuture<?> future;
-
     public ClockGeneratorJvmImpl(String name) {
         this.name = name;
 
-        executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Clock-" + this.name));
+        executor = Executors.newScheduledThreadPool(1,
+                r -> new Thread(r, "Chip8-" + this.name + "-Clock"));
     }
 
     @Override
-    public void setFrequency(int frequency) {
-        this.frequency = frequency;
+    public Handle schedule(Runnable target, int frequency) {
+        final long period = (long)((double)TimeUnit.SECONDS.toNanos(1) / frequency);
 
-        recalculateDelay();
-        maybeRestart();
-    }
+        final ScheduledFuture<?> future =
+                executor.scheduleAtFixedRate(target, 1, period, TimeUnit.NANOSECONDS);
 
-    private void maybeRestart() {
-        //TODO: check if running, if yes, restart?
-    }
-
-    private void recalculateDelay() {
-        //TODO: recalculate delay
+        return future::cancel;
     }
 
     @Override
-    public int getFrequency() {
-        return frequency;
+    public Handle schedule(Runnable target) {
+        final ScheduledFuture<?> future = executor.schedule(target, 1, TimeUnit.NANOSECONDS);
+        return future::cancel;
+    }
+
+    // TODO: https://stackoverflow.com/questions/9748710/how-to-pause-resume-all-threads-in-an-executorservice-in-java
+    @Override
+    public boolean isPaused() {
+        throw new UnsupportedOperationException("not implemented"); // TODO: implement
     }
 
     @Override
-    public void setTarget(Runnable target) {
-        this.target = target;
-    }
-
-    @Override
-    public Runnable getTarget() {
-        return target;
-    }
-
-    @Override
-    public void start() {
-
-    }
-
-    @Override
-    public void stop() {
-
+    public void setPaused(boolean paused) {
+        throw new UnsupportedOperationException("not implemented"); // TODO: implement
     }
 }

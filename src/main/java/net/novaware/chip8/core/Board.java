@@ -1,22 +1,23 @@
 package net.novaware.chip8.core;
 
+import net.novaware.chip8.core.clock.ClockGenerator;
+import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.Timer;
 import net.novaware.chip8.core.memory.Loader;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.memory.SplittableMemory;
-import net.novaware.chip8.core.port.*;
+import net.novaware.chip8.core.port.AudioPort;
+import net.novaware.chip8.core.port.DisplayPort;
+import net.novaware.chip8.core.port.KeyPort;
+import net.novaware.chip8.core.port.StoragePort;
 import net.novaware.chip8.core.util.uml.Owns;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -36,12 +37,10 @@ public class Board {
     @Owns
     private final Cpu cpu;
 
-    //private Clock clock;
-
-    private ScheduledExecutorService executor;
-    private volatile ScheduledFuture<?> future;
-
-    private long lastNanoTime; // ns
+    private ClockGenerator clock;
+    private volatile ClockGenerator.Handle cycleHandle;
+    private volatile ClockGenerator.Handle delayHandle;
+    private volatile ClockGenerator.Handle soundHandle;
 
     private KeyPort keyPort = new KeyPort() {
         @Override
@@ -80,6 +79,8 @@ public class Board {
         this.config = config;
         this.memoryMap = memoryMap;
         this.cpu = cpu;
+
+        clock = new ClockGeneratorJvmImpl("Board");
     }
 
     public void init() {
@@ -117,8 +118,6 @@ public class Board {
             }
         });
 
-        executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Board-Clock"));
-
         LOG.traceExit();
     }
 
@@ -126,34 +125,33 @@ public class Board {
     }
 
     public void runOnScheduler(int maxCycles) {
-        final long period = (long)((double)TimeUnit.SECONDS.toNanos(1) / config.getCpuFrequency());
-
-        lastNanoTime = System.nanoTime();
-
+        final boolean countCycles = maxCycles != Integer.MAX_VALUE;
         final AtomicInteger cycles = new AtomicInteger();
 
-        future = executor.scheduleAtFixedRate(() -> {
-            long currentNanoTime = System.nanoTime();
-            final long actualPeriod = currentNanoTime - lastNanoTime;
-            double error = (double) Math.abs(period - actualPeriod) / period * 100;
+        // TODO: handle threading of handle references xD
+        delayHandle = clock.schedule(cpu::delayTick, config.getDelayTimerFrequency());
+        soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
 
-            lastNanoTime = currentNanoTime;
-
-            //LOG.info("SES error: " + String.format("%3.2f", error) + " % for " + period + " ns");
-
+        cycleHandle = clock.schedule(() -> {
             cpu.cycle();
 
-            if (maxCycles != Integer.MAX_VALUE) { // bypass counting
+            if (countCycles) { // bypass counting
                 int currentCycles = cycles.incrementAndGet();
 
-                if (currentCycles >= maxCycles && future != null) {
+                if (currentCycles >= maxCycles && cycleHandle != null) {
                     LOG.warn("Reached maxCycles: {}", maxCycles);
 
-                    future.cancel(false);
-                    future = null;
+                    cycleHandle.cancel(false);
+                    cycleHandle = null;
+
+                    delayHandle.cancel(false);
+                    delayHandle = null;
+
+                    soundHandle.cancel(false);
+                    soundHandle = null;
                 }
             }
-        }, period, period, TimeUnit.NANOSECONDS);
+        }, config.getCpuFrequency());
     }
 
     public AudioPort getAudioPort() {
@@ -173,6 +171,6 @@ public class Board {
     }
 
     public boolean isRunning() {
-        return future != null;
+        return cycleHandle != null;
     }
 }
