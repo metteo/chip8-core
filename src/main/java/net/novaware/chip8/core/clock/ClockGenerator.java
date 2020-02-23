@@ -1,6 +1,6 @@
-package net.novaware.chip8.core.cpu.unit;
+package net.novaware.chip8.core.clock;
 
-public interface Clock {
+public interface ClockGenerator {
 
     /**
      * @param frequency in Hz

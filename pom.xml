@@ -62,11 +62,13 @@
                         <include>**/*Spec.class</include>
                     </includes>
                     <argLine> <!-- TODO: Report here: https://issues.apache.org/jira/browse/SUREFIRE-1262  -->
+                        ${jpms.opens}.clock=ALL-UNNAMED
                         ${jpms.opens}.cpu=ALL-UNNAMED
                         ${jpms.opens}.cpu.instruction=ALL-UNNAMED
                         ${jpms.opens}.cpu.instruction.definition=ALL-UNNAMED
                         ${jpms.opens}.cpu.register=ALL-UNNAMED
                         ${jpms.opens}.cpu.unit=ALL-UNNAMED
+                        ${jpms.opens}.gpu=ALL-UNNAMED
                         ${jpms.opens}.memory=ALL-UNNAMED
                         ${jpms.opens}.util=ALL-UNNAMED
                     </argLine>

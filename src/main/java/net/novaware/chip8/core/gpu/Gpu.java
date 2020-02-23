@@ -1,21 +1,20 @@
-package net.novaware.chip8.core.cpu.unit;
+package net.novaware.chip8.core.gpu;
 
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.util.ViewPort;
-import net.novaware.chip8.core.util.ViewPort.Index;
+import net.novaware.chip8.core.gpu.ViewPort.Index;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import static net.novaware.chip8.core.cpu.register.Registers.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
-import static net.novaware.chip8.core.util.ViewPort.Bit;
+import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 
 /**
- * GPU
+ * Graphics Processing Unit
  */
-public class GraphicsProcessing {
+public class Gpu {
 
     private static final Logger LOG = LogManager.getLogger();
 
@@ -39,7 +38,7 @@ public class GraphicsProcessing {
     final boolean clipping = false; //TODO: make configurable
     final boolean dump = true; //TODO: debugging UI
 
-    public GraphicsProcessing(Registers registers, Memory memory) {
+    public Gpu(Registers registers, Memory memory) {
         this.registers = registers;
         this.memory = memory;
 
@@ -62,7 +61,6 @@ public class GraphicsProcessing {
         registers.getGraphicChange().set(GC_ERASE);
     }
 
-    //TODO: write a combined test
     public void drawSprite(short x, short y, short height) {
         final int xBit = registers.getVariable(x).getAsInt();
         final int yBit = registers.getVariable(y).getAsInt();

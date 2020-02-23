@@ -2,6 +2,7 @@ package net.novaware.chip8.core.cpu;
 
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
+import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.util.uml.Owns;
@@ -54,7 +55,13 @@ public class Cpu {
     private final StackEngine stackEngine;
 
     @Owns
-    private final GraphicsProcessing gpu;
+    private final Gpu gpu;
+
+    @Owns //TODO: initialize
+    private final Timer delayTimer = null;
+
+    @Owns //TODO: initialize
+    private final Timer soundTimer = null;
 
     @Uses
     private final Memory memory;
@@ -68,7 +75,7 @@ public class Cpu {
         alu = new ArithmeticLogic(new Random()::nextInt, registers, memory);
         agu = new AddressGeneration(registers, memory);
         stackEngine = new StackEngine(registers, memory);
-        gpu = new GraphicsProcessing(registers, memory);
+        gpu = new Gpu(registers, memory);
 
         ControlUnit.Config cuConfig = new ControlUnit.Config() {
             @Override public boolean isLegacyShift()      { return config.isLegacyShift(); }
@@ -95,5 +102,9 @@ public class Cpu {
         controlUnit.fetch();
         controlUnit.decode();
         controlUnit.execute();
+    }
+
+    public void timerTick() {
+        //TODO: forward to timers
     }
 }

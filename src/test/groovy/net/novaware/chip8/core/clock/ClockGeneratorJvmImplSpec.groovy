@@ -1,14 +1,15 @@
-package net.novaware.chip8.core.cpu.unit
+package net.novaware.chip8.core.clock
+
 
 import spock.lang.Specification
 
-class ClockJvmImplSpec extends Specification {
+class ClockGeneratorJvmImplSpec extends Specification {
 
     boolean targetExecuted
 
     def "should construct properly"() {
         when:
-        Clock instance = new ClockJvmImpl()
+        ClockGenerator instance = new ClockGeneratorJvmImpl()
         instance.setFrequency(500)
         instance.setTarget(this.&sampleTarget as Runnable)
 

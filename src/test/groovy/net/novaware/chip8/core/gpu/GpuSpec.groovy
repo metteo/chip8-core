@@ -1,26 +1,23 @@
-package net.novaware.chip8.core.cpu.unit
+package net.novaware.chip8.core.gpu
 
 import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 import spock.lang.Unroll
 
-import static net.novaware.chip8.core.cpu.register.Registers.GC_DRAW
-import static net.novaware.chip8.core.cpu.register.Registers.GC_ERASE
-import static net.novaware.chip8.core.cpu.register.Registers.GC_MIX
-import static net.novaware.chip8.core.cpu.register.Registers.GC_NOOP
-import static net.novaware.chip8.core.cpu.unit.GraphicsProcessing.MAX_SPRITE_HEIGHT
+import static Gpu.MAX_SPRITE_HEIGHT
+import static net.novaware.chip8.core.cpu.register.Registers.*
 import static net.novaware.chip8.core.util.HexUtil.toHexString
 
-class GraphicsProcessingSpec extends Specification {
+class GpuSpec extends Specification {
 
-    private static final boolean DUMP_MEMORY = Boolean.getBoolean(GraphicsProcessingSpec.getSimpleName() + ".DUMP_MEMORY")
+    private static final boolean DUMP_MEMORY = Boolean.getBoolean(GpuSpec.getSimpleName() + ".DUMP_MEMORY")
 
     def registers = new Registers()
 
     def memory = new PhysicalMemory("GFX", 256)
 
-    def instance = new GraphicsProcessing(registers, memory)
+    def instance = new Gpu(registers, memory)
 
     def "should properly extract sprite from memory"() {
         given:

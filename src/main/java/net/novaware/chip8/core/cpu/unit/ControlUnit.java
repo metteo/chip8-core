@@ -6,6 +6,7 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
+import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.util.uml.Owns;
@@ -52,7 +53,7 @@ public class ControlUnit {
     private final StackEngine stackEngine;
 
     @Uses
-    private final GraphicsProcessing gpu;
+    private final Gpu gpu;
 
     public ControlUnit(
             final Config config,
@@ -61,7 +62,7 @@ public class ControlUnit {
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
-            final GraphicsProcessing gpu
+            final Gpu gpu
     ) {
         this.config = config;
         this.decoder = new InstructionDecoder(registers);

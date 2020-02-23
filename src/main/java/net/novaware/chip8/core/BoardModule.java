@@ -10,6 +10,8 @@ import net.novaware.chip8.core.memory.MemoryMap;
 
 import javax.inject.Named;
 
+//TODO: replace with more specific modules, like MemoryModule, RegisterModule, etc
+@Deprecated(forRemoval = true)
 @Module
 public class BoardModule {
 

@@ -1,4 +1,4 @@
-package net.novaware.chip8.core.port;
+package net.novaware.chip8.core.memory;
 
 //TODO: move to another package?
 public class Loader {

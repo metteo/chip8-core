@@ -1,10 +1,10 @@
-package net.novaware.chip8.core.cpu.unit;
+package net.novaware.chip8.core.clock;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 
-public class ClockJvmImpl implements Clock {
+public class ClockGeneratorJvmImpl implements ClockGenerator {
 
     private final String name;
 
@@ -16,7 +16,7 @@ public class ClockJvmImpl implements Clock {
     private int delay;
     private ScheduledFuture<?> future;
 
-    public ClockJvmImpl(String name) {
+    public ClockGeneratorJvmImpl(String name) {
         this.name = name;
 
         executor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "Chip8-Clock-" + this.name));

@@ -3,6 +3,7 @@ package net.novaware.chip8.core;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.Timer;
+import net.novaware.chip8.core.memory.Loader;
 import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.memory.SplittableMemory;
 import net.novaware.chip8.core.port.*;
@@ -84,6 +85,7 @@ public class Board {
     public void init() {
         LOG.traceEntry();
 
+        //TODO: load the font from file or integrate into bigger rom
         byte[] font = new Loader().loadFont();
         memoryMap.getInterpreter().setBytes((short) 0x0, font, font.length);
         memoryMap.getInterpreter().setReadOnly(config::isEnforceMemoryRoRwState);

@@ -1,4 +1,4 @@
-package net.novaware.chip8.core.util;
+package net.novaware.chip8.core.gpu;
 
 import static java.util.Objects.requireNonNull;
 

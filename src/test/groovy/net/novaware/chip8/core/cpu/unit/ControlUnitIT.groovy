@@ -1,6 +1,7 @@
 package net.novaware.chip8.core.cpu.unit
 
 import net.novaware.chip8.core.cpu.register.Registers
+import net.novaware.chip8.core.gpu.Gpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
@@ -27,7 +28,7 @@ class ControlUnitIT extends Specification {
 
     StackEngine stackEngine = new StackEngine(registers, memory)
 
-    GraphicsProcessing gpu = new GraphicsProcessing(registers, memory)
+    Gpu gpu = new Gpu(registers, memory)
 
     ControlUnit cu = new ControlUnit(config, registers, memory, alu, agu, stackEngine, gpu)
 
