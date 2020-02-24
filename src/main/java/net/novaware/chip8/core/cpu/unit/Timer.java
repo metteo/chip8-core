@@ -7,13 +7,13 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nullable;
 
 /**
- * Special unit attached to a timer register which decreases
+ * Special unit attached to a timer register which decreases it
  */
 public class Timer {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    private final ByteRegister timerRegister; //TODO: rename to timerRegister
+    private final ByteRegister timerRegister;
 
     @Nullable
     private final ByteRegister outputRegister;
@@ -28,7 +28,10 @@ public class Timer {
     }
 
     public void init() {
+        LOG.info(() -> "Configured with " + timerRegister.getName());
+
         if (outputRegister != null) {
+            LOG.info(() -> "Will report values higher than 1 to " + outputRegister.getName());
             timerRegister.setCallback(r -> {
                 final int timer = timerRegister.getAsInt();
                 final int state = outputRegister.getAsInt();
