@@ -66,6 +66,8 @@ public class Cpu {
     @Uses
     private final Memory memory;
 
+    private State state;
+
     @Inject
     public Cpu(final Config config, @Named("cpu") final Memory memory, final Registers registers) {
         this.config = config;
@@ -97,6 +99,8 @@ public class Cpu {
 
         delayTimer.init();
         soundTimer.init();
+
+        state = State.OPERATING;
     }
 
 
@@ -111,16 +115,22 @@ public class Cpu {
      * multiple instructions / cycles to complete.
      */
     public void cycle() {
-        controlUnit.fetch();
-        controlUnit.decode();
-        controlUnit.execute();
+        if (state == State.OPERATING) {
+            controlUnit.fetch();
+            controlUnit.decode();
+            controlUnit.execute();
+        }
     }
 
     public void delayTick() {
-        delayTimer.maybeDecrementValue();
+        if (state == State.OPERATING) {
+            delayTimer.maybeDecrementValue();
+        }
     }
 
     public void soundTick() {
-        soundTimer.maybeDecrementValue();
+        if (state == State.OPERATING) {
+            soundTimer.maybeDecrementValue();
+        }
     }
 }
