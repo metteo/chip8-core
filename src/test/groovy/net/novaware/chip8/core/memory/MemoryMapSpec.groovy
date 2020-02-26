@@ -4,6 +4,9 @@ import net.novaware.chip8.core.cpu.register.Registers
 import spock.lang.Shared
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort
+
 class MemoryMapSpec extends Specification {
 
     @Shared
@@ -57,6 +60,24 @@ class MemoryMapSpec extends Specification {
         expect:
         (short) 0x002 == memory.translateToSegmentAddress(segment, address)
 
+    }
+
+    //TODO: refactor to allow testing, (mocking of memory segments)
+    def "should clear writeable memory segments"() {
+        given:
+        def displayIo = instance.getDisplayIo()
+
+        for (int i = 0; i < displayIo.size; ++i) {
+            displayIo.setByte(ushort(i), ubyte(0xFF))
+        }
+
+        when:
+        instance.clear()
+
+        then:
+        for (int i = 0; i < displayIo.size; ++i) {
+            assert displayIo.getByte(ushort(i)) == 0 as byte
+        }
     }
 
     //TODO: read / write tests, add nice logging

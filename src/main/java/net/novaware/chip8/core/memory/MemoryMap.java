@@ -9,6 +9,9 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+
 /**
  * Chip8 Memory Map (4096 bytes)
  */
@@ -79,6 +82,14 @@ public class MemoryMap {
         entries.add(new MappedMemory.Entry(DISPLAY_IO_START, DISPLAY_IO_END, displayIo));
 
         cpuMemory = new MappedMemory("CPU", entries);
+    }
+
+    public void clear() {
+        //TODO: implement and test properly
+        //TODO: figure out what to do with roms which write to ROM area (reload the rom?)
+        for (int i = 0; i < displayIo.getSize(); ++i) {
+            displayIo.setByte(ushort(i), ubyte(0));
+        }
     }
 
     public ReadOnlyMemory getInterpreter() {

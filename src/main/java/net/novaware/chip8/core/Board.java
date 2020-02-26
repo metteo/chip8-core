@@ -51,6 +51,11 @@ public class Board {
         public void keyPressed(byte key) {
             clock.schedule(() -> cpu.getRegisters().getKeyValue().set(key));
         }
+
+        @Override
+        public void reset() {
+            clock.schedule(Board.this::reset);
+        }
     };
 
     private StoragePort storagePort = new StoragePort() {
@@ -116,6 +121,8 @@ public class Board {
     }
 
     public void reset() {
+        memoryMap.clear();
+        cpu.reset();
     }
 
     public void runOnScheduler(int maxCycles) {

@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.cpu;
 
+import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.gpu.Gpu;
@@ -66,6 +67,7 @@ public class Cpu {
     @Uses
     private final Memory memory;
 
+    //TODO: make it a register and only expose a getter with enum
     private State state;
 
     @Inject
@@ -103,6 +105,19 @@ public class Cpu {
         state = State.OPERATING;
     }
 
+    public void reset() {
+        registers.getProgramCounter().set(MemoryMap.PROGRAM_START);
+        registers.getStackPointer().set(MemoryMap.STACK_START);
+        registers.getIndex().set(0);
+        registers.getDelay().set(0);
+        registers.getSound().set(0);
+        registers.getSoundOn().set(0);
+
+        ByteRegister[] vars = registers.getVariables();
+        for (int i = 0; i < vars.length; ++i) {
+            vars[i].set(0);
+        }
+    }
 
     public Registers getRegisters() {
         return registers;
