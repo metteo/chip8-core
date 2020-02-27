@@ -121,8 +121,9 @@ public class Board {
     }
 
     public void reset() {
-        memoryMap.clear();
-        cpu.reset();
+        // https://en.wikipedia.org/wiki/Hardware_reset
+        memoryMap.clear(); // TODO:  hard reset clears whole memory and reloads roms?
+        cpu.reset();  //TODO: soft reset clears only display / registers
     }
 
     public void runOnScheduler(int maxCycles) {
