@@ -37,6 +37,8 @@ public class Board {
     private final Cpu cpu;
 
     private ClockGenerator clock;
+
+    //TODO: class for managing handles
     private volatile ClockGenerator.Handle cycleHandle;
     private volatile ClockGenerator.Handle delayHandle;
     private volatile ClockGenerator.Handle soundHandle;
