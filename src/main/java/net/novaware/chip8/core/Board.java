@@ -89,6 +89,25 @@ public class Board {
         clock = new ClockGeneratorJvmImpl("Board");
     }
 
+    public void powerOn() {
+        // https://computer.howstuffworks.com/pc3.htm
+        // power on self test and beep
+        // hardware specs printed: cpu Hz, memory size, storage connected, logo?
+        // check the program in storage, if ok load it
+        // call the program
+
+        init();
+        runOnScheduler(Integer.MAX_VALUE);
+    }
+
+    public void powerOff(boolean force) {
+        cycleHandle.cancel(force);
+        delayHandle.cancel(force);
+        soundHandle.cancel(force);
+
+        reset();
+    }
+
     public void init() {
         LOG.traceEntry();
 
