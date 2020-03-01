@@ -3,7 +3,8 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
 
-import static java.lang.Short.toUnsignedInt;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 public class StackEngine {
 
@@ -21,14 +22,16 @@ public class StackEngine {
 
     /* package */ void call(final short address) {
         registers.getStackPointer().increment(2); // 2 byte address
-        memory.setWord(registers.getStackPointer().get(), registers.getProgramCounter().get());
+        memory.setWord(registers.getStackPointer().get(), registers.getMemoryAddress().get());
         registers.getProgramCounter().set(address);
     }
 
     /* package */ void returnFromSubroutine() {
         final short address = memory.getWord(registers.getStackPointer().get());
         registers.getStackPointer().increment(-2);
+
         registers.getProgramCounter().set(address);
+        registers.getProgramCounter().increment(2);
     }
 
     /* package */ void jump(final short address) {
@@ -37,12 +40,10 @@ public class StackEngine {
 
     /* package */ void jump(final short address, final short offset) {
         final int offsetValue = registers.getVariable(offset).getAsInt();
-        int newPc = toUnsignedInt(address);
+        int newPc = uint(address);
 
-        newPc += offsetValue;
+        newPc += offsetValue; //TODO: may overflow
 
-        registers.getProgramCounter().set(newPc);
-
-        registers.getProgramCounter().set(address + offsetValue); //TODO: may overflow
+        jump(ushort(newPc));
     }
 }

@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
  * Control Unit (CU)
@@ -77,10 +78,13 @@ public class ControlUnit {
 
     public void fetch() {
         final short pc = registers.getProgramCounter().get();
+        registers.getMemoryAddress().set(pc);
 
-        final short instruction = memory.getWord(pc);
+        final short ma = registers.getMemoryAddress().get();
+        final short instruction = memory.getWord(ma);
+        registers.getCurrentInstruction().set(instruction);
 
-        registers.getFetchedInstruction().set(instruction);
+        registers.getProgramCounter().increment(2);
     }
 
     public void decode() {
@@ -93,7 +97,7 @@ public class ControlUnit {
 
         final InstructionType instructionType = InstructionType.valueOf(di[0].get());
 
-        int increment = 2; // instructions are always 2 bytes long
+        int skip = 0;
 
         final boolean useY = config.isLegacyShift();
         final boolean incrementI = config.isLegacyLoadStore();
@@ -106,11 +110,11 @@ public class ControlUnit {
             case Ox00EE: stackEngine.returnFromSubroutine(); break;
             case Ox0MMM: throw new RuntimeException("system call is unsupported, yet");
 
-            case Ox1MMM: stackEngine.jump(di[1].get()); increment = 0; break;
-            case Ox2MMM: stackEngine.call(di[1].get()); increment = 0; break;
-            case Ox3XKK: increment = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 4 : increment; break;
-            case Ox4XKK: increment = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? increment : 4; break;
-            case Ox5XY0: increment = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 4 : increment; break;
+            case Ox1MMM: stackEngine.jump(di[1].get()); break;
+            case Ox2MMM: stackEngine.call(di[1].get()); break;
+            case Ox3XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 2 : 0; break;
+            case Ox4XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
+            case Ox5XY0: skip = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 2 : 0; break;
             case Ox6XKK: alu.loadValueIntoRegister(di[1].get(), di[2].get()); break;
             case Ox7XKK: alu.addValueToRegister(di[1].get(), di[2].get()); break;
 
@@ -124,17 +128,17 @@ public class ControlUnit {
             case Ox8XY7: alu.subtractRegisterFromRegister(di[1].get(), di[2].get(), di[1].get()); break;
             case Ox8XYE: alu.shiftLeftRegisterIntoRegister(di[1].get(), useY ? di[2].get() : di[1].get()); break;
 
-            case Ox9XY0: increment = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? increment : 4; break;
+            case Ox9XY0: skip = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
             case OxAMMM: agu.loadAddressIntoIndex(di[1].get()); break;
-            case OxBMMM: stackEngine.jump(di[1].get(), (short) 0x0); increment = 0; break;
+            case OxBMMM: stackEngine.jump(di[1].get(), (short) 0x0); break;
             case OxCXKK: alu.andRandomToRegister(di[1].get(), di[2].get()); break;
             case OxDXYK: gpu.drawSprite(di[1].get(), di[2].get(), di[3].get()); break;
 
-            case OxEX9E: increment = compareKeyStateWithRegister(di[1].get()) ? 4 : increment; break;
-            case OxEXA1: increment = compareKeyStateWithRegister(di[1].get()) ? increment : 4; break;
+            case OxEX9E: skip = compareKeyStateWithRegister(di[1].get()) ? 2 : 0; break;
+            case OxEXA1: skip = compareKeyStateWithRegister(di[1].get()) ? 0 : 2; break;
 
             case OxFX07: loadTimerIntoRegister(di[1].get(), registers.getDelay()); break;
-            case OxFX0A: increment = checkIfKeyPressed(di[1].get()) ? increment : 0; break;
+            case OxFX0A: skip = checkIfKeyPressed(di[1].get()) ? 0 : -2; break;
             case OxFX15: loadRegisterIntoTimer(di[1].get(), registers.getDelay()); break;
             case OxFX18: loadRegisterIntoTimer(di[1].get(), registers.getSound()); break;
             case OxFX1E: agu.addRegisterIntoIndex(di[1].get(), overflowI); break;
@@ -146,7 +150,7 @@ public class ControlUnit {
             default: throw new RuntimeException("Unknown instruction: " + di[0].get());
         }
 
-        pc.increment(increment);
+        pc.increment(skip);
     }
 
     /**
@@ -202,7 +206,7 @@ public class ControlUnit {
     //TODO: special unit for handling transfers between memory and registers? registers are memory mapped BTW...
 
     private void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
-        int xIndex = Short.toUnsignedInt(x);
+        int xIndex = uint(x);
         int iValue = registers.getIndex().getAsInt();
 
 
@@ -217,7 +221,7 @@ public class ControlUnit {
     }
 
     private void loadRegistersIntoMemory(final short x, final boolean incrementI) {
-        int xIndex = Short.toUnsignedInt(x);
+        int xIndex = uint(x);
         int iValue = registers.getIndex().getAsInt();
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {

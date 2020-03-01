@@ -39,7 +39,7 @@ class CpuIT extends Specification {
         cpu.cycle()
 
         then:
-        def actual = cpu.getRegisters().getFetchedInstruction().get()
+        def actual = cpu.getRegisters().getCurrentInstruction().get()
         actual == instruction
     }
 
@@ -56,7 +56,7 @@ class CpuIT extends Specification {
         cpu.cycle()
 
         then:
-        def actual = cpu.getRegisters().getFetchedInstruction().get()
+        def actual = cpu.getRegisters().getCurrentInstruction().get()
         actual == instruction
     }
 

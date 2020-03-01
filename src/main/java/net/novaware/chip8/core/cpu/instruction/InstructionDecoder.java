@@ -22,7 +22,7 @@ public class InstructionDecoder {
 
     public void decode() {
         @Unsigned
-        final short instruction = registers.getFetchedInstruction().get();
+        final short instruction = registers.getCurrentInstruction().get();
         final InstructionDefinition def = registry.getDefinition(instruction);
 
         if (def != null) {

@@ -3,7 +3,6 @@ package net.novaware.chip8.core.cpu.unit
 import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ControlUnitSpec extends Specification {
@@ -27,6 +26,8 @@ class ControlUnitSpec extends Specification {
         cu.fetch()
 
         then:
-        registers.getFetchedInstruction().getAsInt() == 0x1234
+        registers.getMemoryAddress().getAsInt() == 0x200
+        registers.getProgramCounter().getAsInt() == 0x202
+        registers.getCurrentInstruction().getAsInt() == 0x1234
     }
 }

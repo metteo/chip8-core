@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 public class MappedMemory extends AbstractMemory implements Memory {
 
@@ -34,8 +35,8 @@ public class MappedMemory extends AbstractMemory implements Memory {
         short currentStart = 0x0000;
 
         for (Entry entry : entries) {
-            final int end = Short.toUnsignedInt(entry.end);
-            final int start = Short.toUnsignedInt(entry.start);
+            final int end = uint(entry.end);
+            final int start = uint(entry.start);
 
             assert start < end;
 
@@ -56,13 +57,13 @@ public class MappedMemory extends AbstractMemory implements Memory {
 
     /*package*/ Entry getSegment(short address) {
 
-        int addr =  Short.toUnsignedInt(address);
+        int addr = uint(address);
         int size = entries.size();
         for (int i = 0; i < size; i++) {
             Entry entry = entries.get(i);
 
-            final int end = Short.toUnsignedInt(entry.end);
-            final int start = Short.toUnsignedInt(entry.start);
+            final int end = uint(entry.end);
+            final int start = uint(entry.start);
 
             if (addr >= start && addr <= end) {
                 return entry;
@@ -73,8 +74,8 @@ public class MappedMemory extends AbstractMemory implements Memory {
     }
 
     /*package*/ short translateToSegmentAddress(Entry segment, short address) {
-        final int addr =  Short.toUnsignedInt(address);
-        final int start = Short.toUnsignedInt(segment.start);
+        final int addr =  uint(address);
+        final int start = uint(segment.start);
 
         return (short) (addr - start);
     }

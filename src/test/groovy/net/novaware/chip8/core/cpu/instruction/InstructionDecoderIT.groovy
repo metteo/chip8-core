@@ -12,7 +12,7 @@ class InstructionDecoderIT extends Specification {
 
     def "should properly decode MVI / LD I instruction"() {
         given:
-        registers.getFetchedInstruction().set(0xA123)
+        registers.getCurrentInstruction().set(0xA123)
 
         when:
         decoder.decode()
@@ -28,7 +28,7 @@ class InstructionDecoderIT extends Specification {
 
     def "should properly decode JMP instruction"() {
         given:
-        registers.getFetchedInstruction().set(0x1234)
+        registers.getCurrentInstruction().set(0x1234)
 
         when:
         decoder.decode()
@@ -44,7 +44,7 @@ class InstructionDecoderIT extends Specification {
 
     def "should properly decode SE X KK instruction"() {
         given:
-        registers.getFetchedInstruction().set(0x3456)
+        registers.getCurrentInstruction().set(0x3456)
 
         when:
         decoder.decode()

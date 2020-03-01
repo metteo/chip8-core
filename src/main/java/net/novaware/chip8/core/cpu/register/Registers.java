@@ -37,8 +37,20 @@ public class Registers {
 
     /**
      * Also Instruction Pointer (IP)
+     *
+     * Holds the address of the next instruction.
      */
     private final TribbleRegister programCounter = new TribbleRegister("PC");
+
+    /**
+     * Memory Address Register
+     *
+     * Holds address of currently executed instruction. Not involved in other
+     * memory related operations.
+     *
+     * @see <a href="https://en.wikipedia.org/wiki/Memory_address_register" >MAR</a>
+     */
+    private final TribbleRegister memoryAddress = new TribbleRegister("MAR");
 
     private final TribbleRegister stackSegment = new TribbleRegister("SS");
 
@@ -86,9 +98,9 @@ public class Registers {
     private ByteRegister soundOn = new ByteRegister("SO");
 
     /**
-     * Currently fetched instruction
+     * Current Instruction Register
      */
-    private final WordRegister fetchedInstruction = new WordRegister("IR");
+    private final WordRegister currentInstruction = new WordRegister("IR");
 
     /**
      * Currently decoded instruction with parameters (up to 3)
@@ -164,8 +176,8 @@ public class Registers {
         return sound;
     }
 
-    public WordRegister getFetchedInstruction() {
-        return fetchedInstruction;
+    public WordRegister getCurrentInstruction() {
+        return currentInstruction;
     }
 
     public WordRegister[] getDecodedInstruction() {
@@ -182,5 +194,9 @@ public class Registers {
 
     public ByteRegister getSoundOn() {
         return soundOn;
+    }
+
+    public TribbleRegister getMemoryAddress() {
+        return memoryAddress;
     }
 }
