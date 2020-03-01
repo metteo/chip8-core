@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
 
+//TODO: public methods should schedule commands to clock generator
 @Singleton
 public class Board {
 
@@ -61,9 +62,11 @@ public class Board {
     };
 
     private StoragePort storagePort = new StoragePort() {
+        //TODO: the board should request data from storage device, not the other way around
         @Override
         public void load(byte[] data) {
             SplittableMemory programMemory = memoryMap.getProgram();
+            programMemory.setStrict(false); //disable RO mode
             programMemory.setBytes((short) 0x0, data, data.length);
             programMemory.setSplit(data.length);
             programMemory.setStrict(config::isEnforceMemoryRoRwState);

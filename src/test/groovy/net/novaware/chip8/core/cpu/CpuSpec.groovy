@@ -20,6 +20,7 @@ class CpuSpec extends Specification {
 
     def "should reset the registers"() {
         given:
+        registers.getMemoryAddress().set(0x232)
         registers.getProgramCounter().set(0x234)
         registers.getStackPointer().set(uint(MemoryMap.STACK_START) + 4)
         registers.getIndex().set(0x345)
@@ -32,6 +33,7 @@ class CpuSpec extends Specification {
         instance.reset()
 
         then:
+        registers.getMemoryAddress().getAsInt() == 0
         registers.getProgramCounter().getAsInt() == 0x200
         registers.getStackPointer().getAsInt() == MemoryMap.STACK_START
         registers.getIndex().getAsInt() == 0

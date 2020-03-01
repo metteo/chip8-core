@@ -106,6 +106,7 @@ public class Cpu {
     }
 
     public void reset() {
+        registers.getMemoryAddress().set(0);
         registers.getProgramCounter().set(MemoryMap.PROGRAM_START);
         registers.getStackPointer().set(MemoryMap.STACK_START);
         registers.getIndex().set(0);
