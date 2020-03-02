@@ -46,7 +46,7 @@ public class ArithmeticLogic {
     /* package */ void addValueToRegister(final short x, final short value) {
         int xValue = registers.getVariable(x).getAsInt();
 
-        xValue += uint(value);
+        xValue = xValue + uint(value);
 
         registers.getVariable(x).set(xValue);
     }
@@ -55,7 +55,7 @@ public class ArithmeticLogic {
         int xValue = registers.getVariable(x).getAsInt();
         final int yValue = registers.getVariable(y).getAsInt();
 
-        xValue += yValue;
+        xValue = xValue + yValue;
 
         final int overflow = xValue >>> 8;
         final int carry = overflow > 0 ? 0b1 : 0;
@@ -77,11 +77,11 @@ public class ArithmeticLogic {
         byte borrow = 0b1;
 
         if (yValue > xValue) {
-            targetValue += 0x100;
+            targetValue = targetValue + 0x100;
             borrow = 0;
         }
 
-        targetValue -= yValue;
+        targetValue = targetValue - yValue;
 
         registers.getVariable(target).set(targetValue);
 
@@ -146,7 +146,7 @@ public class ArithmeticLogic {
         int xValue = registers.getVariable(x).getAsInt();
         final int yValue = registers.getVariable(y).getAsInt();
 
-        xValue &= yValue;
+        xValue = xValue & yValue;
 
         registers.getVariable(x).set(xValue);
     }
@@ -155,7 +155,7 @@ public class ArithmeticLogic {
         int xValue = registers.getVariable(x).getAsInt();
         final int yValue = registers.getVariable(y).getAsInt();
 
-        xValue |= yValue;
+        xValue = xValue | yValue;
 
         registers.getVariable(x).set(xValue);
     }
@@ -164,7 +164,7 @@ public class ArithmeticLogic {
         int xValue = registers.getVariable(x).getAsInt();
         final int yValue = registers.getVariable(y).getAsInt();
 
-        xValue ^= yValue;
+        xValue = xValue ^ yValue;
 
         registers.getVariable(x).set(xValue);
     }

@@ -63,8 +63,8 @@ public class ViewPort {
         int yBit = b.y;
 
         if (wrapping) {
-            xBit %= maxWidth;
-            yBit %= maxHeight;
+            xBit = xBit % maxWidth;
+            yBit = yBit % maxHeight;
         } else if (isOutOfBounds(xBit, yBit)) {
             i.arrayByte = -1;
             i.byteBit = -1;

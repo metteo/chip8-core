@@ -32,7 +32,7 @@ public class AddressGeneration {
         final int xValue = registers.getVariable(x).getAsInt();
         int iValue = registers.getIndex().getAsInt();
 
-        iValue += xValue;
+        iValue = iValue + xValue;
 
         final int overflow = iValue >>> 12;
         final int carry = overflow > 0 ? 0b1 : 0;

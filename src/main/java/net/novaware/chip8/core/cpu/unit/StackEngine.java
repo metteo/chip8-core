@@ -42,7 +42,7 @@ public class StackEngine {
         final int offsetValue = registers.getVariable(offset).getAsInt();
         int newPc = uint(address);
 
-        newPc += offsetValue; //TODO: may overflow
+        newPc = newPc + offsetValue; //TODO: may overflow
 
         jump(ushort(newPc));
     }

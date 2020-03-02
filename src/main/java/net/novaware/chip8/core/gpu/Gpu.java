@@ -110,7 +110,7 @@ public class Gpu {
             if (idx1.byteBit == 0) { // byte aligned
                 rowData = memory.getByte(ushort(graphicSegment + idx1.arrayByte));
             } else { // misaligned
-                bit.x += 8;
+                bit.x = bit.x + 8;
                 viewPort.toIndex(bit, idx2, true);
 
                 short word = getRowAsWord(graphicSegment, idx1, idx2);
@@ -200,7 +200,7 @@ public class Gpu {
             if (idx1.byteBit == 0) { // byte aligned
                 memory.setByte(ushort(graphicSegment + idx1.arrayByte), buffer[row]);
             } else { // misaligned
-                bit.x += 8;
+                bit.x = bit.x + 8;
                 viewPort.toIndex(bit, idx2, true);
 
                 short rowIndex1 = ushort(graphicSegment + idx1.arrayByte);
