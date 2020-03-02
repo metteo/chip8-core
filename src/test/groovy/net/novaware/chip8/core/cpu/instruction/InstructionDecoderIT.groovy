@@ -1,12 +1,13 @@
 package net.novaware.chip8.core.cpu.instruction
 
-import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.cpu.register.WordRegister
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
+
 class InstructionDecoderIT extends Specification {
 
-    Registers registers = new Registers()
+    def registers = newRegisters()
 
     InstructionDecoder decoder = new InstructionDecoder(registers)
 

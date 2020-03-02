@@ -1,15 +1,16 @@
 package net.novaware.chip8.core.cpu.unit
 
-import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
+
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 
 class ControlUnitSpec extends Specification {
 
     ControlUnit.Config config = Mock()
 
-    Registers registers = new Registers()
+    def registers = newRegisters()
 
     Memory memory = new PhysicalMemory("test", 4096)
 

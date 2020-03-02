@@ -1,11 +1,10 @@
 package net.novaware.chip8.core.cpu
 
-
-import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.MemoryMap
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 import static net.novaware.chip8.core.util.UnsignedUtil.uint
 
 class CpuSpec extends Specification {
@@ -14,7 +13,7 @@ class CpuSpec extends Specification {
 
     Memory memory = Mock()
 
-    Registers registers = new Registers()
+    def registers = newRegisters()
 
     Cpu instance = new Cpu(config, memory, registers)
 

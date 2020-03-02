@@ -11,6 +11,7 @@ import java.util.function.IntUnaryOperator
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 
 class ControlUnitIT extends Specification {
 
@@ -18,7 +19,7 @@ class ControlUnitIT extends Specification {
 
     Memory memory = new PhysicalMemory("test", 4096)
 
-    Registers registers = new Registers()
+    def registers = newRegisters()
 
     IntUnaryOperator randomSource = Mock()
 

@@ -1,13 +1,11 @@
 package net.novaware.chip8.core.memory
 
-import net.novaware.chip8.core.cpu.register.Registers
+import net.novaware.chip8.core.cpu.register.RegisterModule
 import spock.lang.Specification
 
 class MappedMemorySpec extends Specification {
 
-    Registers registers = new Registers()
-
-    MemoryMap memoryMap = new MemoryMap(registers.getVariables())
+    MemoryMap memoryMap = new MemoryMap(RegisterModule.provideVariables())
 
     MappedMemory memory = memoryMap.getCpuMemory()
 

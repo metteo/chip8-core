@@ -1,6 +1,6 @@
 package net.novaware.chip8.core.memory
 
-import net.novaware.chip8.core.cpu.register.Registers
+import net.novaware.chip8.core.cpu.register.RegisterModule
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -10,10 +10,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort
 class MemoryMapSpec extends Specification {
 
     @Shared
-    Registers registers = new Registers()
-
-    @Shared
-    MemoryMap instance = new MemoryMap(registers.getVariables())
+    MemoryMap instance = new MemoryMap(RegisterModule.provideVariables())
 
     def "should properly size memory segments" () {
         expect:

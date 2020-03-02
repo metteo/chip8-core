@@ -7,13 +7,14 @@ import spock.lang.Unroll
 
 import static Gpu.MAX_SPRITE_HEIGHT
 import static net.novaware.chip8.core.cpu.register.Registers.*
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 import static net.novaware.chip8.core.util.HexUtil.toHexString
 
 class GpuSpec extends Specification {
 
     private static final boolean DUMP_MEMORY = Boolean.getBoolean(GpuSpec.getSimpleName() + ".DUMP_MEMORY")
 
-    def registers = new Registers()
+    def registers = newRegisters()
 
     def memory = new PhysicalMemory("GFX", 256)
 

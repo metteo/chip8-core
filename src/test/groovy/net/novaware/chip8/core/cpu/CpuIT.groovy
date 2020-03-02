@@ -1,9 +1,10 @@
 package net.novaware.chip8.core.cpu
 
-import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.MemoryMap
 import spock.lang.Specification
+
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 
 class CpuIT extends Specification {
 
@@ -14,7 +15,7 @@ class CpuIT extends Specification {
     Memory memory
 
     void setup() {
-        def registers = new Registers()
+        def registers = newRegisters()
         memory = new MemoryMap(registers.getVariables()).getCpuMemory()
 
         cpu = new Cpu(config, memory, registers)
