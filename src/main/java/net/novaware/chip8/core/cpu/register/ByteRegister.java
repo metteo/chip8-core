@@ -1,5 +1,8 @@
 package net.novaware.chip8.core.cpu.register;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+
 /**
  * General purpose data register. Holds 8 bits of data.
  */
@@ -16,7 +19,7 @@ public class ByteRegister extends Register<ByteRegister> {
     }
 
     public int getAsInt() {
-        return Byte.toUnsignedInt(data);
+        return uint(data);
     }
 
     public void set(byte data) {
@@ -27,10 +30,10 @@ public class ByteRegister extends Register<ByteRegister> {
 
     //TODO: when setting value using bigger types, optionally log if data was truncated in the process
     public void set(short data) {
-        set((byte) data);
+        set(ubyte(data));
     }
 
     public void set(int data) {
-        set((byte) data);
+        set(ubyte(data));
     }
 }

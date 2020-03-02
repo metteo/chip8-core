@@ -8,6 +8,7 @@ import java.util.List;
 
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 public class MappedMemory extends AbstractMemory implements Memory {
 
@@ -46,7 +47,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
             assert addressBasedSize == refBasedSize : "addressing for " + entry.ref.getName();
             assert currentStart == entry.start : "contiguity of " + entry.ref.getName();
 
-            currentStart = (short)(end + 1);
+            currentStart = ushort(end + 1);
         }
     }
 
@@ -77,7 +78,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final int addr =  uint(address);
         final int start = uint(segment.start);
 
-        return (short) (addr - start);
+        return ushort(addr - start);
     }
 
     @Override

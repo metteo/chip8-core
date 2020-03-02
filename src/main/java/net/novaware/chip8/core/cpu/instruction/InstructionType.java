@@ -10,6 +10,7 @@ import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 import static net.novaware.chip8.core.cpu.instruction.InstructionMask.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
  * MMM - address
@@ -340,8 +341,8 @@ public enum InstructionType {
     private final short mask;
 
     InstructionType(final int opcode, final int mask) {
-        this.opcode = (short) opcode;
-        this.mask = (short) mask;
+        this.opcode = ushort(opcode);
+        this.mask = ushort(mask);
     }
 
     @Unsigned
@@ -361,7 +362,7 @@ public enum InstructionType {
      */
     @Nullable
     public static InstructionType valueOf(int opcode) {
-        return byOpCode.get((short) opcode);
+        return byOpCode.get(ushort(opcode));
     }
 
     /**

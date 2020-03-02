@@ -4,6 +4,8 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import java.util.List;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+
 /**
  * NOTE: Every mask instance name starts with capital 'O', not 0 because of Java syntax rules
  */
@@ -33,7 +35,7 @@ public enum InstructionMask {
     private final short value;
 
     InstructionMask(final int value) {
-        this.value = (short) value;
+        this.value = ushort(value);
     }
 
     @Unsigned

@@ -5,9 +5,8 @@ import net.novaware.chip8.core.memory.Memory;
 
 import java.util.function.IntUnaryOperator;
 
-import static java.lang.Short.toUnsignedInt;
 import static net.novaware.chip8.core.cpu.register.Registers.*;
-import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 /**
  * Arithmetic Logic Unit (ALU)
@@ -47,7 +46,7 @@ public class ArithmeticLogic {
     /* package */ void addValueToRegister(final short x, final short value) {
         int xValue = registers.getVariable(x).getAsInt();
 
-        xValue += toUnsignedInt(value);
+        xValue += uint(value);
 
         registers.getVariable(x).set(xValue);
     }
@@ -96,7 +95,7 @@ public class ArithmeticLogic {
     /* package */ void shiftRightRegisterIntoRegister(final short x, final short y) {
         final int yValue = registers.getVariable(y).getAsInt();
 
-        final byte leastSignificantBit = (byte)(0b1 & yValue);
+        final byte leastSignificantBit = ubyte(0b1 & yValue);
         final int xValue = yValue >>> 1;
 
         registers.getVariable(x).set(xValue);
@@ -111,7 +110,7 @@ public class ArithmeticLogic {
     /* package */ void shiftLeftRegisterIntoRegister(final short x, final short y) {
         final int yValue = registers.getVariable(y).getAsInt();
 
-        final byte mostSignificantBit = (byte)((0x80 & yValue) >>> 7);
+        final byte mostSignificantBit = ubyte((0x80 & yValue) >>> 7);
         final int xValue = yValue << 1;
 
         registers.getVariable(x).set(xValue);
@@ -128,7 +127,7 @@ public class ArithmeticLogic {
     /* package */ boolean compareValueWithRegister(final short x, final short value) {
         final int xValue = registers.getVariable(x).getAsInt();
 
-        return xValue == toUnsignedInt(value);
+        return xValue == uint(value);
     }
 
     /**
@@ -176,13 +175,13 @@ public class ArithmeticLogic {
         final int xValue = registers.getVariable(x).getAsInt();
         final int address = registers.getIndex().getAsInt();
 
-        final byte hundreds = (byte)(xValue / 100);
-        final byte tens = (byte) ((xValue / 10) % 10);
-        final byte units = (byte) (xValue % 10);
+        final byte hundreds = ubyte(xValue / 100);
+        final byte tens = ubyte((xValue / 10) % 10);
+        final byte units = ubyte(xValue % 10);
 
-        memory.setByte((short)(address    ), hundreds);
-        memory.setByte((short)(address + 1), tens);
-        memory.setByte((short)(address + 2), units);
+        memory.setByte(ushort(address), hundreds);
+        memory.setByte(ushort(address + 1), tens);
+        memory.setByte(ushort(address + 2), units);
     }
 
     /* package */ void andRandomToRegister(final short x, final short value) {

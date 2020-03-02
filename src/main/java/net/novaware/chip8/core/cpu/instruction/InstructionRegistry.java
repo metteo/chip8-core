@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 public class InstructionRegistry {
 
@@ -74,7 +75,7 @@ public class InstructionRegistry {
             short mask = masks.get(m).value();
 
             @Unsigned
-            short opcode = (short) (mask & instruction);
+            short opcode = ushort(mask & instruction);
 
             final InstructionDefinition instructionDefinition = defsIndex.get(mask).get(opcode);
             if (instructionDefinition != null) {

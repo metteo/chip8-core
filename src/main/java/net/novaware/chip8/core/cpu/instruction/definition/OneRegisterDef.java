@@ -3,6 +3,8 @@ package net.novaware.chip8.core.cpu.instruction.definition;
 import net.novaware.chip8.core.cpu.instruction.InstructionType;
 import net.novaware.chip8.core.cpu.instruction.InstructionDefinition;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+
 public class OneRegisterDef extends AbstractDefinition implements InstructionDefinition {
 
     private static final int REGISTER_MASK = 0x0F00;
@@ -12,7 +14,7 @@ public class OneRegisterDef extends AbstractDefinition implements InstructionDef
     }
 
     private short getRegister(final short instruction) {
-        return (short)((instruction & REGISTER_MASK) >>> 8 /* bits */);
+        return ushort((instruction & REGISTER_MASK) >>> 8 /* bits */);
     }
 
     @Override

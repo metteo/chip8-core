@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
  * Control Unit (CU)
@@ -130,7 +131,7 @@ public class ControlUnit {
 
             case Ox9XY0: skip = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
             case OxAMMM: agu.loadAddressIntoIndex(di[1].get()); break;
-            case OxBMMM: stackEngine.jump(di[1].get(), (short) 0x0); break;
+            case OxBMMM: stackEngine.jump(di[1].get(), ushort(0x0)); break;
             case OxCXKK: alu.andRandomToRegister(di[1].get(), di[2].get()); break;
             case OxDXYK: gpu.drawSprite(di[1].get(), di[2].get(), di[3].get()); break;
 
@@ -211,7 +212,7 @@ public class ControlUnit {
 
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {
-            final byte data = memory.getByte((short) iValue);
+            final byte data = memory.getByte(ushort(iValue));
             registers.getVariable(i).set(data);
         }
 
@@ -226,7 +227,7 @@ public class ControlUnit {
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {
             final byte data = registers.getVariable(i).get();
-            memory.setByte((short)iValue, data);
+            memory.setByte(ushort(iValue), data);
         }
 
         if (incrementI) {

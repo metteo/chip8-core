@@ -16,6 +16,7 @@ public class UnsignedUtil {
 
     @Unsigned
     public static short ushort(int i) {
+        //TODO: maybe log truncation?
         return (short) i;
     }
 
@@ -26,11 +27,13 @@ public class UnsignedUtil {
 
     @Unsigned
     public static byte ubyte(int i) {
+        //TODO: maybe log truncation?
         return (byte) i;
     }
 
     @Unsigned
     public static byte ubyte(short s) {
+        //TODO: maybe log truncation?
         return (byte) s;
     }
 }

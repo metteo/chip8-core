@@ -1,5 +1,7 @@
 package net.novaware.chip8.core.memory;
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
+
 //TODO: move to another package?
 public class Loader {
 
@@ -27,7 +29,7 @@ public class Loader {
         //TODO: fonts are data and should be at the end of interpreter segment
         //TODO: create font segment register
         for (int i = 0; i < FONT.length; i++) { //TODO: move to dedicated graphics memoryMap and copy single sprite into interpreter area when needed?
-            bytes[i] = (byte)FONT[i];
+            bytes[i] = ubyte(FONT[i]);
         }
 
         return bytes;

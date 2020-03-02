@@ -22,6 +22,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 //TODO: public methods should schedule commands to clock generator
 @Singleton
@@ -67,7 +68,7 @@ public class Board {
         public void load(byte[] data) {
             SplittableMemory programMemory = memoryMap.getProgram();
             programMemory.setStrict(false); //disable RO mode
-            programMemory.setBytes((short) 0x0, data, data.length);
+            programMemory.setBytes(ushort(0x0), data, data.length);
             programMemory.setSplit(data.length);
             programMemory.setStrict(config::isEnforceMemoryRoRwState);
         }
@@ -116,7 +117,7 @@ public class Board {
 
         //TODO: load the font from file or integrate into bigger rom
         byte[] font = new Loader().loadFont();
-        memoryMap.getInterpreter().setBytes((short) 0x0, font, font.length);
+        memoryMap.getInterpreter().setBytes(ushort(0x0), font, font.length);
         memoryMap.getInterpreter().setReadOnly(config::isEnforceMemoryRoRwState);
 
         cpu.initialize();
@@ -127,7 +128,7 @@ public class Board {
             int change = gc.getAsInt();
 
             if (change > 0) {
-                memoryMap.getDisplayIo().getBytes((short) 0x0, displayBuffer, displayBuffer.length);
+                memoryMap.getDisplayIo().getBytes(ushort(0x0), displayBuffer, displayBuffer.length);
 
                 if (displayReceiver != null) {
                     displayReceiver.accept(change, displayBuffer);
