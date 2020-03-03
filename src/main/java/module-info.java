@@ -12,6 +12,7 @@ module net.novaware.chip8.core {
 
     exports net.novaware.chip8.core;
     exports net.novaware.chip8.core.port;
+    exports net.novaware.chip8.core.clock;
 
     exports net.novaware.chip8.core.cpu;
     exports net.novaware.chip8.core.cpu.register; //TODO: internal, expose part as public API

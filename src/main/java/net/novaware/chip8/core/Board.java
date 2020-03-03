@@ -31,21 +31,23 @@ public class Board {
 
     private static final Logger LOG = LogManager.getLogger();
 
+    @Owns
     private final BoardConfig config;
 
     @Owns
     private final Memory mmu;
+
+    @Owns
+    private final Cpu cpu;
+
+    @Owns
+    private ClockGenerator clock;
 
     @Uses
     private final Memory interpreterRom;
 
     @Uses
     private final Memory program;
-
-    @Owns
-    private final Cpu cpu;
-
-    private ClockGenerator clock;
 
     //TODO: class for managing handles
     private volatile ClockGenerator.Handle cycleHandle;
@@ -97,15 +99,17 @@ public class Board {
             @Named(PROGRAM) final Memory program,
             @Named(INTERPRETER_ROM) final Memory interpreterRom,
             @Named(MMU) final Memory mmu,
+            final ClockGenerator clock,
             final Cpu cpu
     ) {
         this.config = config;
+
         this.program = program;
         this.interpreterRom = interpreterRom;
         this.mmu = mmu;
-        this.cpu = cpu;
 
-        clock = new ClockGeneratorJvmImpl("Board");
+        this.clock = clock;
+        this.cpu = cpu;
     }
 
     public void powerOn() {

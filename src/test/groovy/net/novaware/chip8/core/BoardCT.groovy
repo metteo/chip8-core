@@ -1,5 +1,6 @@
 package net.novaware.chip8.core
 
+import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -24,7 +25,9 @@ class BoardCT extends Specification {
                 legacyAddressSum: false
         )
 
-        def factory = newBoardFactory(config)
+        def clock = new ClockGeneratorJvmImpl("Test");
+
+        def factory = newBoardFactory(config, clock)
 
         byte[] infiniteLoop = [0x12, 0x00] //jump to 0x200
 

@@ -2,6 +2,7 @@ package net.novaware.chip8.core;
 
 import dagger.BindsInstance;
 import dagger.Component;
+import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.memory.MemoryModule;
 
@@ -15,9 +16,10 @@ import javax.inject.Singleton;
 })
 public abstract class BoardFactory {
 
-    public static BoardFactory newBoardFactory(BoardConfig config) {
+    public static BoardFactory newBoardFactory(BoardConfig config, ClockGenerator clock) {
         return DaggerBoardFactory.builder()
                 .config(config)
+                .clock(clock)
                 .build();
     }
 
@@ -28,6 +30,9 @@ public abstract class BoardFactory {
 
         @BindsInstance
         public abstract Builder config(BoardConfig config);
+
+        @BindsInstance
+        public abstract Builder clock(ClockGenerator clock);
 
         public abstract BoardFactory build();
     }
