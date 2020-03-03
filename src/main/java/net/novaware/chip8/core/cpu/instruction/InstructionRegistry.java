@@ -1,9 +1,9 @@
 package net.novaware.chip8.core.cpu.instruction;
 
 import net.novaware.chip8.core.cpu.instruction.definition.*;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.*;
 

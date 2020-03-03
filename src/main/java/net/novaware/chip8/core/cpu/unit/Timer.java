@@ -3,8 +3,7 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Special unit attached to a timer register which decreases it

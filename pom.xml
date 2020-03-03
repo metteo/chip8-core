@@ -178,11 +178,6 @@
             <version>2.13.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>3.0.2</version>
-        </dependency>
         <dependency> <!-- TODO: Enable compile time checks -->
             <groupId>org.checkerframework</groupId>
             <artifactId>checker-qual</artifactId>

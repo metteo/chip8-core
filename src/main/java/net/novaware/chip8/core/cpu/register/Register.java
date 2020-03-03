@@ -1,6 +1,7 @@
 package net.novaware.chip8.core.cpu.register;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.function.Consumer;
 
 /**
