@@ -21,6 +21,7 @@ public class RegisterModule {
     public static final String STACK_SEGMENT = "stackSegment";
     public static final String STACK_POINTER = "stackPointer";
 
+    public static final String FONT_SEGMENT = "fontSegment";
     public static final String GRAPHIC_SEGMENT = "graphicSegment";
     public static final String GRAPHIC_CHANGE = "graphicChange";
 
@@ -95,6 +96,13 @@ public class RegisterModule {
     @Named(STACK_POINTER)
     static TribbleRegister provideStackPointer() {
         return new TribbleRegister("SP");
+    }
+
+    @Provides
+    @Singleton
+    @Named(FONT_SEGMENT)
+    static TribbleRegister provideFontSegment() {
+        return new TribbleRegister("FS");
     }
 
     @Provides

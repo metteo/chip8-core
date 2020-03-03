@@ -116,13 +116,16 @@ public class Board {
         LOG.traceEntry();
 
         //TODO: load the font from file or integrate into bigger rom
+        short fontAddress = MemoryMap.INTERPRETER_START;
         byte[] font = new Loader().loadFont();
-        memoryMap.getInterpreter().setBytes(ushort(0x0), font, font.length);
+        memoryMap.getInterpreter().setBytes(fontAddress, font, font.length);
         memoryMap.getInterpreter().setReadOnly(config::isEnforceMemoryRoRwState);
 
         cpu.initialize();
 
         final Registers registers = cpu.getRegisters();
+
+        registers.getFontSegment().set(fontAddress);
 
         registers.getGraphicChange().setCallback(gc -> {
             int change = gc.getAsInt();

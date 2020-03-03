@@ -76,6 +76,11 @@ public class Registers {
     private final TribbleRegister stackPointer;
 
     /**
+     * Start of the memory with font sprites
+     */
+    private final TribbleRegister fontSegment;
+
+    /**
      * Start of the part of memory (256 bytes) mapped to screen
      */
     private final TribbleRegister graphicSegment;
@@ -139,6 +144,7 @@ public class Registers {
         @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
         @Named(STACK_SEGMENT) final TribbleRegister stackSegment,
         @Named(STACK_POINTER) final TribbleRegister stackPointer,
+        @Named(FONT_SEGMENT) final TribbleRegister fontSegment,
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(KEY_STATE) final WordRegister keyState,
@@ -162,6 +168,7 @@ public class Registers {
         this.stackSegment = stackSegment;
         this.stackPointer = stackPointer;
 
+        this.fontSegment = fontSegment;
         this.graphicSegment = graphicSegment;
         this.graphicChange = graphicChange;
 
@@ -215,6 +222,10 @@ public class Registers {
 
     public TribbleRegister getStackPointer() {
         return stackPointer;
+    }
+
+    public TribbleRegister getFontSegment() {
+        return fontSegment;
     }
 
     public TribbleRegister getGraphicSegment() {

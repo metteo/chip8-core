@@ -13,6 +13,7 @@ class RegistersHelper {
                 provideProgramCounter(),
                 provideStackSegment(),
                 provideStackPointer(),
+                provideFontSegment(),
                 provideGraphicSegment(),
                 provideGraphicChange(),
                 provideKeyState(),

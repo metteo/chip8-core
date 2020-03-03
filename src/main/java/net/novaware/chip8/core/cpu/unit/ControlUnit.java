@@ -180,7 +180,7 @@ public class ControlUnit {
 
     private void loadFontAddressIntoRegister(final short x) {
         final int xValue = registers.getVariable(x).getAsInt();
-        final int fontSegment = MemoryMap.INTERPRETER_START; //TODO: replace with call to font segment register
+        final int fontSegment = registers.getFontSegment().getAsInt();
 
         final int fontAddress = fontSegment +  xValue * 5;
 

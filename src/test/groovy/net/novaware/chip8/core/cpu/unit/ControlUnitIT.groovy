@@ -719,15 +719,16 @@ class ControlUnitIT extends Specification {
 
     def "should load address of the font sprite"() {
         given:
+        def fontStartAddress = 0x5
+        def spriteSize = 5 //bytes
+
         registers.getProgramCounter().set(0x208)
+        registers.getFontSegment().set(fontStartAddress)
         registers.getVariable(0xC).set((byte)9)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX29.opcode())
         instruction[1].set(0xC)
-
-        def fontStartAddress = 0x0
-        def spriteSize = 5 //bytes
 
         when:
         cu.execute()
