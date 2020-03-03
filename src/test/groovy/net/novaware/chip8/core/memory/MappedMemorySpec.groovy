@@ -3,11 +3,70 @@ package net.novaware.chip8.core.memory
 import net.novaware.chip8.core.cpu.register.RegisterModule
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort
+
 class MappedMemorySpec extends Specification {
 
-    MemoryMap memoryMap = new MemoryMap(RegisterModule.provideVariables())
+    MappedMemory memory = MappedMemoryHelper.newMappedMemory(RegisterModule.provideVariables())
 
-    MappedMemory memory = memoryMap.getCpuMemory()
+    def "should properly size memory segments" () {
+        expect:
+        memory.entries[0].ref.getSize() == MemoryModule.INTERPRETER_ROM_SIZE
+        memory.entries[1].ref.getSize() == MemoryModule.PROGRAM_SIZE
+        memory.entries[2].ref.getSize() == MemoryModule.STACK_SIZE
+        memory.entries[3].ref.getSize() == MemoryModule.INTERPRETER_RAM_SIZE
+        memory.entries[4].ref.getSize() == MemoryModule.VARIABLES_SIZE
+        memory.entries[5].ref.getSize() == MemoryModule.DISPLAY_IO_SIZE
+        memory.getSize() == 4096
+    }
+
+    def "should return correct segment with given address" () {
+        when:
+        def segment = memory.getSegment(address).ref
+
+        then:
+        segment.getName() == expectedSegment
+
+        where:
+
+        address                            || expectedSegment
+        MemoryModule.INTERPRETER_ROM_START || "Interpreter ROM"
+        (short) 0x002                      || "Interpreter ROM"
+        MemoryModule.INTERPRETER_ROM_END   || "Interpreter ROM"
+
+        MemoryModule.PROGRAM_START         || "Program"
+        (short) 0x203                      || "Program"
+        MemoryModule.PROGRAM_END           || "Program"
+
+        //TODO: add more tests that verify the whole mapped memoryMap
+    }
+
+    def "should translate absolute address into segment space" () {
+        given:
+        short address = 0x202
+
+        def segment = memory.getSegment(address)
+
+        expect:
+        (short) 0x002 == memory.translateToSegmentAddress(segment, address)
+    }
+
+    //TODO: refactor to allow testing, (mocking of memory segments)
+    def "should clear writeable memory segments"() {
+        given:
+        for (int i = MemoryModule.DISPLAY_IO_START; i <= MemoryModule.DISPLAY_IO_END; ++i) {
+            memory.setByte(ushort(i), ubyte(0xFF))
+        }
+
+        when:
+        memory.clear()
+
+        then:
+        for (int i = MemoryModule.DISPLAY_IO_START; i <= MemoryModule.DISPLAY_IO_END; ++i) {
+            assert memory.getByte(ushort(i)) == 0 as byte
+        }
+    }
 
     def "should save and retrieve byte of data"() {
         given:
@@ -30,7 +89,7 @@ class MappedMemorySpec extends Specification {
         then:
         dest[0] == data
         dest2 == data2
-        memory.getName() == "CPU"
+        memory.getName() == "MMU"
     }
 
     def "should save and retrieve byte of data (end of large memory)"() {
@@ -102,6 +161,17 @@ class MappedMemorySpec extends Specification {
         memory.getBytes(address, memoryPart, 2)
 
         then:
-        memoryPart == [(byte)0x12, (byte)0x34]
+        memoryPart == [(byte)0x12, (byte)0x34] as byte[]
+    }
+
+    def "should throw IAE when address is outside mapped range"() {
+        given:
+        short address = 0x1234
+
+        when:
+        memory.getByte(address)
+
+        then:
+        thrown(IllegalArgumentException)
     }
 }

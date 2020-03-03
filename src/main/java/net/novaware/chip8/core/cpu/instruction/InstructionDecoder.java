@@ -2,18 +2,18 @@ package net.novaware.chip8.core.cpu.instruction;
 
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.register.WordRegister;
+import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Uses;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionDefinition.notSupported;
 
 public class InstructionDecoder {
 
-    // Contains ---------------------------------
-
+    @Owns
     private InstructionRegistry registry = new InstructionRegistry();
 
-    // Accessible -------------------------------
-
+    @Uses
     private Registers registers;
 
     public InstructionDecoder(Registers registers) {

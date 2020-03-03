@@ -9,6 +9,8 @@ public interface Memory {
 
     int getSize();
 
+    default void clear() {}
+
     byte getByte(short address);
 
     void setByte(short address, byte value);

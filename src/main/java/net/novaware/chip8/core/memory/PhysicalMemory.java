@@ -25,6 +25,13 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
         return size;
     }
 
+    @Override
+    public void clear() {
+        for (int i = 0; i < size; ++i) {
+            array[i] = 0;
+        }
+    }
+
     private int getArrayIndex(short address) {
         int arrayIndex = uint(address);
 

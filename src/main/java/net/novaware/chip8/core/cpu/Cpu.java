@@ -5,7 +5,7 @@ import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.memory.MemoryMap;
+import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 
@@ -13,6 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Random;
+
+import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 
 /**
  * Central Processing Unit (CPU)
@@ -71,7 +73,7 @@ public class Cpu {
     private State state;
 
     @Inject
-    public Cpu(final Config config, @Named("cpu") final Memory memory, final Registers registers) {
+    public Cpu(final Config config, @Named(MMU) final Memory memory, final Registers registers) {
         this.config = config;
         this.memory = memory;
         this.registers = registers;
@@ -94,10 +96,10 @@ public class Cpu {
     }
 
     public void initialize() { //TODO: move it to interpreter and start from 0x0000
-        registers.getProgramCounter().set(MemoryMap.PROGRAM_START);
-        registers.getStackPointer().set(MemoryMap.STACK_START);
-        registers.getStackSegment().set(MemoryMap.STACK_START);
-        registers.getGraphicSegment().set(MemoryMap.DISPLAY_IO_START);
+        registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
+        registers.getStackPointer().set(MemoryModule.STACK_START);
+        registers.getStackSegment().set(MemoryModule.STACK_START);
+        registers.getGraphicSegment().set(MemoryModule.DISPLAY_IO_START);
 
         delayTimer.init();
         soundTimer.init();
@@ -107,8 +109,8 @@ public class Cpu {
 
     public void reset() {
         registers.getMemoryAddress().set(0);
-        registers.getProgramCounter().set(MemoryMap.PROGRAM_START);
-        registers.getStackPointer().set(MemoryMap.STACK_START);
+        registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
+        registers.getStackPointer().set(MemoryModule.STACK_START);
         registers.getIndex().set(0);
         registers.getDelay().set(0);
         registers.getSound().set(0);

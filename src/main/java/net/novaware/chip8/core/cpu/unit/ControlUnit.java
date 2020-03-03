@@ -8,7 +8,6 @@ import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.memory.MemoryMap;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;

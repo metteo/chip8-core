@@ -1,7 +1,8 @@
 module net.novaware.chip8.core {
-    requires java.base;
+    requires static java.compiler; // @j.a.p.Generated
 
-    requires javax.inject; //automatic
+    //TODO: consider transitive / static
+    requires javax.inject; // automatic
     requires dagger; //automatic
 
     requires org.checkerframework.checker.qual;

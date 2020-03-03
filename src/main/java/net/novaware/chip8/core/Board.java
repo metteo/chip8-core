@@ -4,24 +4,25 @@ import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.memory.Loader;
-import net.novaware.chip8.core.memory.MemoryMap;
-import net.novaware.chip8.core.memory.SplittableMemory;
+import net.novaware.chip8.core.memory.*;
 import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
 import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
+import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 //TODO: public methods should schedule commands to clock generator
@@ -33,7 +34,13 @@ public class Board {
     private final BoardConfig config;
 
     @Owns
-    private final MemoryMap memoryMap;
+    private final Memory mmu;
+
+    @Uses
+    private final Memory interpreterRom;
+
+    @Uses
+    private final Memory program;
 
     @Owns
     private final Cpu cpu;
@@ -66,7 +73,7 @@ public class Board {
         //TODO: the board should request data from storage device, not the other way around
         @Override
         public void load(byte[] data) {
-            SplittableMemory programMemory = memoryMap.getProgram();
+            SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
             programMemory.setStrict(false); //disable RO mode
             programMemory.setBytes(ushort(0x0), data, data.length);
             programMemory.setSplit(data.length);
@@ -79,15 +86,23 @@ public class Board {
         }
     };
 
-    private byte[] displayBuffer = new byte[MemoryMap.DISPLAY_IO_SIZE];
+    private byte[] displayBuffer = new byte[MemoryModule.DISPLAY_IO_SIZE];
     private BiConsumer<Integer, byte[]> displayReceiver;
 
     private Consumer<Boolean> audioReceiver;
 
     @Inject
-    public Board(final BoardConfig config, final MemoryMap memoryMap, final Cpu cpu) {
+    public Board(
+            final BoardConfig config,
+            @Named(PROGRAM) final Memory program,
+            @Named(INTERPRETER_ROM) final Memory interpreterRom,
+            @Named(MMU) final Memory mmu,
+            final Cpu cpu
+    ) {
         this.config = config;
-        this.memoryMap = memoryMap;
+        this.program = program;
+        this.interpreterRom = interpreterRom;
+        this.mmu = mmu;
         this.cpu = cpu;
 
         clock = new ClockGeneratorJvmImpl("Board");
@@ -116,10 +131,9 @@ public class Board {
         LOG.traceEntry();
 
         //TODO: load the font from file or integrate into bigger rom
-        short fontAddress = MemoryMap.INTERPRETER_START;
+        short fontAddress = INTERPRETER_ROM_START;
         byte[] font = new Loader().loadFont();
-        memoryMap.getInterpreter().setBytes(fontAddress, font, font.length);
-        memoryMap.getInterpreter().setReadOnly(config::isEnforceMemoryRoRwState);
+        mmu.setBytes(fontAddress, font, font.length);
 
         cpu.initialize();
 
@@ -131,7 +145,7 @@ public class Board {
             int change = gc.getAsInt();
 
             if (change > 0) {
-                memoryMap.getDisplayIo().getBytes(ushort(0x0), displayBuffer, displayBuffer.length);
+                mmu.getBytes(DISPLAY_IO_START, displayBuffer, displayBuffer.length);
 
                 if (displayReceiver != null) {
                     displayReceiver.accept(change, displayBuffer);
@@ -145,12 +159,15 @@ public class Board {
             audioReceiver.accept(so.getAsInt() == 1);
         });
 
+        ReadOnlyMemory interpreter = (ReadOnlyMemory) interpreterRom; //TODO: add check
+        interpreter.setReadOnly(config::isEnforceMemoryRoRwState);
+
         LOG.traceExit();
     }
 
     public void reset() {
         // https://en.wikipedia.org/wiki/Hardware_reset
-        memoryMap.clear(); // TODO:  hard reset clears whole memory and reloads roms?
+        mmu.clear(); // TODO:  hard reset clears whole memory and reloads roms?
         cpu.reset();  //TODO: soft reset clears only display / registers
     }
 

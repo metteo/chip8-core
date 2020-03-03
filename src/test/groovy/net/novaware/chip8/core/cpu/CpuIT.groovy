@@ -1,10 +1,11 @@
 package net.novaware.chip8.core.cpu
 
 import net.novaware.chip8.core.memory.Memory
-import net.novaware.chip8.core.memory.MemoryMap
+import net.novaware.chip8.core.memory.MemoryModule
 import spock.lang.Specification
 
 import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
+import static net.novaware.chip8.core.memory.MappedMemoryHelper.newMappedMemory
 
 class CpuIT extends Specification {
 
@@ -16,7 +17,7 @@ class CpuIT extends Specification {
 
     void setup() {
         def registers = newRegisters()
-        memory = new MemoryMap(registers.getVariables()).getCpuMemory()
+        memory = newMappedMemory(registers.getVariables())
 
         cpu = new Cpu(config, memory, registers)
         cpu.initialize()
@@ -24,9 +25,9 @@ class CpuIT extends Specification {
 
     def "should properly initialize cpu"() {
         expect:
-        MemoryMap.PROGRAM_START == cpu.getRegisters().getProgramCounter().get()
-        MemoryMap.STACK_START == cpu.getRegisters().getStackPointer().get()
-        MemoryMap.STACK_START == cpu.getRegisters().getStackSegment().get()
+        MemoryModule.PROGRAM_START == cpu.getRegisters().getProgramCounter().get()
+        MemoryModule.STACK_START == cpu.getRegisters().getStackPointer().get()
+        MemoryModule.STACK_START == cpu.getRegisters().getStackSegment().get()
     }
 
     def "should properly fetch first instruction"() {

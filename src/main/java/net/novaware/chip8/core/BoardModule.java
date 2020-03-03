@@ -3,20 +3,10 @@ package net.novaware.chip8.core;
 import dagger.Module;
 import dagger.Provides;
 import net.novaware.chip8.core.cpu.Cpu;
-import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.memory.MemoryMap;
-
-import javax.inject.Named;
 
 @Deprecated(forRemoval = true)
 @Module
 public class BoardModule {
-
-    @Provides
-    @Named("cpu")
-    static Memory provideCpuMemory(MemoryMap memoryMap) {
-        return memoryMap.getCpuMemory();
-    }
 
     @Provides
     static Cpu.Config provideCpuConfig(BoardConfig boardConfig) {

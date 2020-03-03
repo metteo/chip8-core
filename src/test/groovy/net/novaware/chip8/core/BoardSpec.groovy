@@ -1,7 +1,7 @@
 package net.novaware.chip8.core
 
 import net.novaware.chip8.core.cpu.Cpu
-import net.novaware.chip8.core.memory.MemoryMap
+import net.novaware.chip8.core.memory.Memory
 import spock.lang.Specification
 
 class BoardSpec extends Specification {
@@ -10,9 +10,11 @@ class BoardSpec extends Specification {
 
     Cpu cpu = Mock()
 
-    MemoryMap memoryMap = Mock()
+    Memory interpreter = Mock()
+    Memory program = Mock()
+    Memory mmu = Mock()
 
-    Board instance = new Board(config, memoryMap, cpu)
+    Board instance = new Board(config, interpreter, program, mmu, cpu)
 
     def "should reset cpu and memory"() {
         when:
@@ -20,6 +22,6 @@ class BoardSpec extends Specification {
 
         then:
         1 * cpu.reset()
-        1 * memoryMap.clear()
+        1 * mmu.clear()
     }
 }
