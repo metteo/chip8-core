@@ -1,12 +1,17 @@
 package net.novaware.chip8.core.cpu.instruction.definition;
 
+import net.novaware.chip8.core.cpu.instruction.InstructionType;
+
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*;
 import static net.novaware.chip8.core.cpu.instruction.InstructionDefinition.notSupported;
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 
 public class SystemJumpDef extends AddressOnlyDef {
 
-    public SystemJumpDef() {
-        super(Ox0MMM);
+    public SystemJumpDef(final InstructionType instructionType) {
+        super(instructionType);
+
+        assertArgument(instructionType != Ox0MMM, "only Ox0MMM is supported");
     }
 
     @Override

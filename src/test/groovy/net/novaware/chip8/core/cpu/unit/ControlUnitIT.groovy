@@ -1,9 +1,11 @@
 package net.novaware.chip8.core.cpu.unit
 
+import net.novaware.chip8.core.Board
+import net.novaware.chip8.core.BoardConfig
+import net.novaware.chip8.core.BoardFactory
+import net.novaware.chip8.core.clock.ClockGenerator
 import net.novaware.chip8.core.cpu.register.Registers
-import net.novaware.chip8.core.gpu.Gpu
 import net.novaware.chip8.core.memory.Memory
-import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -11,27 +13,20 @@ import java.util.function.IntUnaryOperator
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION
-import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 
 class ControlUnitIT extends Specification {
 
-    ControlUnit.Config config = Mock()
-
-    Memory memory = new PhysicalMemory("test", 4096)
-
-    def registers = newRegisters()
-
     IntUnaryOperator randomSource = Mock()
 
-    ArithmeticLogic alu = new ArithmeticLogic(randomSource, registers, memory)
+    BoardConfig config = Mock()
 
-    AddressGeneration agu = new AddressGeneration(registers, memory)
+    Board board = BoardFactory.newBoardFactory(config, Mock(ClockGenerator), randomSource).newBoard()
 
-    StackEngine stackEngine = new StackEngine(registers, memory)
+    ControlUnit cu = board.cpu.controlUnit
 
-    Gpu gpu = new Gpu(registers, memory)
+    Memory memory = board.mmu
 
-    ControlUnit cu = new ControlUnit(config, registers, memory, alu, agu, stackEngine, gpu)
+    def registers = board.cpu.registers
 
     def "should clear the screen"() {
         given:

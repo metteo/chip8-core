@@ -9,7 +9,11 @@ class InstructionDecoderIT extends Specification {
 
     def registers = newRegisters()
 
-    InstructionDecoder decoder = new InstructionDecoder(registers)
+    InstructionDecoder decoder = new InstructionDecoder(
+            registers.getCurrentInstruction(),
+            registers.getDecodedInstruction(),
+            new InstructionRegistry()
+    )
 
     def "should properly decode MVI / LD I instruction"() {
         given:

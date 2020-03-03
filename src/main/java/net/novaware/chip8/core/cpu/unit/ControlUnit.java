@@ -13,6 +13,10 @@ import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
@@ -56,17 +60,19 @@ public class ControlUnit {
     @Uses
     private final Gpu gpu;
 
+    @Inject
     public ControlUnit(
             final Config config,
+            final InstructionDecoder decoder,
             final Registers registers,
-            final Memory memory,
+            @Named(MMU) final Memory memory,
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
             final Gpu gpu
     ) {
         this.config = config;
-        this.decoder = new InstructionDecoder(registers);
+        this.decoder = decoder;
 
         this.registers = registers;
         this.memory = memory;

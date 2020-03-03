@@ -1,8 +1,10 @@
 package net.novaware.chip8.core.cpu.instruction.definition;
 
 import net.novaware.chip8.core.cpu.instruction.InstructionDefinition;
+import net.novaware.chip8.core.cpu.instruction.InstructionType;
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.OxDXYK;
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 public class DrawSpriteDef extends AbstractDefinition implements InstructionDefinition {
@@ -11,8 +13,10 @@ public class DrawSpriteDef extends AbstractDefinition implements InstructionDefi
     private static final int REGISTER_Y_MASK = 0x00F0;
     private static final int VALUE_MASK      = 0x000F;
 
-    public DrawSpriteDef() {
-        super(OxDXYK);
+    public DrawSpriteDef(final InstructionType instructionType) {
+        super(instructionType);
+
+        assertArgument(instructionType != OxDXYK, "only OxDXYK is supported");
     }
 
     private short getRegisterX(final short instruction) {

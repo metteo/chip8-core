@@ -4,7 +4,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
- * 16 bit register type. Used to hold 2 bytes or a single instruction.
+ * 16 bit register type. Used to hold 2 bytes of data or a single instruction.
  */
 public class WordRegister extends Register<WordRegister> {
 

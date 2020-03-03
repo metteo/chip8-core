@@ -1,45 +1,74 @@
 package net.novaware.chip8.core.cpu.unit;
 
-import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.cpu.register.ByteRegister;
+import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.util.uml.Uses;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
+import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
+import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
+@Singleton
 public class StackEngine {
 
-    // Accessible -------------------------------
+    @Uses
+    private final TribbleRegister stackPointer;
 
-    private final Registers registers;
+    @Uses
+    private final TribbleRegister memoryAddress;
 
+    @Uses
+    private final TribbleRegister programCounter;
+
+    @Uses
+    private final ByteRegister[] variables;
+
+    @Uses
     private final Memory memory;
 
-    public StackEngine(Registers registers, Memory memory) {
-        this.registers = registers;
+    @Inject
+    public StackEngine(
+            @Named(STACK_POINTER) final TribbleRegister stackPointer,
+            @Named(MEMORY_ADDRESS) final TribbleRegister memoryAddress,
+            @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
+            @Named(VARIABLES) final ByteRegister[] variables,
+            @Named(MMU) final Memory memory
+    ) {
+        this.stackPointer = stackPointer;
+        this.memoryAddress = memoryAddress;
+        this.programCounter = programCounter;
+        this.variables = variables;
 
         this.memory = memory;
     }
 
     /* package */ void call(final short address) {
-        registers.getStackPointer().increment(2); // 2 byte address
-        memory.setWord(registers.getStackPointer().get(), registers.getMemoryAddress().get());
-        registers.getProgramCounter().set(address);
+        stackPointer.increment(2); // 2 byte address
+        memory.setWord(stackPointer.get(), memoryAddress.get());
+        programCounter.set(address);
     }
 
     /* package */ void returnFromSubroutine() {
-        final short address = memory.getWord(registers.getStackPointer().get());
-        registers.getStackPointer().increment(-2);
+        final short address = memory.getWord(stackPointer.get());
+        stackPointer.increment(-2);
 
-        registers.getProgramCounter().set(address);
-        registers.getProgramCounter().increment(2);
+        programCounter.set(address);
+        programCounter.increment(2);
     }
 
     /* package */ void jump(final short address) {
-        registers.getProgramCounter().set(address);
+        programCounter.set(address);
     }
 
     /* package */ void jump(final short address, final short offset) {
-        final int offsetValue = registers.getVariable(offset).getAsInt();
+        final int offsetValue = getVariable(variables, offset).getAsInt();
         int newPc = uint(address);
 
         newPc = newPc + offsetValue; //TODO: may overflow

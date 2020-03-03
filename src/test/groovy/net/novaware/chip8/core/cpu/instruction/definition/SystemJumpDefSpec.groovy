@@ -2,9 +2,11 @@ package net.novaware.chip8.core.cpu.instruction.definition
 
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.cpu.instruction.InstructionType.Ox0MMM
+
 class SystemJumpDefSpec extends Specification {
 
-    def instance = new SystemJumpDef()
+    def instance = new SystemJumpDef(Ox0MMM)
 
     def "should decode jump to system location" () {
         given:

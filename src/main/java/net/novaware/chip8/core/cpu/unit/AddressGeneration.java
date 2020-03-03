@@ -1,47 +1,70 @@
 package net.novaware.chip8.core.cpu.unit;
 
+import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.util.uml.Uses;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
+import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
 
 /**
  * Address Generation Unit (AGU)
- *
+ * <p>
  * also known as
- *
+ * <p>
  * Address Computation Unit (ACU)
  */
+@Singleton
 public class AddressGeneration {
 
-    // Accessible -------------------------------
+    @Uses
+    private final ByteRegister[] variables;
 
-    private final Registers registers;
+    @Uses
+    private final TribbleRegister index;
 
-    private final Memory memory;
+    @Uses
+    private final ByteRegister status;
 
-    public AddressGeneration(Registers registers, Memory memory) {
-        this.registers = registers;
+    @Uses
+    private final ByteRegister statusType;
 
-        this.memory = memory;
+    @Inject
+    public AddressGeneration(
+            @Named(VARIABLES) final ByteRegister[] variables,
+            @Named(INDEX) final TribbleRegister index,
+            @Named(STATUS) final ByteRegister status,
+            @Named(STATUS_TYPE) final ByteRegister statusType
+    ) {
+        this.variables = variables;
+        this.index = index;
+        this.status = status;
+        this.statusType = statusType;
     }
 
     /* package */ void loadAddressIntoIndex(final short address) {
-        registers.getIndex().set(address);
+        index.set(address);
     }
 
     /* package */ void addRegisterIntoIndex(final short x, boolean overflowI) {
-        final int xValue = registers.getVariable(x).getAsInt();
-        int iValue = registers.getIndex().getAsInt();
+        final int xValue = getVariable(variables, x).getAsInt();
+        int iValue = index.getAsInt();
 
         iValue = iValue + xValue;
 
         final int overflow = iValue >>> 12;
         final int carry = overflow > 0 ? 0b1 : 0;
 
-        registers.getIndex().set(iValue);
+        index.set(iValue);
 
         if (overflowI) {
-            registers.getStatus().set(carry);
-            registers.getStatusType().set(Registers.VF_CARRY_I);
+            status.set(carry);
+            statusType.set(Registers.VF_CARRY_I);
         }
     }
 }

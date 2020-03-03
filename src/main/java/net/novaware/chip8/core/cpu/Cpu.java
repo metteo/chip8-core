@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.cpu;
 
+import net.novaware.chip8.core.cpu.instruction.InstructionDecoder;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
@@ -12,7 +13,6 @@ import net.novaware.chip8.core.util.uml.Uses;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Random;
 
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 
@@ -32,11 +32,7 @@ public class Cpu {
     }
 
     public interface Config {
-        boolean isLegacyShift();
 
-        boolean isLegacyLoadStore();
-
-        boolean isLegacyAddressSum();
     }
 
     @Owns
@@ -73,26 +69,34 @@ public class Cpu {
     private State state;
 
     @Inject
-    public Cpu(final Config config, @Named(MMU) final Memory memory, final Registers registers) {
+    public Cpu(
+            final Config config,
+            @Named(MMU) final Memory memory,
+            final Registers registers,
+
+            final ArithmeticLogic alu,
+            final AddressGeneration agu,
+            final StackEngine stackEngine,
+            final Gpu gpu,
+
+            final ControlUnit controlUnit,
+
+            @Named("delay") final Timer delayTimer,
+            @Named("sound") final Timer soundTimer
+    ) {
         this.config = config;
         this.memory = memory;
         this.registers = registers;
 
-        alu = new ArithmeticLogic(new Random()::nextInt, registers, memory);
-        agu = new AddressGeneration(registers, memory);
-        stackEngine = new StackEngine(registers, memory);
-        gpu = new Gpu(registers, memory);
+        this.alu = alu;
+        this.agu = agu;
+        this.stackEngine = stackEngine;
+        this.gpu = gpu;
 
-        ControlUnit.Config cuConfig = new ControlUnit.Config() {
-            @Override public boolean isLegacyShift()      { return config.isLegacyShift(); }
-            @Override public boolean isLegacyLoadStore()  { return config.isLegacyLoadStore(); }
-            @Override public boolean isLegacyAddressSum() { return config.isLegacyAddressSum(); }
-        };
+        this.controlUnit = controlUnit;
 
-        controlUnit = new ControlUnit(cuConfig, registers, this.memory, alu, agu, stackEngine, gpu);
-
-        delayTimer = new Timer(registers.getDelay());
-        soundTimer = new Timer(registers.getSound(), registers.getSoundOn());
+        this.delayTimer = delayTimer;
+        this.soundTimer = soundTimer;
     }
 
     public void initialize() { //TODO: move it to interpreter and start from 0x0000

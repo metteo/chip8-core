@@ -1,5 +1,7 @@
 package net.novaware.chip8.core.cpu.unit
 
+import net.novaware.chip8.core.cpu.instruction.InstructionDecoder
+import net.novaware.chip8.core.cpu.instruction.InstructionRegistry
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
@@ -14,7 +16,17 @@ class ControlUnitSpec extends Specification {
 
     Memory memory = new PhysicalMemory("test", 4096)
 
-    ControlUnit cu = new ControlUnit(config, registers, memory, null, null, null, null)
+    ControlUnit cu = new ControlUnit(
+            config,
+            new InstructionDecoder(
+                    registers.getCurrentInstruction(),
+                    registers.getDecodedInstruction(),
+                    new InstructionRegistry()
+            ),
+            registers,
+            memory,
+            null, null, null, null
+    )
 
     def "should fetch instruction from memory pointed by PC"() {
         given:

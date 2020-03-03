@@ -4,22 +4,27 @@ import dagger.BindsInstance;
 import dagger.Component;
 import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
+import net.novaware.chip8.core.cpu.unit.UnitModule;
 import net.novaware.chip8.core.memory.MemoryModule;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.function.IntUnaryOperator;
 
 @Singleton
 @Component(modules = {
-        BoardModule.class,
+        RegisterModule.class,
         MemoryModule.class,
-        RegisterModule.class
+        UnitModule.class,
+        BoardModule.class
 })
 public abstract class BoardFactory {
 
-    public static BoardFactory newBoardFactory(BoardConfig config, ClockGenerator clock) {
+    public static BoardFactory newBoardFactory(BoardConfig config, ClockGenerator clock, IntUnaryOperator random) {
         return DaggerBoardFactory.builder()
                 .config(config)
                 .clock(clock)
+                .random(random)
                 .build();
     }
 
@@ -33,6 +38,9 @@ public abstract class BoardFactory {
 
         @BindsInstance
         public abstract Builder clock(ClockGenerator clock);
+
+        @BindsInstance
+        public abstract Builder random(@Named("random") IntUnaryOperator random);
 
         public abstract BoardFactory build();
     }

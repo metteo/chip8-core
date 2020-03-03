@@ -1,5 +1,11 @@
 package net.novaware.chip8.core.cpu
 
+import net.novaware.chip8.core.cpu.unit.AddressGeneration
+import net.novaware.chip8.core.cpu.unit.ArithmeticLogic
+import net.novaware.chip8.core.cpu.unit.ControlUnit
+import net.novaware.chip8.core.cpu.unit.StackEngine
+import net.novaware.chip8.core.cpu.unit.Timer
+import net.novaware.chip8.core.gpu.Gpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.MemoryModule
 import spock.lang.Specification
@@ -9,13 +15,32 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint
 
 class CpuSpec extends Specification {
 
-    Cpu.Config config = Mock()
-
     Memory memory = Mock()
 
     def registers = newRegisters()
 
-    Cpu instance = new Cpu(config, memory, registers)
+    Cpu instance = new Cpu(
+            Mock(Cpu.Config),
+            memory,
+            registers,
+            Mock(ArithmeticLogic),
+            Mock(AddressGeneration),
+            Mock(StackEngine),
+            Mock(Gpu),
+            Mock(ControlUnit),
+            Mock(Timer),
+            Mock(Timer)
+    )
+
+    def "should properly initialize cpu"() {
+        when:
+        instance.initialize()
+
+        then:
+        MemoryModule.PROGRAM_START == instance.getRegisters().getProgramCounter().get()
+        MemoryModule.STACK_START == instance.getRegisters().getStackPointer().get()
+        MemoryModule.STACK_START == instance.getRegisters().getStackSegment().get()
+    }
 
     def "should reset the registers"() {
         given:

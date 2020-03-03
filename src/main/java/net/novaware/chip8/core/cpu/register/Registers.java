@@ -196,6 +196,10 @@ public class Registers {
         return getVariable(uint(i));
     }
 
+    public static ByteRegister getVariable(ByteRegister[] variables, short i) {
+        return variables[uint(i)];
+    }
+
     public ByteRegister getStatus() {
         return getVariable(0xF);
     }

@@ -4,6 +4,7 @@ import net.novaware.chip8.core.cpu.instruction.definition.*;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.util.*;
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*;
@@ -13,11 +14,12 @@ public class InstructionRegistry {
 
     private final Map<Short, Map<Short, InstructionDefinition>> defsIndex;
 
+    @Inject
     public InstructionRegistry() {
         List<InstructionDefinition> defs = new ArrayList<>(Arrays.asList(
                 new OpCodeOnlyDef(Ox00E0),
                 new OpCodeOnlyDef(Ox00EE),
-                new SystemJumpDef(/* Ox0MMM */),
+                new SystemJumpDef(Ox0MMM),
                 new AddressOnlyDef(Ox1MMM),
                 new AddressOnlyDef(Ox2MMM),
                 new RegisterValueDef(Ox3XKK),
@@ -38,7 +40,7 @@ public class InstructionRegistry {
                 new AddressOnlyDef(OxAMMM),
                 new AddressOnlyDef(OxBMMM),
                 new RegisterValueDef(OxCXKK),
-                new DrawSpriteDef(/* OxDXYK */),
+                new DrawSpriteDef(OxDXYK),
                 new OneRegisterDef(OxEXA1),
                 new OneRegisterDef(OxEX9E),
                 new OneRegisterDef(OxFX07),

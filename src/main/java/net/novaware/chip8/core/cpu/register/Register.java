@@ -10,6 +10,7 @@ public abstract class Register<T extends Register> {
 
     private final String name;
 
+    //TODO: replace with some callback manager
     private Consumer<T> callback;
 
     protected Register(String name) {

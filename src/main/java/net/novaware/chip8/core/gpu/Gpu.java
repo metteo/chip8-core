@@ -3,27 +3,38 @@ package net.novaware.chip8.core.gpu;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.gpu.ViewPort.Index;
+import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.signedness.qual.Unsigned;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import static net.novaware.chip8.core.cpu.register.Registers.*;
+import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 
 /**
  * Graphics Processing Unit
  */
+@Singleton
 public class Gpu {
 
     private static final Logger LOG = LogManager.getLogger();
 
     public static final int MAX_SPRITE_HEIGHT = 0x10;
 
+    @Uses
     private final Registers registers;
 
+    @Uses
     private final Memory memory;
 
+    @Owns
     private final ViewPort viewPort = new ViewPort();
 
     private byte[] spriteBuffer;
@@ -38,7 +49,8 @@ public class Gpu {
     final boolean clipping = false; //TODO: make configurable
     final boolean dump = true; //TODO: debugging UI
 
-    public Gpu(Registers registers, Memory memory) {
+    @Inject
+    public Gpu(Registers registers, @Named(MMU) Memory memory) {
         this.registers = registers;
         this.memory = memory;
 
