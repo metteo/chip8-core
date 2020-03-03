@@ -3,26 +3,35 @@ package net.novaware.chip8.core.cpu.unit;
 import dagger.Module;
 import dagger.Provides;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
+import net.novaware.chip8.core.cpu.register.RegisterModule;
 
 import javax.inject.Named;
-
-import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
+import javax.inject.Singleton;
 
 @Module
 public class UnitModule {
 
+    public static final String DELAY = "delay";
+    public static final String SOUND = "sound";
+
     @Provides
-    @Named("delay")
-    static Timer provideDelayTimer(@Named(DELAY) final ByteRegister delay) {
-        return new Timer(delay);
+    @Singleton
+    @Named(DELAY)
+    static Timer provideDelayTimer(
+            @Named(RegisterModule.VARIABLES) final ByteRegister[] variables,
+            @Named(RegisterModule.DELAY) final ByteRegister delay
+    ) {
+        return new Timer(variables, delay);
     }
 
     @Provides
-    @Named("sound")
+    @Singleton
+    @Named(SOUND)
     static Timer provideSoundTimer(
-            @Named(SOUND) final ByteRegister sound,
-            @Named(SOUND_ON) final ByteRegister soundOn
+            @Named(RegisterModule.VARIABLES) final ByteRegister[] variables,
+            @Named(RegisterModule.SOUND) final ByteRegister sound,
+            @Named(RegisterModule.SOUND_ON) final ByteRegister soundOn
     ) {
-        return new Timer(sound, soundOn);
+        return new Timer(variables, sound, soundOn);
     }
 }

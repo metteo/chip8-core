@@ -1,6 +1,5 @@
 package net.novaware.chip8.core.cpu;
 
-import net.novaware.chip8.core.cpu.instruction.InstructionDecoder;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.unit.*;
@@ -14,6 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
+import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 
 /**
@@ -81,8 +82,8 @@ public class Cpu {
 
             final ControlUnit controlUnit,
 
-            @Named("delay") final Timer delayTimer,
-            @Named("sound") final Timer soundTimer
+            @Named(DELAY) final Timer delayTimer,
+            @Named(SOUND) final Timer soundTimer
     ) {
         this.config = config;
         this.memory = memory;

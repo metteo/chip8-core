@@ -2,7 +2,6 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.instruction.InstructionDecoder;
 import net.novaware.chip8.core.cpu.instruction.InstructionType;
-import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
@@ -16,6 +15,8 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
+import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
@@ -60,26 +61,41 @@ public class ControlUnit {
     @Uses
     private final Gpu gpu;
 
+    @Uses
+    private final Timer delayTimer;
+
+    @Uses
+    private final Timer soundTimer;
+
     @Inject
     public ControlUnit(
             final Config config,
             final InstructionDecoder decoder,
+
             final Registers registers,
             @Named(MMU) final Memory memory,
+
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
-            final Gpu gpu
+            final Gpu gpu,
+
+            @Named(DELAY) final Timer delayTimer,
+            @Named(SOUND) final Timer soundTimer
     ) {
         this.config = config;
         this.decoder = decoder;
 
         this.registers = registers;
         this.memory = memory;
+
         this.alu = alu;
         this.agu = agu;
         this.stackEngine = stackEngine;
         this.gpu = gpu;
+
+        this.delayTimer = delayTimer;
+        this.soundTimer = soundTimer;
     }
 
     public void fetch() {
@@ -143,10 +159,10 @@ public class ControlUnit {
             case OxEX9E: skip = compareKeyStateWithRegister(di[1].get()) ? 2 : 0; break;
             case OxEXA1: skip = compareKeyStateWithRegister(di[1].get()) ? 0 : 2; break;
 
-            case OxFX07: loadTimerIntoRegister(di[1].get(), registers.getDelay()); break;
+            case OxFX07: delayTimer.storeTimerIntoVariable(di[1].get()); break;
             case OxFX0A: skip = checkIfKeyPressed(di[1].get()) ? 0 : -2; break;
-            case OxFX15: loadRegisterIntoTimer(di[1].get(), registers.getDelay()); break;
-            case OxFX18: loadRegisterIntoTimer(di[1].get(), registers.getSound()); break;
+            case OxFX15: delayTimer.loadVariableIntoTimer(di[1].get()); break;
+            case OxFX18: soundTimer.loadVariableIntoTimer(di[1].get()); break;
             case OxFX1E: agu.addRegisterIntoIndex(di[1].get(), overflowI); break;
             case OxFX29: loadFontAddressIntoRegister(di[1].get()); break;
             case OxFX33: alu.bcdRegisterToMemory(di[1].get()); break;
@@ -171,16 +187,6 @@ public class ControlUnit {
             registers.getKeyWait().set(0x1);
             return false;
         }
-    }
-
-    private void loadTimerIntoRegister(short x, ByteRegister timer) {
-        byte currentDelay = timer.get();
-        registers.getVariable(x).set(currentDelay);
-    }
-
-    private void loadRegisterIntoTimer(short x, ByteRegister timer) {
-        byte delay = registers.getVariable(x).get();
-        timer.set(delay);
     }
 
     private void loadFontAddressIntoRegister(final short x) {

@@ -3,28 +3,30 @@ package net.novaware.chip8.core.cpu.unit
 import net.novaware.chip8.core.cpu.register.ByteRegister
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
+
 class TimerSpec extends Specification {
 
     def "should not decrement the timer when 0"() {
         given:
-        ByteRegister delay = new ByteRegister("DT")
-        Timer timer = new Timer(delay, null)
+        def registers = newRegisters()
+        Timer timer = new Timer(registers.getVariables(), registers.getDelay())
         timer.init()
 
         when:
         timer.maybeDecrementValue()
 
         then:
-        delay.get() == 0x0 as byte
+        registers.getDelay().get() == 0x0 as byte
     }
 
     def "should decrement the timer to 0 from 1, after multiple invocations"() {
         given:
-        ByteRegister delay = new ByteRegister("DT")
-        Timer timer = new Timer(delay, null)
+        def registers = newRegisters()
+        Timer timer = new Timer(registers.getVariables(), registers.getDelay())
         timer.init()
 
-        delay.set(0x1 as byte)
+        registers.getDelay().set(0x1 as byte)
 
         when:
         timer.maybeDecrementValue()
@@ -32,14 +34,16 @@ class TimerSpec extends Specification {
         timer.maybeDecrementValue()
 
         then:
-        delay.get() == 0x0 as byte
+        registers.getDelay().get() == 0x0 as byte
     }
 
     def "should decrement the timer by 1 every invocation"() {
         given:
-        ByteRegister delay = new ByteRegister("DT")
-        Timer timer = new Timer(delay, null)
+        def registers = newRegisters()
+        Timer timer = new Timer(registers.getVariables(), registers.getDelay())
         timer.init()
+
+        def delay = registers.getDelay()
 
         delay.set(0x3 as byte)
 
@@ -57,10 +61,12 @@ class TimerSpec extends Specification {
 
     def "should trigger output register when more than 1"() {
         given:
-        ByteRegister sound = new ByteRegister("ST")
-        ByteRegister soundOn = new ByteRegister("SO")
+        def registers = newRegisters()
 
-        Timer timer = new Timer(sound, soundOn)
+        ByteRegister sound = registers.getSound()
+        ByteRegister soundOn = registers.getSoundOn()
+
+        Timer timer = new Timer(registers.getVariables(), sound, soundOn)
         timer.init()
 
         when:
@@ -77,13 +83,15 @@ class TimerSpec extends Specification {
 
     def "should zero out output register when reached 0"() {
         given:
-        ByteRegister sound = new ByteRegister("ST")
+        def registers = newRegisters()
+
+        ByteRegister sound = registers.getSound()
         sound.set(1)
 
-        ByteRegister soundOn = new ByteRegister("SO")
+        ByteRegister soundOn = registers.getSoundOn()
         soundOn.set(1)
 
-        Timer timer = new Timer(sound, soundOn)
+        Timer timer = new Timer(registers.getVariables(), sound, soundOn)
         timer.init()
 
         when:

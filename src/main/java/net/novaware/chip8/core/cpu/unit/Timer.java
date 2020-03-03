@@ -1,9 +1,12 @@
 package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
+import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
 
 /**
  * Special unit attached to a timer register which decreases it
@@ -12,18 +15,28 @@ public class Timer {
 
     private static final Logger LOG = LogManager.getLogger();
 
+    @Uses
+    private final ByteRegister[] variables;
+
+    @Uses
     private final ByteRegister timerRegister;
 
+    @Uses
     @Nullable
     private final ByteRegister outputRegister;
 
-    public Timer(ByteRegister timerRegister, @Nullable ByteRegister outputRegister) {
+    public Timer(
+            final ByteRegister[] variables,
+            final ByteRegister timerRegister,
+            final @Nullable ByteRegister outputRegister
+    ) {
+        this.variables = variables;
         this.timerRegister = timerRegister;
         this.outputRegister = outputRegister;
     }
 
-    public Timer(ByteRegister timerRegister) {
-        this(timerRegister, null);
+    public Timer(final ByteRegister[] variables, final ByteRegister timerRegister) {
+        this(variables, timerRegister, null);
     }
 
     public void init() {
@@ -44,6 +57,16 @@ public class Timer {
                 }
             });
         }
+    }
+
+    public void storeTimerIntoVariable(short x) {
+        byte currentDelay = timerRegister.get();
+        getVariable(variables, x).set(currentDelay);
+    }
+
+    public void loadVariableIntoTimer(short x) {
+        byte delay = getVariable(variables, x).get();
+        timerRegister.set(delay);
     }
 
     public void maybeDecrementValue() {
