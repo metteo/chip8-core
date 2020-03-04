@@ -185,10 +185,8 @@ public class ControlUnit {
     private boolean checkIfKeyPressed(short x) {
         if (registers.getKeyState().getAsInt() > 0) { //some keys are pressed
             registers.getVariable(x).set(registers.getKeyValue().get());
-            registers.getKeyWait().set(0x0);
             return true;
         } else {
-            registers.getKeyWait().set(0x1);
             return false;
         }
     }

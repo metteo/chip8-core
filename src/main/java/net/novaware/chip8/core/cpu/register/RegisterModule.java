@@ -9,6 +9,8 @@ import javax.inject.Named;
 @Module
 public class RegisterModule {
 
+    public static final String CPU_STATE = "cpuState";
+
     public static final String VARIABLES = "variables";
 
     public static final String STATUS = "status";
@@ -26,7 +28,6 @@ public class RegisterModule {
     public static final String GRAPHIC_CHANGE = "graphicChange";
 
     public static final String KEY_STATE = "keyState";
-    public static final String KEY_WAIT = "keyWait";
     public static final String KEY_VALUE = "keyValue";
 
     public static final String DELAY = "delay";
@@ -35,6 +36,14 @@ public class RegisterModule {
 
     public static final String CURRENT_INSTRUCTION = "currentInstruction";
     public static final String DECODED_INSTRUCTION = "decodedInstruction";
+
+    @Provides
+    @BoardScope
+    @Named(CPU_STATE)
+    static ByteRegister provideCpuState() {
+        // not CS because it's reserved for Code Segment
+        return new ByteRegister("PS"); // Processor State
+    }
 
     @Provides
     @BoardScope
@@ -124,13 +133,6 @@ public class RegisterModule {
     @Named(KEY_STATE)
     static WordRegister provideKeyState() {
         return new WordRegister("KS");
-    }
-
-    @Provides
-    @BoardScope
-    @Named(KEY_WAIT)
-    static ByteRegister provideKeyWait() {
-        return new ByteRegister("KW");
     }
 
     @Provides

@@ -25,6 +25,7 @@ import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 //TODO: public methods should schedule commands to clock generator
+//TODO: don't forget to handle exceptions in the Future
 @BoardScope
 public class Board {
 
@@ -170,6 +171,7 @@ public class Board {
 
     public void reset() {
         // https://en.wikipedia.org/wiki/Hardware_reset
+        // Hard reset vs soft reset in nes: https://github.com/Parseus/nesimulare/blob/master/src/nesimulare/core/cpu/CPU.java#L287
         mmu.clear(); // TODO:  hard reset clears whole memory and reloads roms?
         cpu.reset();  //TODO: soft reset clears only display / registers
     }
@@ -183,7 +185,13 @@ public class Board {
         soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
 
         cycleHandle = clock.schedule(() -> {
-            cpu.cycle();
+            try {
+                //TODO: report exceptions back to Board owner
+                cpu.cycle();
+            } catch(Exception e) {
+                LOG.error("Exception during CPU cycle: ", e);
+                clock.shutdown();
+            }
 
             if (countCycles) { // bypass counting
                 int currentCycles = cycles.incrementAndGet();

@@ -13,6 +13,7 @@ import net.novaware.chip8.core.util.uml.Uses;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static net.novaware.chip8.core.cpu.CpuState.OPERATING;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
@@ -22,15 +23,6 @@ import static net.novaware.chip8.core.memory.MemoryModule.MMU;
  */
 @BoardScope
 public class Cpu {
-
-    // https://www.golinuxhub.com/2018/06/what-cpu-c-states-check-cpu-core-linux.html
-    public enum State {
-        OPERATING,
-        HALT,
-        STOP_CLOCK,
-        SLEEP,
-        ;
-    }
 
     public interface Config {
 
@@ -65,9 +57,6 @@ public class Cpu {
 
     @Uses
     private final Memory memory;
-
-    //TODO: make it a register and only expose a getter with enum
-    private State state;
 
     @Inject
     public Cpu(
@@ -109,7 +98,7 @@ public class Cpu {
         delayTimer.init();
         soundTimer.init();
 
-        state = State.OPERATING;
+        registers.getCpuState().set(OPERATING.value());
     }
 
     public void reset() {
@@ -138,7 +127,7 @@ public class Cpu {
      * multiple instructions / cycles to complete.
      */
     public void cycle() {
-        if (state == State.OPERATING) {
+        if (registers.getCpuState().get() == OPERATING.value()) {
             controlUnit.fetch();
             controlUnit.decode();
             controlUnit.execute();
@@ -146,14 +135,60 @@ public class Cpu {
     }
 
     public void delayTick() {
-        if (state == State.OPERATING) {
+        if (registers.getCpuState().get() == OPERATING.value()) {
             delayTimer.maybeDecrementValue();
         }
     }
 
     public void soundTick() {
-        if (state == State.OPERATING) {
+        if (registers.getCpuState().get() == OPERATING.value()) {
             soundTimer.maybeDecrementValue();
         }
+    }
+
+    /**
+     * Switch from {@link CpuState#OPERATING} to {@link CpuState#HALT}
+     */
+    public void halt() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    /**
+     * Switch from {@link CpuState#HALT} to {@link CpuState#OPERATING}
+     * <p>
+     * NOTE: This method should be named 'continue' but it's a reserved
+     * java keyword so we use a abbreviation that matches reverse operation
+     * {@link #halt()}
+     */
+    public void cont() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    /**
+     * Switch from {@link CpuState#OPERATING} to {@link CpuState#STOP_CLOCK}
+     */
+    public void stopClock() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    /**
+     * Switch from {@link CpuState#STOP_CLOCK} to {@link CpuState#OPERATING}
+     */
+    public void startClock() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    /**
+     * Goes to {@link CpuState#SLEEP}
+     */
+    public void sleep() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+    }
+
+    /**
+     * Switch from {@link CpuState#SLEEP} to {@link CpuState#OPERATING}
+     */
+    public void wakeUp() {
+        throw new UnsupportedOperationException("not implemented"); //TODO: implement
     }
 }

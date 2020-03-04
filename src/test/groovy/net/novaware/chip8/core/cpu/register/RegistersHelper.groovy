@@ -6,6 +6,7 @@ class RegistersHelper {
 
     static Registers newRegisters() {
         new Registers(
+                provideCpuState(),
                 provideVariables(),
                 provideStatusType(),
                 provideIndex(),
@@ -17,7 +18,6 @@ class RegistersHelper {
                 provideGraphicSegment(),
                 provideGraphicChange(),
                 provideKeyState(),
-                provideKeyWait(),
                 provideKeyValue(),
                 provideDelay(),
                 provideSound(),

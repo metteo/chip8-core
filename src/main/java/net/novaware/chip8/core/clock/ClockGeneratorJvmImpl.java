@@ -44,4 +44,9 @@ public class ClockGeneratorJvmImpl implements ClockGenerator {
     public void setPaused(boolean paused) {
         throw new UnsupportedOperationException("not implemented"); // TODO: implement
     }
+
+    @Override
+    public void shutdown() {
+        executor.shutdown();
+    }
 }

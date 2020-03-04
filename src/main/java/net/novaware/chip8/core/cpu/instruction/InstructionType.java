@@ -6,7 +6,6 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Arrays.stream;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 import static net.novaware.chip8.core.cpu.instruction.InstructionMask.*;
@@ -329,10 +328,10 @@ public enum InstructionType {
     OxFX65 (0xF065, OxF0FF.value()),
     ;
 
-    private static final Map<Short, InstructionType> byOpCode = stream(values())
-            .collect(toUnmodifiableMap(InstructionType::opcode, identity()));
-
     private static final List<InstructionType> instances = List.of(values());
+
+    private static final Map<Short, InstructionType> byOpCode = getInstances().stream()
+            .collect(toUnmodifiableMap(InstructionType::opcode, identity()));
 
     @Unsigned
     private final short opcode;

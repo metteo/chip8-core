@@ -30,6 +30,11 @@ public class Registers {
     public static final byte VF_COLLISION = 0x06;
 
     /**
+     * Describes the state of CPU
+     */
+    private final ByteRegister cpuState;
+
+    /**
      * General purpose registers (V0 - VE)
      * Status register (VF)
      */
@@ -95,14 +100,9 @@ public class Registers {
     private final ByteRegister graphicChange;
 
     /**
-     * Dedicated registere (2 bytes) mapped to keys (bits 0-F represent keys)
+     * Dedicated register (2 bytes) mapped to keys (bits 0-F represent keys)
      */
     private final WordRegister keyState;
-
-    /**
-     * Register which when non 0 signals suspension of the execution
-     */
-    private final ByteRegister keyWait;
 
     /**
      * Value of the key that was last pressed, used by wait for key
@@ -119,7 +119,7 @@ public class Registers {
      */
     private ByteRegister sound;
 
-    // TODO: figure out a better name
+    // TODO: figure out a better name, or remove when possible to attach multiple callbacks?
     /**
      * Value 0x1 turns on the sound, 0x0 turns it off
      */
@@ -138,6 +138,7 @@ public class Registers {
 
     @Inject
     public Registers(
+        @Named(CPU_STATE) final ByteRegister cpuState,
         @Named(VARIABLES) final ByteRegister[] variables,
         @Named(STATUS_TYPE) final ByteRegister statusType,
         @Named(INDEX) final TribbleRegister index,
@@ -149,7 +150,6 @@ public class Registers {
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(KEY_STATE) final WordRegister keyState,
-        @Named(KEY_WAIT) final ByteRegister keyWait,
         @Named(KEY_VALUE) final ByteRegister keyValue,
         @Named(DELAY) final ByteRegister delay,
         @Named(SOUND) final ByteRegister sound,
@@ -157,6 +157,8 @@ public class Registers {
         @Named(CURRENT_INSTRUCTION) final WordRegister currentInstruction,
         @Named(DECODED_INSTRUCTION) final WordRegister[] decodedInstruction
     ) {
+        this.cpuState = cpuState;
+
         this.variables = variables;
 
         this.statusType = statusType;
@@ -174,7 +176,6 @@ public class Registers {
         this.graphicChange = graphicChange;
 
         this.keyState = keyState;
-        this.keyWait = keyWait;
         this.keyValue = keyValue;
 
         this.delay = delay;
@@ -183,6 +184,10 @@ public class Registers {
 
         this.currentInstruction = currentInstruction;
         this.decodedInstruction = decodedInstruction;
+    }
+
+    public ByteRegister getCpuState() {
+        return cpuState;
     }
 
     public ByteRegister[] getVariables() {
@@ -243,10 +248,6 @@ public class Registers {
 
     public WordRegister getKeyState() {
         return keyState;
-    }
-
-    public ByteRegister getKeyWait() {
-        return keyWait;
     }
 
     public ByteRegister getKeyValue() {

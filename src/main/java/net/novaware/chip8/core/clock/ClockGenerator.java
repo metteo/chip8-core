@@ -13,4 +13,6 @@ public interface ClockGenerator {
     boolean isPaused();
 
     void setPaused(boolean paused);
+
+    void shutdown();
 }
