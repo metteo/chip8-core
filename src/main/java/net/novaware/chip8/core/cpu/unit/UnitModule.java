@@ -4,9 +4,9 @@ import dagger.Module;
 import dagger.Provides;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
+import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 @Module
 public class UnitModule {
@@ -15,7 +15,7 @@ public class UnitModule {
     public static final String SOUND = "sound";
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(DELAY)
     static Timer provideDelayTimer(
             @Named(RegisterModule.VARIABLES) final ByteRegister[] variables,
@@ -25,7 +25,7 @@ public class UnitModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(SOUND)
     static Timer provideSoundTimer(
             @Named(RegisterModule.VARIABLES) final ByteRegister[] variables,

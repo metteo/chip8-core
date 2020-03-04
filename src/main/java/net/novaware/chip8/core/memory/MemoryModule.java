@@ -5,10 +5,9 @@ import dagger.Provides;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,7 @@ public class MemoryModule {
     public static final String MMU                     = "mmu";
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(INTERPRETER_ROM)
     static Memory provideInterpreterRom() {
         final PhysicalMemory interpreterRom = new PhysicalMemory("Interpreter ROM", INTERPRETER_ROM_SIZE);
@@ -58,7 +57,7 @@ public class MemoryModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(PROGRAM)
     static Memory provideProgram() {
         final PhysicalMemory programMemory = new PhysicalMemory("Program", PROGRAM_SIZE);
@@ -66,7 +65,7 @@ public class MemoryModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(STACK)
     static Memory provideStack() {
         TribbleRegister[] stackRegisters = new TribbleRegister[STACK_SIZE / 2];
@@ -78,14 +77,14 @@ public class MemoryModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(INTERPRETER_RAM)
     static Memory provideInterpreterRam() {
         return new PhysicalMemory("Interpreter RAM", INTERPRETER_RAM_SIZE);
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(VARIABLES)
     static Memory provideVariables(@Named(RegisterModule.VARIABLES) final ByteRegister[] variables) {
         assertArgument(variables.length != VARIABLES_SIZE, "variables.length should be " + VARIABLES_SIZE);
@@ -94,14 +93,14 @@ public class MemoryModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(DISPLAY_IO)
     static Memory provideDisplayIo() {
         return new PhysicalMemory("Display IO", DISPLAY_IO_SIZE);
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(MMU)
     static Memory provideMmu(
             @Named(INTERPRETER_ROM) final Memory interpreterRom,

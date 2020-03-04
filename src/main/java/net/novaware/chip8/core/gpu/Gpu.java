@@ -1,8 +1,9 @@
 package net.novaware.chip8.core.gpu;
 
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.gpu.ViewPort.Index;
+import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
@@ -11,17 +12,16 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import static net.novaware.chip8.core.cpu.register.Registers.*;
+import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
-import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 
 /**
  * Graphics Processing Unit
  */
-@Singleton
+@BoardScope
 public class Gpu {
 
     private static final Logger LOG = LogManager.getLogger();

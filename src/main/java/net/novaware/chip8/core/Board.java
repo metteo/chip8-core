@@ -8,6 +8,7 @@ import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
+import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 import org.apache.logging.log4j.LogManager;
@@ -15,7 +16,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -25,7 +25,7 @@ import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 //TODO: public methods should schedule commands to clock generator
-@Singleton
+@BoardScope
 public class Board {
 
     private static final Logger LOG = LogManager.getLogger();

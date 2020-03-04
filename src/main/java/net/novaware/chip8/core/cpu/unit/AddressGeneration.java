@@ -3,11 +3,11 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Uses;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
@@ -19,7 +19,7 @@ import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
  * <p>
  * Address Computation Unit (ACU)
  */
-@Singleton
+@BoardScope
 public class AddressGeneration {
 
     @Uses

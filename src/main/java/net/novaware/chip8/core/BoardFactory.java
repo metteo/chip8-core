@@ -6,12 +6,12 @@ import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.cpu.unit.UnitModule;
 import net.novaware.chip8.core.memory.MemoryModule;
+import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.function.IntUnaryOperator;
 
-@Singleton
+@BoardScope
 @Component(modules = {
         RegisterModule.class,
         MemoryModule.class,

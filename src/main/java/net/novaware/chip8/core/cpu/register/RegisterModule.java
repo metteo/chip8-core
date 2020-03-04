@@ -2,9 +2,9 @@ package net.novaware.chip8.core.cpu.register;
 
 import dagger.Module;
 import dagger.Provides;
+import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 @Module
 public class RegisterModule {
@@ -37,7 +37,7 @@ public class RegisterModule {
     public static final String DECODED_INSTRUCTION = "decodedInstruction";
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(VARIABLES)
     static ByteRegister[] provideVariables() {
         final ByteRegister[] variables = new ByteRegister[16];
@@ -50,126 +50,126 @@ public class RegisterModule {
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(STATUS)
     static ByteRegister provideStatus(@Named(VARIABLES) final ByteRegister[] variables) {
         return variables[0xF];
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(STATUS_TYPE)
     static ByteRegister provideStatusType() {
         return new ByteRegister("ST");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(INDEX)
     static TribbleRegister provideIndex() {
         return new TribbleRegister("I");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(MEMORY_ADDRESS)
     static TribbleRegister provideMemoryAddress() {
         return new TribbleRegister("MAR");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(PROGRAM_COUNTER)
     static TribbleRegister provideProgramCounter() {
         return new TribbleRegister("PC");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(STACK_SEGMENT)
     static TribbleRegister provideStackSegment() {
         return new TribbleRegister("SS");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(STACK_POINTER)
     static TribbleRegister provideStackPointer() {
         return new TribbleRegister("SP");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(FONT_SEGMENT)
     static TribbleRegister provideFontSegment() {
         return new TribbleRegister("FS");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(GRAPHIC_SEGMENT)
     static TribbleRegister provideGraphicSegment() {
         return new TribbleRegister("GS");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(GRAPHIC_CHANGE)
     static ByteRegister provideGraphicChange() {
         return new ByteRegister("GC");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(KEY_STATE)
     static WordRegister provideKeyState() {
         return new WordRegister("KS");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(KEY_WAIT)
     static ByteRegister provideKeyWait() {
         return new ByteRegister("KW");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(KEY_VALUE)
     static ByteRegister provideKeyValue() {
         return new ByteRegister("KV");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(DELAY)
     static ByteRegister provideDelay() {
         return new ByteRegister("DT");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(SOUND)
     static ByteRegister provideSound() {
         return new ByteRegister("ST");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(SOUND_ON)
     static ByteRegister provideSoundOn() {
         return new ByteRegister("SO");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(CURRENT_INSTRUCTION)
     static WordRegister provideCurrentInstruction() {
         return new WordRegister("CIR");
     }
 
     @Provides
-    @Singleton
+    @BoardScope
     @Named(DECODED_INSTRUCTION)
     static WordRegister[] provideDecodedInstruction() {
         final WordRegister[] decodedInstruction = new WordRegister[4];

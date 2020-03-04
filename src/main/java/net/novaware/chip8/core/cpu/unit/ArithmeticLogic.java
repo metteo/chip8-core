@@ -3,12 +3,12 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 import java.util.function.IntUnaryOperator;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
@@ -19,7 +19,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.*;
 /**
  * Arithmetic Logic Unit (ALU)
  */
-@Singleton
+@BoardScope
 public class ArithmeticLogic {
 
     @Owns

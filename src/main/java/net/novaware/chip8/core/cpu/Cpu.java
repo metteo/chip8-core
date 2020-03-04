@@ -6,12 +6,12 @@ import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryModule;
+import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
@@ -20,7 +20,7 @@ import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 /**
  * Central Processing Unit (CPU)
  */
-@Singleton
+@BoardScope
 public class Cpu {
 
     // https://www.golinuxhub.com/2018/06/what-cpu-c-states-check-cpu-core-linux.html

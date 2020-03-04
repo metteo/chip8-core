@@ -1,8 +1,9 @@
 package net.novaware.chip8.core.cpu.register;
 
+import net.novaware.chip8.core.util.di.BoardScope;
+
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
@@ -11,7 +12,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint;
  * Register file containing all the register references
  *
  */
-@Singleton
+@BoardScope
 public class Registers {
 
     public static final byte GC_IDLE = 0x00;
