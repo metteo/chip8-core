@@ -1,7 +1,6 @@
 package net.novaware.chip8.core;
 
 import net.novaware.chip8.core.clock.ClockGenerator;
-import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.Registers;
 import net.novaware.chip8.core.memory.*;
@@ -94,7 +93,7 @@ public class Board {
     private Consumer<Boolean> audioReceiver;
 
     @Inject
-    public Board(
+    /* package */ Board(
             final BoardConfig config,
             @Named(PROGRAM) final Memory program,
             @Named(INTERPRETER_ROM) final Memory interpreterRom,

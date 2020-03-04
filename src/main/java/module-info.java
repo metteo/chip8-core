@@ -1,9 +1,7 @@
 module net.novaware.chip8.core {
     requires static java.compiler; // @j.a.p.Generated
-
-    //TODO: consider transitive / static
-    requires javax.inject; // automatic
-    requires dagger; //automatic
+    requires dagger; //TODO: filename-based
+    requires javax.inject; //TODO: filename-based, should be transitive of dagger
 
     requires org.checkerframework.checker.qual;
 
@@ -12,10 +10,9 @@ module net.novaware.chip8.core {
     exports net.novaware.chip8.core;
     exports net.novaware.chip8.core.port;
     exports net.novaware.chip8.core.clock;
+    exports net.novaware.chip8.core.util;
 
-    exports net.novaware.chip8.core.cpu;
-    exports net.novaware.chip8.core.cpu.register; //TODO: internal, expose part as public API
+    uses net.novaware.chip8.core.clock.ClockGenerator;
+
     exports net.novaware.chip8.core.gpu; //TODO: temporary, screen should not need internal ViewPort
-    exports net.novaware.chip8.core.memory;
-    exports net.novaware.chip8.core.util; //TODO: should be part of chip8-jvm or sth?
 }

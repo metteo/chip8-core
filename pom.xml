@@ -146,6 +146,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+
         <!--Log4j2 with yml config -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -165,17 +171,17 @@
             <version>2.9.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency> <!-- for jackson-dataformat-yaml with jpms support -->
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.26</version>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.google.dagger</groupId>
             <artifactId>dagger</artifactId>
             <version>${dagger.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.13.0</version>
         </dependency>
 
         <dependency> <!-- TODO: Enable compile time checks -->
