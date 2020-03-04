@@ -40,10 +40,10 @@ public class Timer {
     }
 
     public void init() {
-        LOG.info(() -> "Configured with " + timerRegister.getName());
+        LOG.debug(() -> "Configured with " + timerRegister.getName());
 
         if (outputRegister != null) {
-            LOG.info(() -> "Will report values higher than 1 to " + outputRegister.getName());
+            LOG.debug(() -> "Will report values higher than 1 to " + outputRegister.getName());
             timerRegister.setCallback(r -> {
                 final int timer = timerRegister.getAsInt();
                 final int state = outputRegister.getAsInt();

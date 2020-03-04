@@ -173,6 +173,10 @@ public class ControlUnit {
         }
 
         pc.increment(skip);
+
+        LOG.trace(() -> toHexString(registers.getMemoryAddress().get()) +
+                ": " + toHexString(registers.getCurrentInstruction().get()) +
+                " -> " + toHexString(pc.get()));
     }
 
     /**
