@@ -129,6 +129,7 @@ public class Board {
         soundHandle.cancel(force);
 
         reset();
+        //TODO: shutdown the clock
     }
 
     public void init() {
@@ -169,6 +170,7 @@ public class Board {
         LOG.traceExit();
     }
 
+    //TODO: race condition
     public void reset() {
         // https://en.wikipedia.org/wiki/Hardware_reset
         // Hard reset vs soft reset in nes: https://github.com/Parseus/nesimulare/blob/master/src/nesimulare/core/cpu/CPU.java#L287
@@ -184,13 +186,14 @@ public class Board {
         delayHandle = clock.schedule(cpu::delayTick, config.getDelayTimerFrequency());
         soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
 
+        //TODO: react to cpu state and control the clock properly
         cycleHandle = clock.schedule(() -> {
             try {
                 //TODO: report exceptions back to Board owner
                 cpu.cycle();
             } catch(Exception e) {
                 LOG.error("Exception during CPU cycle: ", e);
-                clock.shutdown();
+                clock.shutdown(); //TODO: maybe trigger stop clock instead?
             }
 
             if (countCycles) { // bypass counting
@@ -210,6 +213,14 @@ public class Board {
                 }
             }
         }, config.getCpuFrequency());
+    }
+
+    public void pause() {
+        clock.schedule(() -> cpu.sleep());
+    }
+
+    public void resume() {
+        clock.schedule(() -> cpu.wakeUp());
     }
 
     public AudioPort getAudioPort() {

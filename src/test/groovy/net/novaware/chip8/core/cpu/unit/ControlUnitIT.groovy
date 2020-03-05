@@ -4,6 +4,7 @@ import net.novaware.chip8.core.Board
 import net.novaware.chip8.core.BoardConfig
 import net.novaware.chip8.core.BoardFactory
 import net.novaware.chip8.core.clock.ClockGenerator
+import net.novaware.chip8.core.cpu.CpuState
 import net.novaware.chip8.core.cpu.register.Registers
 import net.novaware.chip8.core.memory.Memory
 import spock.lang.Specification
@@ -127,6 +128,24 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x345 as short
+        registers.getCpuState().get() == CpuState.OPERATING.value()
+    }
+
+    def "should jump and stop clock in case of infinite jump"() {
+        given:
+        registers.getMemoryAddress().set(0x0200)
+        registers.getProgramCounter().set(0x0202)
+
+        def instruction = registers.getDecodedInstruction()
+        instruction[0].set(Ox1MMM.opcode())
+        instruction[1].set(0x0200)
+
+        when:
+        cu.execute()
+
+        then:
+        registers.getProgramCounter().get() == 0x200 as short
+        registers.getCpuState().get() == CpuState.STOP_CLOCK.value()
     }
 
     def "should increment register I with value of register X (no carry)"() {
@@ -665,9 +684,9 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        //TODO: figure out what to do //registers.getKeyWait().get() != 0x0 as byte
         registers.getKeyState().getAsInt() == 0x0
         registers.getProgramCounter().get() == 0x202 as short // rerun the same instruction
+        registers.getCpuState().get() == CpuState.HALT.value()
     }
 
     def "should NOT wait for key press, when one is already pressed"() {
@@ -685,9 +704,9 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        //TODO: figure out what to do //registers.getKeyWait().get() == 0x0 as byte
         registers.getVariable(0x7).getAsInt() == 0x2
         registers.getProgramCounter().get() == 0x204 as short // use already incremented pc
+        registers.getCpuState().get() == CpuState.OPERATING.value()
     }
 
     def "should store BCD representation of a number"() {
@@ -966,6 +985,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x3AC as short
+        registers.getCpuState().get() == CpuState.OPERATING.value()
     }
 
     def "should properly shift Vx left (legacy mode) with overflow"() {

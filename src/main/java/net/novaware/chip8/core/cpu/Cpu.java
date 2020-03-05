@@ -13,7 +13,7 @@ import net.novaware.chip8.core.util.uml.Uses;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static net.novaware.chip8.core.cpu.CpuState.OPERATING;
+import static net.novaware.chip8.core.cpu.CpuState.*;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
@@ -47,6 +47,9 @@ public class Cpu {
     private final StackEngine stackEngine;
 
     @Owns
+    private final PowerMgmt powerMgmt;
+
+    @Owns
     private final Gpu gpu;
 
     @Owns
@@ -67,6 +70,7 @@ public class Cpu {
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
+            final PowerMgmt powerMgmt,
             final Gpu gpu,
 
             final ControlUnit controlUnit,
@@ -81,6 +85,7 @@ public class Cpu {
         this.alu = alu;
         this.agu = agu;
         this.stackEngine = stackEngine;
+        this.powerMgmt = powerMgmt;
         this.gpu = gpu;
 
         this.controlUnit = controlUnit;
@@ -98,7 +103,21 @@ public class Cpu {
         delayTimer.init();
         soundTimer.init();
 
-        registers.getCpuState().set(OPERATING.value());
+        powerMgmt.setState(OPERATING);
+
+        //unhalt / start clock after a key press
+        registers.getKeyValue().setCallback(kv -> {
+            powerMgmt.cont();
+            powerMgmt.startClock();
+        });
+    }
+
+    public void sleep() {
+        powerMgmt.sleep();
+    }
+
+    public void wakeUp() {
+        powerMgmt.wakeUp();
     }
 
     public void reset() {
@@ -125,6 +144,8 @@ public class Cpu {
      *
      * On the original - CDP18S711, single virtual instruction could take
      * multiple instructions / cycles to complete.
+     *
+     * Supports clock gating
      */
     public void cycle() {
         if (registers.getCpuState().get() == OPERATING.value()) {
@@ -134,61 +155,21 @@ public class Cpu {
         }
     }
 
+    /**
+     * Supports clock gating
+     */
     public void delayTick() {
         if (registers.getCpuState().get() == OPERATING.value()) {
             delayTimer.maybeDecrementValue();
         }
     }
 
+    /**
+     * Supports clock gating
+     */
     public void soundTick() {
         if (registers.getCpuState().get() == OPERATING.value()) {
             soundTimer.maybeDecrementValue();
         }
-    }
-
-    /**
-     * Switch from {@link CpuState#OPERATING} to {@link CpuState#HALT}
-     */
-    public void halt() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    /**
-     * Switch from {@link CpuState#HALT} to {@link CpuState#OPERATING}
-     * <p>
-     * NOTE: This method should be named 'continue' but it's a reserved
-     * java keyword so we use a abbreviation that matches reverse operation
-     * {@link #halt()}
-     */
-    public void cont() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    /**
-     * Switch from {@link CpuState#OPERATING} to {@link CpuState#STOP_CLOCK}
-     */
-    public void stopClock() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    /**
-     * Switch from {@link CpuState#STOP_CLOCK} to {@link CpuState#OPERATING}
-     */
-    public void startClock() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    /**
-     * Goes to {@link CpuState#SLEEP}
-     */
-    public void sleep() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
-    }
-
-    /**
-     * Switch from {@link CpuState#SLEEP} to {@link CpuState#OPERATING}
-     */
-    public void wakeUp() {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
     }
 }

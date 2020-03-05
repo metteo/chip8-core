@@ -59,6 +59,9 @@ public class ControlUnit {
     private final StackEngine stackEngine;
 
     @Uses
+    private final PowerMgmt powerMgmt;
+
+    @Uses
     private final Gpu gpu;
 
     @Uses
@@ -78,6 +81,7 @@ public class ControlUnit {
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
+            final PowerMgmt powerMgmt,
             final Gpu gpu,
 
             @Named(DELAY) final Timer delayTimer,
@@ -92,6 +96,7 @@ public class ControlUnit {
         this.alu = alu;
         this.agu = agu;
         this.stackEngine = stackEngine;
+        this.powerMgmt = powerMgmt;
         this.gpu = gpu;
 
         this.delayTimer = delayTimer;
@@ -132,7 +137,7 @@ public class ControlUnit {
             case Ox00EE: stackEngine.returnFromSubroutine(); break;
             case Ox0MMM: throw new RuntimeException("system call is unsupported, yet");
 
-            case Ox1MMM: stackEngine.jump(di[1].get()); break;
+            case Ox1MMM: jump(di[1].get()); break;
             case Ox2MMM: stackEngine.call(di[1].get()); break;
             case Ox3XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 2 : 0; break;
             case Ox4XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
@@ -179,6 +184,19 @@ public class ControlUnit {
                 " -> " + toHexString(pc.get()));
     }
 
+    private void jump(final short destination) {
+        // complete the cycle
+        stackEngine.jump(destination);
+
+        int from = registers.getMemoryAddress().getAsInt();
+        int to = uint(destination);
+
+        if (from == to) {
+            // prevent infinite jumps, like on IBM logo ROM
+            powerMgmt.stopClock();
+        }
+    }
+
     /**
      * @return true if key is pressed
      */
@@ -187,6 +205,7 @@ public class ControlUnit {
             registers.getVariable(x).set(registers.getKeyValue().get());
             return true;
         } else {
+            powerMgmt.halt();
             return false;
         }
     }

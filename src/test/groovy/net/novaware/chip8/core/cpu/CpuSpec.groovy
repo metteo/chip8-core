@@ -1,10 +1,6 @@
 package net.novaware.chip8.core.cpu
 
-import net.novaware.chip8.core.cpu.unit.AddressGeneration
-import net.novaware.chip8.core.cpu.unit.ArithmeticLogic
-import net.novaware.chip8.core.cpu.unit.ControlUnit
-import net.novaware.chip8.core.cpu.unit.StackEngine
-import net.novaware.chip8.core.cpu.unit.Timer
+import net.novaware.chip8.core.cpu.unit.*
 import net.novaware.chip8.core.gpu.Gpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.MemoryModule
@@ -26,6 +22,7 @@ class CpuSpec extends Specification {
             Mock(ArithmeticLogic),
             Mock(AddressGeneration),
             Mock(StackEngine),
+            Mock(PowerMgmt),
             Mock(Gpu),
             Mock(ControlUnit),
             Mock(Timer),

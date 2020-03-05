@@ -1,5 +1,7 @@
 package net.novaware.chip8.core.cpu.register;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Consumer;
@@ -8,6 +10,8 @@ import java.util.function.Consumer;
  * Base register class. Contains name property which is only used for debugging
  */
 public abstract class Register<T extends Register> {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     private final String name;
 
@@ -27,6 +31,9 @@ public abstract class Register<T extends Register> {
      * @param callback
      */
     public void setCallback(@Nullable Consumer<T> callback) {
+        String setOrUpdate = this.callback != null ? "Updating" : "Setting";
+        LOG.info(() -> setOrUpdate + " " + name + " callback");
+
         this.callback = callback;
     }
 
