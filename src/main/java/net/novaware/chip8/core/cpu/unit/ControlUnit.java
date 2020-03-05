@@ -50,6 +50,9 @@ public class ControlUnit {
     private final Memory memory;
 
     @Uses
+    private final LoadStore lsu;
+
+    @Uses
     private final ArithmeticLogic alu;
 
     @Uses
@@ -78,6 +81,7 @@ public class ControlUnit {
             final Registers registers,
             @Named(MMU) final Memory memory,
 
+            final LoadStore lsu,
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
@@ -93,6 +97,7 @@ public class ControlUnit {
         this.registers = registers;
         this.memory = memory;
 
+        this.lsu = lsu;
         this.alu = alu;
         this.agu = agu;
         this.stackEngine = stackEngine;
@@ -120,8 +125,6 @@ public class ControlUnit {
 
     public void execute() {
         final WordRegister[] di = registers.getDecodedInstruction();
-        final TribbleRegister pc = registers.getProgramCounter();
-
         final InstructionType instructionType = InstructionType.valueOf(di[0].get());
 
         int skip = 0;
@@ -169,19 +172,19 @@ public class ControlUnit {
             case OxFX15: delayTimer.loadVariableIntoTimer(di[1].get()); break;
             case OxFX18: soundTimer.loadVariableIntoTimer(di[1].get()); break;
             case OxFX1E: agu.addRegisterIntoIndex(di[1].get(), overflowI); break;
-            case OxFX29: loadFontAddressIntoRegister(di[1].get()); break;
+            case OxFX29: gpu.loadFontAddressIntoRegister(di[1].get()); break;
             case OxFX33: alu.bcdRegisterToMemory(di[1].get()); break;
-            case OxFX55: loadRegistersIntoMemory(di[1].get(), incrementI); break;
-            case OxFX65: loadMemoryIntoRegisters(di[1].get(), incrementI); break;
+            case OxFX55: lsu.loadRegistersIntoMemory(di[1].get(), incrementI); break;
+            case OxFX65: lsu.loadMemoryIntoRegisters(di[1].get(), incrementI); break;
 
             default: throw new RuntimeException("Unknown instruction: " + di[0].get());
         }
 
-        pc.increment(skip);
+        registers.getProgramCounter().increment(skip);
 
         LOG.trace(() -> toHexString(registers.getMemoryAddress().get()) +
                 ": " + toHexString(registers.getCurrentInstruction().get()) +
-                " -> " + toHexString(pc.get()));
+                " -> " + toHexString(registers.getProgramCounter().get()));
     }
 
     private void jump(final short destination) {
@@ -210,15 +213,6 @@ public class ControlUnit {
         }
     }
 
-    private void loadFontAddressIntoRegister(final short x) {
-        final int xValue = registers.getVariable(x).getAsInt();
-        final int fontSegment = registers.getFontSegment().getAsInt();
-
-        final int fontAddress = fontSegment +  xValue * 5;
-
-        registers.getIndex().set(fontAddress);
-    }
-
     /**
      * @return true if key was pressed
      */
@@ -234,36 +228,5 @@ public class ControlUnit {
         boolean keyNotPressed = (keys & keyMask) == 0;
 
         return !keyNotPressed;
-    }
-
-    //TODO: special unit for handling transfers between memory and registers? registers are memory mapped BTW...
-
-    private void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
-        int xIndex = uint(x);
-        int iValue = registers.getIndex().getAsInt();
-
-
-        for (int i = 0; i <= xIndex; ++i, ++iValue) {
-            final byte data = memory.getByte(ushort(iValue));
-            registers.getVariable(i).set(data);
-        }
-
-        if (incrementI) {
-            registers.getIndex().set(iValue);
-        }
-    }
-
-    private void loadRegistersIntoMemory(final short x, final boolean incrementI) {
-        int xIndex = uint(x);
-        int iValue = registers.getIndex().getAsInt();
-
-        for (int i = 0; i <= xIndex; ++i, ++iValue) {
-            final byte data = registers.getVariable(i).get();
-            memory.setByte(ushort(iValue), data);
-        }
-
-        if (incrementI) {
-            registers.getIndex().set(iValue);
-        }
     }
 }

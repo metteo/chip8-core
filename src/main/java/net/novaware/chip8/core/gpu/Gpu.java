@@ -73,6 +73,15 @@ public class Gpu {
         registers.getGraphicChange().set(GC_ERASE);
     }
 
+    public void loadFontAddressIntoRegister(final short x) {
+        final int xValue = registers.getVariable(x).getAsInt();
+        final int fontSegment = registers.getFontSegment().getAsInt();
+
+        final int fontAddress = fontSegment +  xValue * 5 /* bits of height */;
+
+        registers.getIndex().set(fontAddress);
+    }
+
     public void drawSprite(short x, short y, short height) {
         final int xBit = registers.getVariable(x).getAsInt();
         final int yBit = registers.getVariable(y).getAsInt();

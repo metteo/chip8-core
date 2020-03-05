@@ -327,6 +327,7 @@ public enum InstructionType {
      */
     OxFX65 (0xF065, OxF0FF.value()),
     ;
+    // TODO: maybe provide OxUNKN instruction to get rid of nullable
 
     private static final List<InstructionType> instances = List.of(values());
 

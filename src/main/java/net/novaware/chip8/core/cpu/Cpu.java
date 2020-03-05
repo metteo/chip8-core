@@ -38,6 +38,9 @@ public class Cpu {
     private final ControlUnit controlUnit;
 
     @Owns
+    private final LoadStore lsu;
+
+    @Owns
     private final ArithmeticLogic alu;
 
     @Owns
@@ -67,6 +70,7 @@ public class Cpu {
             @Named(MMU) final Memory memory,
             final Registers registers,
 
+            final LoadStore lsu,
             final ArithmeticLogic alu,
             final AddressGeneration agu,
             final StackEngine stackEngine,
@@ -82,6 +86,7 @@ public class Cpu {
         this.memory = memory;
         this.registers = registers;
 
+        this.lsu = lsu;
         this.alu = alu;
         this.agu = agu;
         this.stackEngine = stackEngine;

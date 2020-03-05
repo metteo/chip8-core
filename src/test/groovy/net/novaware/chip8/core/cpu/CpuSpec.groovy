@@ -19,6 +19,7 @@ class CpuSpec extends Specification {
             Mock(Cpu.Config),
             memory,
             registers,
+            Mock(LoadStore),
             Mock(ArithmeticLogic),
             Mock(AddressGeneration),
             Mock(StackEngine),

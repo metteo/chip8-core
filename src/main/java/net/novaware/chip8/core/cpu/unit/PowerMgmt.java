@@ -11,6 +11,9 @@ import static net.novaware.chip8.core.cpu.CpuState.*;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.CPU_STATE;
 import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 
+/**
+ * Power Management Unit
+ */
 @BoardScope
 public class PowerMgmt {
 
