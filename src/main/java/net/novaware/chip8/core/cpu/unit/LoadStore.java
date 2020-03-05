@@ -2,17 +2,18 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.math.BigInteger;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
-import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
 
 /**
  * Load Store Unit
@@ -22,17 +23,20 @@ public class LoadStore {
 
     private final ByteRegister[] variables;
     private final TribbleRegister index;
+    private final WordRegister input;
     private final Memory memory;
 
     @Inject
     public LoadStore(
             @Named(VARIABLES) final ByteRegister[] variables,
             @Named(INDEX) final TribbleRegister index,
+            @Named(INPUT) final WordRegister input,
             @Named(MMU) final Memory memory
     ) {
 
         this.variables = variables;
         this.index = index;
+        this.input = input;
         this.memory = memory;
     }
 
@@ -49,6 +53,23 @@ public class LoadStore {
         if (incrementI) {
             index.set(iValue);
         }
+    }
+
+    /**
+     * @return true if input register is non-0
+     */
+    /* package */ boolean loadInputIntoRegister(short x) {
+        int inValue = input.getAsInt();
+
+        if (inValue > 0) { //some bits are set
+            // TODO: instantiation, maybe try to avoid
+            int mostSigNonZeroBitIndex = BigInteger.valueOf(inValue).bitLength() - 1;
+
+            getVariable(variables, x).set(mostSigNonZeroBitIndex);
+            return true;
+        }
+
+        return false;
     }
 
     /* package */ void storeRegistersInMemory(final short x, final boolean incrementI) {

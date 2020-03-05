@@ -226,17 +226,17 @@ public enum InstructionType {
 
     /**
      * Ex9E - SKP Vx
-     * Skip next instruction if key with the value of Vx is pressed.
+     * Skip next instruction if [Vx]-th input bit is set to 1.
      *
-     * Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
+     * Checks the input register, and if the given bit is currently set to 1, PC is increased by 2.
      */
     OxEX9E (0xE09E, OxF0FF.value()),
 
     /**
      * ExA1 - SKNP Vx
-     * Skip next instruction if key with the value of Vx is not pressed.
+     * Skip next instruction if [Vx]-th input bit is set to 0.
      *
-     * Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
+     * Checks the input register, and if the given bit is currently set to 0, PC is increased by 2.
      */
     OxEXA1 (0xE0A1, OxF0FF.value()),
 
@@ -250,9 +250,9 @@ public enum InstructionType {
 
     /**
      * Fx0A - LD Vx, K
-     * Wait for a key press, store the value of the key in Vx.
+     * Wait for an input, store the index of the non-0 bit in Vx. (Highest if multiple are set*)
      *
-     * All execution stops until a key is pressed, then the value of that key is stored in Vx.
+     * All execution stops until an input is provided, then the index of the bit which is set to 1 is stored in Vx.
      */
     OxFX0A (0xF00A, OxF0FF.value()),
 

@@ -100,14 +100,9 @@ public class Registers {
     private final ByteRegister graphicChange;
 
     /**
-     * Dedicated register (2 bytes) mapped to keys (bits 0-F represent keys)
+     * Dedicated Input register (16 bits) mapped to 16 CPU pins
      */
-    private final WordRegister keyState;
-
-    /**
-     * Value of the key that was last pressed, used by wait for key
-     */
-    private final ByteRegister keyValue;
+    private final WordRegister input;
 
     /**
      * Delay timer register value
@@ -149,8 +144,7 @@ public class Registers {
         @Named(FONT_SEGMENT) final TribbleRegister fontSegment,
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
-        @Named(KEY_STATE) final WordRegister keyState,
-        @Named(KEY_VALUE) final ByteRegister keyValue,
+        @Named(INPUT) final WordRegister input,
         @Named(DELAY) final ByteRegister delay,
         @Named(SOUND) final ByteRegister sound,
         @Named(SOUND_ON) final ByteRegister soundOn,
@@ -175,8 +169,7 @@ public class Registers {
         this.graphicSegment = graphicSegment;
         this.graphicChange = graphicChange;
 
-        this.keyState = keyState;
-        this.keyValue = keyValue;
+        this.input = input;
 
         this.delay = delay;
         this.sound = sound;
@@ -250,12 +243,8 @@ public class Registers {
         return graphicChange;
     }
 
-    public WordRegister getKeyState() {
-        return keyState;
-    }
-
-    public ByteRegister getKeyValue() {
-        return keyValue;
+    public WordRegister getInput() {
+        return input;
     }
 
     public ByteRegister getDelay() {

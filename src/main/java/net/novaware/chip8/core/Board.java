@@ -57,17 +57,7 @@ public class Board {
     private KeyPort keyPort = new KeyPort() {
         @Override
         public void updateKeyState(short state) {
-            clock.schedule(() -> cpu.getRegisters().getKeyState().set(state));
-        }
-
-        @Override
-        public void keyPressed(byte key) {
-            clock.schedule(() -> cpu.getRegisters().getKeyValue().set(key));
-        }
-
-        @Override
-        public void reset() {
-            clock.schedule(Board.this::reset);
+            clock.schedule(() -> cpu.getRegisters().getInput().set(state));
         }
     };
 
@@ -170,8 +160,11 @@ public class Board {
         LOG.traceExit();
     }
 
-    //TODO: race condition
     public void reset() {
+        clock.schedule(() -> reset0());
+    }
+
+    /* package */ void reset0() {
         // https://en.wikipedia.org/wiki/Hardware_reset
         // Hard reset vs soft reset in nes: https://github.com/Parseus/nesimulare/blob/master/src/nesimulare/core/cpu/CPU.java#L287
         mmu.clear(); // TODO:  hard reset clears whole memory and reloads roms?

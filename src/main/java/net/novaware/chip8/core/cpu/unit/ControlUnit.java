@@ -165,11 +165,12 @@ public class ControlUnit {
             case OxCXKK: alu.andRandomToRegister(p1, p2); break;
             case OxDXYK: gpu.drawSprite(p1, p2, p3); break;
 
-            case OxEX9E: skip = compareKeyStateWithRegister(p1) ? 2 : 0; break;
-            case OxEXA1: skip = compareKeyStateWithRegister(p1) ? 0 : 2; break;
+            case OxEX9E: skip = alu.compareInputWithRegister(p1) ? 2 : 0; break;
+            case OxEXA1: skip = alu.compareInputWithRegister(p1) ? 0 : 2; break;
 
             case OxFX07: delayTimer.storeTimerIntoVariable(p1); break;
-            case OxFX0A: skip = checkIfKeyPressed(p1) ? 0 : -2; break;
+            // decrement PC to retry in case of wake up from SLEEP instead of HALT
+            case OxFX0A: skip = lsu_loadInputIntoRegister(p1) ? 0 : -2; break;
             case OxFX15: delayTimer.loadVariableIntoTimer(p1); break;
             case OxFX18: soundTimer.loadVariableIntoTimer(p1); break;
             case OxFX1E: agu.addRegisterIntoIndex(p1, overflowI); break;
@@ -199,32 +200,18 @@ public class ControlUnit {
     }
 
     /**
-     * @return true if key is pressed
+     * @return true if input register is non-0
      */
-    private boolean checkIfKeyPressed(short x) {
-        if (registers.getKeyState().getAsInt() > 0) { //some keys are pressed
-            registers.getVariable(x).set(registers.getKeyValue().get());
-            return true;
+    private boolean lsu_loadInputIntoRegister(short x) {
+        boolean nonZero = lsu.loadInputIntoRegister(x);
+
+        if (nonZero) {
+            LOG.debug(() -> "Got: " + toHexString(registers.getVariable(x).get()));
         } else {
+            LOG.debug("Will HALT for input");
             powerMgmt.halt();
-            return false;
         }
-    }
 
-    /**
-     * @return true if key was pressed
-     */
-    private boolean compareKeyStateWithRegister(final short x) { //TODO: refactor more
-        short keys = registers.getKeyState().get();
-
-        byte key = registers.getVariable(x).get();
-
-        LOG.debug(() -> "Key " + toHexString(key) + " checked");
-
-        int keyMask = 1 << key;
-
-        boolean keyNotPressed = (keys & keyMask) == 0;
-
-        return !keyNotPressed;
+        return nonZero;
     }
 }

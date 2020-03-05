@@ -1,11 +1,13 @@
 package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
-import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owns;
 import net.novaware.chip8.core.util.uml.Uses;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -14,13 +16,17 @@ import java.util.function.IntUnaryOperator;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.Registers.*;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
-import static net.novaware.chip8.core.util.UnsignedUtil.*;
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
  * Arithmetic Logic Unit (ALU)
  */
 @BoardScope
 public class ArithmeticLogic {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     @Owns
     private final IntUnaryOperator randomSource;
@@ -29,7 +35,7 @@ public class ArithmeticLogic {
     private final ByteRegister[] variables;
 
     @Uses
-    private final TribbleRegister index;
+    private final WordRegister input;
 
     @Uses
     private final ByteRegister status;
@@ -44,7 +50,7 @@ public class ArithmeticLogic {
     public ArithmeticLogic(
             @Named("random") final IntUnaryOperator randomSource,
             @Named(VARIABLES) final ByteRegister[] variables,
-            @Named(INDEX) final TribbleRegister index,
+            @Named(INPUT) final WordRegister input,
             @Named(STATUS) final ByteRegister status,
             @Named(STATUS_TYPE) final ByteRegister statusType,
             @Named(MMU) final Memory memory
@@ -52,7 +58,7 @@ public class ArithmeticLogic {
         this.randomSource = randomSource;
 
         this.variables = variables;
-        this.index = index;
+        this.input = input;
         this.status = status;
         this.statusType = statusType;
         this.memory = memory;
@@ -167,6 +173,23 @@ public class ArithmeticLogic {
         final int yValue = getVariable(variables, y).getAsInt();
 
         return xValue == yValue;
+    }
+
+    /**
+     * @return true if Vx-th bit was set
+     */
+    /* package */ boolean compareInputWithRegister(final short x) {
+        final int inValue = input.getAsInt();
+        final int bit = getVariable(variables, x).getAsInt();
+
+        assert bit < 0x10 : "input comparison should be in range 0-F";
+
+        final int bitMask = 1 << bit;
+        final boolean bitSet = (inValue & bitMask) != 0;
+
+        LOG.debug(() -> toHexString(ubyte(bit)) + "th input bit was " + (bitSet ? "" : "UN") + "SET");
+
+        return bitSet;
     }
 
     // Logical operations -----------------------

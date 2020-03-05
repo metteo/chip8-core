@@ -17,13 +17,13 @@ public enum CpuState {
      */
     OPERATING(0x00),
     /**
-     * {@link ClockGenerator} paused, key input wakes it up
+     * {@link ClockGenerator} paused, input wakes it up
      * <p>
-     * Usually triggered by key wait instruction
+     * Usually triggered by input wait instruction
      */
     HALT(0x10),
     /**
-     * {@link ClockGenerator} stopped, key input starts it up
+     * {@link ClockGenerator} stopped, input starts it up
      * <p>
      * Usually triggered by infinite jump instruction (jump to the same place in memory)
      * Or an error during execution

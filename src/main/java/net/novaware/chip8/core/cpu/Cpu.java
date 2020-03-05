@@ -110,8 +110,8 @@ public class Cpu {
 
         powerMgmt.setState(OPERATING);
 
-        //unhalt / start clock after a key press
-        registers.getKeyValue().setCallback(kv -> {
+        //unhalt / start clock after input change
+        registers.getInput().setCallback(in -> {
             powerMgmt.cont();
             powerMgmt.startClock();
         });

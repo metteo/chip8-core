@@ -37,7 +37,7 @@ class BoardCT extends Specification {
         board.init()
 
         board.getStoragePort().load(infiniteLoop)
-        board.getKeyPort().keyPressed(0x0 as byte)
+        board.getKeyPort().updateKeyState(0b1 as short)
         board.getAudioPort().attach({on -> println "sound on: " + on})
         board.getDisplayPort().attach({ gc, buffer -> /* noop */})
 

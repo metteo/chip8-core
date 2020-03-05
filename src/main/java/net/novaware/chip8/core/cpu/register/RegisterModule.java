@@ -27,8 +27,7 @@ public class RegisterModule {
     public static final String GRAPHIC_SEGMENT = "graphicSegment";
     public static final String GRAPHIC_CHANGE = "graphicChange";
 
-    public static final String KEY_STATE = "keyState";
-    public static final String KEY_VALUE = "keyValue";
+    public static final String INPUT = "input";
 
     public static final String DELAY = "delay";
     public static final String SOUND = "sound";
@@ -130,16 +129,9 @@ public class RegisterModule {
 
     @Provides
     @BoardScope
-    @Named(KEY_STATE)
-    static WordRegister provideKeyState() {
-        return new WordRegister("KS");
-    }
-
-    @Provides
-    @BoardScope
-    @Named(KEY_VALUE)
-    static ByteRegister provideKeyValue() {
-        return new ByteRegister("KV");
+    @Named(INPUT)
+    static WordRegister provideInput() {
+        return new WordRegister("IN");
     }
 
     @Provides

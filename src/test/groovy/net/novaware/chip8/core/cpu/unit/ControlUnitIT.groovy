@@ -282,9 +282,9 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getVariable(0xA).set(0x8 as byte)
+        registers.getVariable(0xA).set(0x4 as byte)
 
-        registers.getKeyState().set(0x7)
+        registers.getInput().set(0b01011)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxEXA1.opcode())
@@ -301,9 +301,9 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getVariable(0xA).set(0x8 as byte)
+        registers.getVariable(0xA).set(0x4 as byte)
 
-        registers.getKeyState().set(0x101)
+        registers.getInput().set(0b11011)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxEXA1.opcode())
@@ -469,7 +469,7 @@ class ControlUnitIT extends Specification {
         registers.getProgramCounter().set(0x200)
         registers.getVariable(0xA).set(0x3 as byte)
 
-        registers.getKeyState().set(0x8)
+        registers.getInput().set(0b1000)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxEX9E.opcode())
@@ -486,9 +486,9 @@ class ControlUnitIT extends Specification {
         given:
 
         registers.getProgramCounter().set(0x200)
-        registers.getVariable(0xA).set(0x10 as byte)
+        registers.getVariable(0xA).set(0xA as byte)
 
-        registers.getKeyState().set(0x8)
+        registers.getInput().set(0b1111101111111111 as short)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxEX9E.opcode())
@@ -684,7 +684,7 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getKeyState().getAsInt() == 0x0
+        registers.getInput().getAsInt() == 0x0
         registers.getProgramCounter().get() == 0x202 as short // rerun the same instruction
         registers.getCpuState().get() == CpuState.HALT.value()
     }
@@ -693,8 +693,7 @@ class ControlUnitIT extends Specification {
         given:
         registers.getProgramCounter().set(0x204)
         registers.getVariable(7).set(0x0 as byte)
-        registers.getKeyState().set(0x3) //keys 0 and 1 pressed together
-        registers.getKeyValue().set((byte)0x2) // 1 was registered last
+        registers.getInput().set(0b101) //keys 0 and 2 pressed together
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(OxFX0A.opcode())
@@ -704,7 +703,7 @@ class ControlUnitIT extends Specification {
         cu.execute()
 
         then:
-        registers.getVariable(0x7).getAsInt() == 0x2
+        registers.getVariable(0x7).getAsInt() == 0x2 // '2' is highest
         registers.getProgramCounter().get() == 0x204 as short // use already incremented pc
         registers.getCpuState().get() == CpuState.OPERATING.value()
     }

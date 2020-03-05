@@ -3,6 +3,8 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.CpuState;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.util.di.BoardScope;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,6 +18,8 @@ import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
  */
 @BoardScope
 public class PowerMgmt {
+
+    private static final Logger LOG = LogManager.getLogger();
 
     private final ByteRegister cpuState;
 
@@ -33,6 +37,7 @@ public class PowerMgmt {
     public void setState(CpuState state) {
         assertArgument(state == null, "state must not be null");
 
+        LOG.info("Switching CPU to " + state + " state.");
         cpuState.set(state.value());
     }
 

@@ -21,7 +21,7 @@ class BoardSpec extends Specification {
 
     def "should reset cpu and memory"() {
         when:
-        instance.reset()
+        instance.reset0()
 
         then:
         1 * cpu.reset()
