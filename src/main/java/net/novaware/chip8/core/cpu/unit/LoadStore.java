@@ -11,8 +11,8 @@ import javax.inject.Named;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
-import static net.novaware.chip8.core.util.UnsignedUtil.uint;
-import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+import static net.novaware.chip8.core.util.UnsignedUtil.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
 
 /**
  * Load Store Unit
@@ -36,7 +36,7 @@ public class LoadStore {
         this.memory = memory;
     }
 
-    void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
+    /* package */ void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
         int xIndex = uint(x);
         int iValue = index.getAsInt();
 
@@ -51,7 +51,7 @@ public class LoadStore {
         }
     }
 
-    void loadRegistersIntoMemory(final short x, final boolean incrementI) {
+    /* package */ void storeRegistersInMemory(final short x, final boolean incrementI) {
         int xIndex = uint(x);
         int iValue = index.getAsInt();
 
@@ -63,5 +63,18 @@ public class LoadStore {
         if (incrementI) {
             index.set(iValue);
         }
+    }
+
+    /* package */ void storeRegisterInMemoryAsBcd(final short x) {
+        final int xValue = getVariable(variables, x).getAsInt();
+        final int address = index.getAsInt();
+
+        final byte hundreds = ubyte(xValue / 100);
+        final byte tens = ubyte((xValue / 10) % 10);
+        final byte units = ubyte(xValue % 10);
+
+        memory.setByte(ushort(address), hundreds);
+        memory.setByte(ushort(address + 1), tens);
+        memory.setByte(ushort(address + 2), units);
     }
 }

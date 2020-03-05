@@ -200,19 +200,6 @@ public class ArithmeticLogic {
 
     // Special operations -----------------------
 
-    /* package */ void bcdRegisterToMemory(final short x) {
-        final int xValue = getVariable(variables, x).getAsInt();
-        final int address = index.getAsInt();
-
-        final byte hundreds = ubyte(xValue / 100);
-        final byte tens = ubyte((xValue / 10) % 10);
-        final byte units = ubyte(xValue % 10);
-
-        memory.setByte(ushort(address), hundreds);
-        memory.setByte(ushort(address + 1), tens);
-        memory.setByte(ushort(address + 2), units);
-    }
-
     /* package */ void andRandomToRegister(final short x, final short value) {
         int kkValue = uint(value);
         int random = randomSource.applyAsInt(256);

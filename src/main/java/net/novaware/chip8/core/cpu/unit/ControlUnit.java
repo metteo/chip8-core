@@ -3,7 +3,6 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.instruction.InstructionDecoder;
 import net.novaware.chip8.core.cpu.instruction.InstructionType;
 import net.novaware.chip8.core.cpu.register.Registers;
-import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
@@ -125,7 +124,9 @@ public class ControlUnit {
 
     public void execute() {
         final WordRegister[] di = registers.getDecodedInstruction();
+
         final InstructionType instructionType = InstructionType.valueOf(di[0].get());
+        final short p1 = di[1].get(), p2 = di[2].get(), p3 = di[3].get();
 
         int skip = 0;
 
@@ -140,42 +141,42 @@ public class ControlUnit {
             case Ox00EE: stackEngine.returnFromSubroutine(); break;
             case Ox0MMM: throw new RuntimeException("system call is unsupported, yet");
 
-            case Ox1MMM: jump(di[1].get()); break;
-            case Ox2MMM: stackEngine.call(di[1].get()); break;
-            case Ox3XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 2 : 0; break;
-            case Ox4XKK: skip = alu.compareValueWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
-            case Ox5XY0: skip = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 2 : 0; break;
-            case Ox6XKK: alu.loadValueIntoRegister(di[1].get(), di[2].get()); break;
-            case Ox7XKK: alu.addValueToRegister(di[1].get(), di[2].get()); break;
+            case Ox1MMM: stackEngine.jump(p1); maybeStopClock(p1); break;
+            case Ox2MMM: stackEngine.call(p1); break;
+            case Ox3XKK: skip = alu.compareValueWithRegister(p1, p2) ? 2 : 0; break;
+            case Ox4XKK: skip = alu.compareValueWithRegister(p1, p2) ? 0 : 2; break;
+            case Ox5XY0: skip = alu.compareRegisterWithRegister(p1, p2) ? 2 : 0; break;
+            case Ox6XKK: alu.loadValueIntoRegister(p1, p2); break;
+            case Ox7XKK: alu.addValueToRegister(p1, p2); break;
 
-            case Ox8XY0: alu.copyRegisterIntoRegister(di[1].get(), di[2].get()); break;
-            case Ox8XY1: alu.orRegisterToRegister(di[1].get(), di[2].get()); break;
-            case Ox8XY2: alu.andRegisterToRegister(di[1].get(), di[2].get()); break;
-            case Ox8XY3: alu.xorRegisterToRegister(di[1].get(), di[2].get()); break;
-            case Ox8XY4: alu.addRegisterToRegister(di[1].get(), di[2].get()); break;
-            case Ox8XY5: alu.subtractRegisterFromRegister(di[1].get(), di[1].get(), di[2].get()); break;
-            case Ox8XY6: alu.shiftRightRegisterIntoRegister(di[1].get(), useY ? di[2].get() : di[1].get()); break;
-            case Ox8XY7: alu.subtractRegisterFromRegister(di[1].get(), di[2].get(), di[1].get()); break;
-            case Ox8XYE: alu.shiftLeftRegisterIntoRegister(di[1].get(), useY ? di[2].get() : di[1].get()); break;
+            case Ox8XY0: alu.copyRegisterIntoRegister(p1, p2); break;
+            case Ox8XY1: alu.orRegisterToRegister(p1, p2); break;
+            case Ox8XY2: alu.andRegisterToRegister(p1, p2); break;
+            case Ox8XY3: alu.xorRegisterToRegister(p1, p2); break;
+            case Ox8XY4: alu.addRegisterToRegister(p1, p2); break;
+            case Ox8XY5: alu.subtractRegisterFromRegister(p1, p1, p2); break;
+            case Ox8XY6: alu.shiftRightRegisterIntoRegister(p1, useY ? p2 : p1); break;
+            case Ox8XY7: alu.subtractRegisterFromRegister(p1, p2, p1); break;
+            case Ox8XYE: alu.shiftLeftRegisterIntoRegister(p1, useY ? p2 : p1); break;
 
-            case Ox9XY0: skip = alu.compareRegisterWithRegister(di[1].get(), di[2].get()) ? 0 : 2; break;
-            case OxAMMM: agu.loadAddressIntoIndex(di[1].get()); break;
-            case OxBMMM: stackEngine.jump(di[1].get(), ushort(0x0)); break;
-            case OxCXKK: alu.andRandomToRegister(di[1].get(), di[2].get()); break;
-            case OxDXYK: gpu.drawSprite(di[1].get(), di[2].get(), di[3].get()); break;
+            case Ox9XY0: skip = alu.compareRegisterWithRegister(p1, p2) ? 0 : 2; break;
+            case OxAMMM: agu.loadAddressIntoIndex(p1); break;
+            case OxBMMM: stackEngine.jump(p1, ushort(0x0)); break;
+            case OxCXKK: alu.andRandomToRegister(p1, p2); break;
+            case OxDXYK: gpu.drawSprite(p1, p2, p3); break;
 
-            case OxEX9E: skip = compareKeyStateWithRegister(di[1].get()) ? 2 : 0; break;
-            case OxEXA1: skip = compareKeyStateWithRegister(di[1].get()) ? 0 : 2; break;
+            case OxEX9E: skip = compareKeyStateWithRegister(p1) ? 2 : 0; break;
+            case OxEXA1: skip = compareKeyStateWithRegister(p1) ? 0 : 2; break;
 
-            case OxFX07: delayTimer.storeTimerIntoVariable(di[1].get()); break;
-            case OxFX0A: skip = checkIfKeyPressed(di[1].get()) ? 0 : -2; break;
-            case OxFX15: delayTimer.loadVariableIntoTimer(di[1].get()); break;
-            case OxFX18: soundTimer.loadVariableIntoTimer(di[1].get()); break;
-            case OxFX1E: agu.addRegisterIntoIndex(di[1].get(), overflowI); break;
-            case OxFX29: gpu.loadFontAddressIntoRegister(di[1].get()); break;
-            case OxFX33: alu.bcdRegisterToMemory(di[1].get()); break;
-            case OxFX55: lsu.loadRegistersIntoMemory(di[1].get(), incrementI); break;
-            case OxFX65: lsu.loadMemoryIntoRegisters(di[1].get(), incrementI); break;
+            case OxFX07: delayTimer.storeTimerIntoVariable(p1); break;
+            case OxFX0A: skip = checkIfKeyPressed(p1) ? 0 : -2; break;
+            case OxFX15: delayTimer.loadVariableIntoTimer(p1); break;
+            case OxFX18: soundTimer.loadVariableIntoTimer(p1); break;
+            case OxFX1E: agu.addRegisterIntoIndex(p1, overflowI); break;
+            case OxFX29: gpu.loadFontAddressIntoRegister(p1); break;
+            case OxFX33: lsu.storeRegisterInMemoryAsBcd(p1); break;
+            case OxFX55: lsu.storeRegistersInMemory(p1, incrementI); break;
+            case OxFX65: lsu.loadMemoryIntoRegisters(p1, incrementI); break;
 
             default: throw new RuntimeException("Unknown instruction: " + di[0].get());
         }
@@ -187,10 +188,7 @@ public class ControlUnit {
                 " -> " + toHexString(registers.getProgramCounter().get()));
     }
 
-    private void jump(final short destination) {
-        // complete the cycle
-        stackEngine.jump(destination);
-
+    private void maybeStopClock(final short destination) {
         int from = registers.getMemoryAddress().getAsInt();
         int to = uint(destination);
 
