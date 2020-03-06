@@ -1,17 +1,15 @@
 /**
- * TODO: refine and maybe rename annotations
- *
  * Association -
  *   - bi-directional
  *   - uni-directional
  *   - refleexive
  *
- * Aggregation  - "uses" - "has a"
+ * Aggregation  - "@Used" on the field - aggregating class "uses", "has a" target
  *
- * Composition - "owns"
+ * Composition - "@Owned" on the field - composing class "owns" the target
  *
- * Inheritance - "extends" - "is a"
+ * Inheritance - "extends" - inheriting class forms "is a" relation
  *
- * Realization - "implements"
+ * Realization - "implements" - realizing class "implements" the interface
  */
 package net.novaware.chip8.core.util.uml;

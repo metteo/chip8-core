@@ -4,8 +4,8 @@ import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.gpu.ViewPort.Index;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Owns;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Owned;
+import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.signedness.qual.Unsigned;
@@ -28,13 +28,13 @@ public class Gpu {
 
     public static final int MAX_SPRITE_HEIGHT = 0x10;
 
-    @Uses
+    @Used
     private final RegisterFile registers;
 
-    @Uses
+    @Used
     private final Memory memory;
 
-    @Owns
+    @Owned
     private final ViewPort viewPort = new ViewPort();
 
     private byte[] spriteBuffer;

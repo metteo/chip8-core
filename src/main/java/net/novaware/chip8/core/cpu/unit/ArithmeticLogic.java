@@ -4,8 +4,8 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Owns;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Owned;
+import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,22 +28,22 @@ public class ArithmeticLogic {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    @Owns
+    @Owned
     private final IntUnaryOperator randomSource;
 
-    @Uses
+    @Used
     private final ByteRegister[] variables;
 
-    @Uses
+    @Used
     private final WordRegister input;
 
-    @Uses
+    @Used
     private final ByteRegister status;
 
-    @Uses
+    @Used
     private final ByteRegister statusType;
 
-    @Uses
+    @Used
     private final Memory memory;
 
     @Inject

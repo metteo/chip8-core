@@ -4,7 +4,7 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Used;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,16 +22,16 @@ import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
 @BoardScope
 public class AddressGeneration {
 
-    @Uses
+    @Used
     private final ByteRegister[] variables;
 
-    @Uses
+    @Used
     private final TribbleRegister index;
 
-    @Uses
+    @Used
     private final ByteRegister status;
 
-    @Uses
+    @Used
     private final ByteRegister statusType;
 
     @Inject

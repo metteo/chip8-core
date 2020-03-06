@@ -4,7 +4,7 @@ import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Used;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -18,19 +18,19 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 @BoardScope
 public class StackEngine {
 
-    @Uses
+    @Used
     private final TribbleRegister stackPointer;
 
-    @Uses
+    @Used
     private final TribbleRegister memoryAddress;
 
-    @Uses
+    @Used
     private final TribbleRegister programCounter;
 
-    @Uses
+    @Used
     private final ByteRegister[] variables;
 
-    @Uses
+    @Used
     private final Memory memory;
 
     @Inject

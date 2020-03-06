@@ -6,8 +6,8 @@ import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.util.uml.Owns;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Owned;
+import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,40 +36,40 @@ public class ControlUnit {
         boolean isLegacyAddressSum();
     }
 
-    @Owns
+    @Owned
     private final Config config;
 
-    @Owns
+    @Owned
     private final InstructionDecoder decoder;
 
-    @Uses
+    @Used
     private final RegisterFile registers;
 
-    @Uses
+    @Used
     private final Memory memory;
 
-    @Uses
+    @Used
     private final LoadStore lsu;
 
-    @Uses
+    @Used
     private final ArithmeticLogic alu;
 
-    @Uses
+    @Used
     private final AddressGeneration agu;
 
-    @Uses
+    @Used
     private final StackEngine stackEngine;
 
-    @Uses
+    @Used
     private final PowerMgmt powerMgmt;
 
-    @Uses
+    @Used
     private final Gpu gpu;
 
-    @Uses
+    @Used
     private final Timer delayTimer;
 
-    @Uses
+    @Used
     private final Timer soundTimer;
 
     @Inject

@@ -7,8 +7,8 @@ import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Owns;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Owned;
+import net.novaware.chip8.core.util.uml.Used;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,40 +28,40 @@ public class Cpu {
 
     }
 
-    @Owns
+    @Owned
     private final Config config;
 
-    @Owns
+    @Owned
     private final RegisterFile registers;
 
-    @Owns
+    @Owned
     private final ControlUnit controlUnit;
 
-    @Owns
+    @Owned
     private final LoadStore lsu;
 
-    @Owns
+    @Owned
     private final ArithmeticLogic alu;
 
-    @Owns
+    @Owned
     private final AddressGeneration agu;
 
-    @Owns
+    @Owned
     private final StackEngine stackEngine;
 
-    @Owns
+    @Owned
     private final PowerMgmt powerMgmt;
 
-    @Owns
+    @Owned
     private final Gpu gpu;
 
-    @Owns
+    @Owned
     private final Timer delayTimer;
 
-    @Owns
+    @Owned
     private final Timer soundTimer;
 
-    @Uses
+    @Used
     private final Memory memory;
 
     @Inject

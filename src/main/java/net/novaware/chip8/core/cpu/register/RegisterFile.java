@@ -1,7 +1,7 @@
 package net.novaware.chip8.core.cpu.register;
 
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Owns;
+import net.novaware.chip8.core.util.uml.Owned;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,14 +32,14 @@ public class RegisterFile {
     /**
      * Describes the state of CPU
      */
-    @Owns
+    @Owned
     private final ByteRegister cpuState;
 
     /**
      * General purpose registers (V0 - VE)
      * Status register (VF)
      */
-    @Owns
+    @Owned
     private final ByteRegister[] variables;
 
     /**
@@ -47,14 +47,14 @@ public class RegisterFile {
      *
      * @see {@link RegisterFile#VF_EMPTY}
      */
-    @Owns
+    @Owned
     private final ByteRegister statusType;
 
     /**
      * Index register use for holding memory address
      * Accessible by the program
      */
-    @Owns
+    @Owned
     private final TribbleRegister index;
 
     /**
@@ -65,7 +65,7 @@ public class RegisterFile {
      *
      * @see <a href="https://en.wikipedia.org/wiki/Memory_address_register" >MAR</a>
      */
-    @Owns
+    @Owned
     private final TribbleRegister memoryAddress;
 
     /**
@@ -73,32 +73,32 @@ public class RegisterFile {
      *
      * Holds the address of the next instruction.
      */
-    @Owns
+    @Owned
     private final TribbleRegister programCounter;
 
     /**
      * Stack segment value marks the start of the stack in memory
      * Does not change in Chip8
      */
-    @Owns
+    @Owned
     private final TribbleRegister stackSegment;
 
     /**
      * Points to the top of the stack
      */
-    @Owns
+    @Owned
     private final TribbleRegister stackPointer;
 
     /**
      * Start of the memory with font sprites
      */
-    @Owns
+    @Owned
     private final TribbleRegister fontSegment;
 
     /**
      * Start of the part of memory (256 bytes) mapped to screen
      */
-    @Owns
+    @Owned
     private final TribbleRegister graphicSegment;
 
     /**
@@ -107,45 +107,45 @@ public class RegisterFile {
      * Rendering component can then figure out when to repaint the screen to
      * avoid blinking of sprites during repositioning
      */
-    @Owns
+    @Owned
     private final ByteRegister graphicChange;
 
     /**
      * Dedicated Input register (16 bits) mapped to 16 CPU pins
      */
-    @Owns
+    @Owned
     private final WordRegister input;
 
     /**
      * Delay timer register value
      */
-    @Owns
+    @Owned
     private ByteRegister delay;
 
     /**
      * Sound timer register value
      */
-    @Owns
+    @Owned
     private ByteRegister sound;
 
     // TODO: figure out a better name, or remove when possible to attach multiple callbacks?
     /**
      * Value 0x1 turns on the sound, 0x0 turns it off
      */
-    @Owns
+    @Owned
     private ByteRegister soundOn;
 
     /**
      * Current Instruction Register
      * When instruction is fetched it's stored here.
      */
-    @Owns
+    @Owned
     private final WordRegister currentInstruction;
 
     /**
      * Currently decoded instruction with parameters (up to 3)
      */
-    @Owns
+    @Owned
     private final WordRegister[] decodedInstruction;
 
     @Inject

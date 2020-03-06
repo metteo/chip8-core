@@ -1,7 +1,7 @@
 package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -15,13 +15,13 @@ public class Timer {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    @Uses
+    @Used
     private final ByteRegister[] variables;
 
-    @Uses
+    @Used
     private final ByteRegister timerRegister;
 
-    @Uses
+    @Used
     @Nullable
     private final ByteRegister outputRegister;
 

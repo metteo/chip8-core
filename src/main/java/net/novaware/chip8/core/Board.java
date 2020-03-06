@@ -9,8 +9,8 @@ import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
 import net.novaware.chip8.core.util.di.BoardScope;
-import net.novaware.chip8.core.util.uml.Owns;
-import net.novaware.chip8.core.util.uml.Uses;
+import net.novaware.chip8.core.util.uml.Owned;
+import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,22 +31,22 @@ public class Board {
 
     private static final Logger LOG = LogManager.getLogger();
 
-    @Owns
+    @Owned
     private final BoardConfig config;
 
-    @Owns
+    @Owned
     private final Memory mmu;
 
-    @Owns
+    @Owned
     private final Cpu cpu;
 
-    @Owns
+    @Owned
     private ClockGenerator clock;
 
-    @Uses
+    @Used
     private final Memory interpreterRom;
 
-    @Uses
+    @Used
     private final Memory program;
 
     //TODO: class for managing handles
