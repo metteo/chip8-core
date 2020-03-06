@@ -44,7 +44,7 @@ public class Cpu {
     private final ArithmeticLogic alu;
 
     @Owned
-    private final AddressGeneration agu;
+    private final AddressGen agu;
 
     @Owned
     private final StackEngine stackEngine;
@@ -72,7 +72,7 @@ public class Cpu {
 
             final LoadStore lsu,
             final ArithmeticLogic alu,
-            final AddressGeneration agu,
+            final AddressGen agu,
             final StackEngine stackEngine,
             final PowerMgmt powerMgmt,
             final Gpu gpu,
@@ -104,6 +104,7 @@ public class Cpu {
         //TODO: delegate to subunits what can't be done in interpreter
         registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
 
+        agu.initialize();
         stackEngine.initialize();
 
         delayTimer.initialize();
@@ -127,6 +128,7 @@ public class Cpu {
     }
 
     public void reset() {
+        agu.reset();
         stackEngine.reset();
 
         registers.getMemoryAddress().set(0);

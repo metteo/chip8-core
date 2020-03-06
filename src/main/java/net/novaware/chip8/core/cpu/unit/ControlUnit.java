@@ -55,7 +55,7 @@ public class ControlUnit {
     private final ArithmeticLogic alu;
 
     @Used
-    private final AddressGeneration agu;
+    private final AddressGen agu;
 
     @Used
     private final StackEngine stackEngine;
@@ -82,7 +82,7 @@ public class ControlUnit {
 
             final LoadStore lsu,
             final ArithmeticLogic alu,
-            final AddressGeneration agu,
+            final AddressGen agu,
             final StackEngine stackEngine,
             final PowerMgmt powerMgmt,
             final Gpu gpu,

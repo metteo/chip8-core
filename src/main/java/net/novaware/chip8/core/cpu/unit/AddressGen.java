@@ -20,7 +20,7 @@ import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
  * Address Computation Unit (ACU)
  */
 @BoardScope
-public class AddressGeneration {
+public class AddressGen implements Unit {
 
     @Used
     private final ByteRegister[] variables;
@@ -35,7 +35,7 @@ public class AddressGeneration {
     private final ByteRegister statusType;
 
     @Inject
-    public AddressGeneration(
+    public AddressGen(
             @Named(VARIABLES) final ByteRegister[] variables,
             @Named(INDEX) final TribbleRegister index,
             @Named(STATUS) final ByteRegister status,
@@ -45,6 +45,20 @@ public class AddressGeneration {
         this.index = index;
         this.status = status;
         this.statusType = statusType;
+    }
+
+    @Override
+    public void initialize() {
+        zeroOutIndex();
+    }
+
+    @Override
+    public void reset() {
+        zeroOutIndex();
+    }
+
+    private void zeroOutIndex() {
+        index.set(0);
     }
 
     /* package */ void loadAddressIntoIndex(final short address) {
