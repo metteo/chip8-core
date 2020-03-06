@@ -76,9 +76,9 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
 
         if (rom) {
             assertState(strict.get(), "can not write in ROM");
-            LOG.warn(() -> memory.getName() + " ROM setByte " + toHexString(address));
+            LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
-            LOG.trace(() -> memory.getName() + " RAM setByte " + toHexString(address));
+            LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));
         }
 
         super.setByte(address, value);
@@ -97,9 +97,9 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
 
         if (rom) {
             assertState(strict.get(), "can not write in ROM");
-            LOG.warn(() -> memory.getName() + " ROM setWord " + toHexString(address));
+            LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
-            LOG.trace(() -> memory.getName() + " RAM setWord " + toHexString(address));
+            LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));
         }
 
         super.setWord(address, value);
@@ -118,9 +118,9 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
 
         if (rom) {
             assertState(strict.get(), "can not write in ROM");
-            LOG.warn(() -> memory.getName() + " ROM setWord " + toHexString(address));
+            LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
-            LOG.trace(() -> memory.getName() + " RAM setWord " + toHexString(address));
+            LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));
         }
 
         super.setBytes(address, source, length);

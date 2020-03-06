@@ -19,7 +19,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.*;
  * Load Store Unit
  */
 @BoardScope
-public class LoadStore {
+public class LoadStore implements Unit {
 
     private final ByteRegister[] variables;
     private final TribbleRegister index;

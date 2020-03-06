@@ -2,7 +2,6 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
-import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -13,9 +12,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.function.IntUnaryOperator;
 
-import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.*;
-import static net.novaware.chip8.core.memory.MemoryModule.MMU;
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
+import static net.novaware.chip8.core.cpu.unit.UnitModule.RANDOM;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
@@ -24,7 +23,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.uint;
  * Arithmetic Logic Unit (ALU)
  */
 @BoardScope
-public class ArithmeticLogic {
+public class ArithmeticLogic implements Unit {
 
     private static final Logger LOG = LogManager.getLogger();
 
@@ -43,17 +42,13 @@ public class ArithmeticLogic {
     @Used
     private final ByteRegister statusType;
 
-    @Used
-    private final Memory memory;
-
     @Inject
     public ArithmeticLogic(
-            @Named("random") final IntUnaryOperator randomSource,
+            @Named(RANDOM) final IntUnaryOperator randomSource,
             @Named(VARIABLES) final ByteRegister[] variables,
             @Named(INPUT) final WordRegister input,
             @Named(STATUS) final ByteRegister status,
-            @Named(STATUS_TYPE) final ByteRegister statusType,
-            @Named(MMU) final Memory memory
+            @Named(STATUS_TYPE) final ByteRegister statusType
     ) {
         this.randomSource = randomSource;
 
@@ -61,7 +56,6 @@ public class ArithmeticLogic {
         this.input = input;
         this.status = status;
         this.statusType = statusType;
-        this.memory = memory;
     }
 
     // Load operations --------------------------

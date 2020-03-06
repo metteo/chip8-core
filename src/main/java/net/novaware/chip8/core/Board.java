@@ -19,7 +19,9 @@ import javax.inject.Named;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
+import static net.novaware.chip8.core.cpu.instruction.InstructionType.Ox00E0;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
@@ -62,18 +64,13 @@ public class Board {
     };
 
     private StoragePort storagePort = new StoragePort() {
-        //TODO: the board should request data from storage device, not the other way around
         @Override
-        public void load(byte[] data) {
-            SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
-            programMemory.setStrict(false); //disable RO mode
-            programMemory.setBytes(ushort(0x0), data, data.length);
-            programMemory.setSplit(data.length);
-            programMemory.setStrict(config::isEnforceMemoryRoRwState);
+        public void attachSource(Supplier<byte[]> source) {
+            programSupplier = source;
         }
 
         @Override
-        public void setStoreCallback(Consumer<byte[]> callback) {
+        public void attachDestination(Consumer<byte[]> callback) {
             throw new UnsupportedOperationException("unimplemented");
         }
     };
@@ -82,6 +79,8 @@ public class Board {
     private BiConsumer<Integer, byte[]> displayReceiver;
 
     private Consumer<Boolean> audioReceiver;
+
+    private Supplier<byte[]> programSupplier = () -> new byte[0];
 
     @Inject
     /* package */ Board(
@@ -109,7 +108,7 @@ public class Board {
         // check the program in storage, if ok load it
         // call the program
 
-        init();
+        initialize();
         runOnScheduler(Integer.MAX_VALUE);
     }
 
@@ -118,22 +117,24 @@ public class Board {
         delayHandle.cancel(force);
         soundHandle.cancel(force);
 
-        reset();
+        hardReset0();
         //TODO: shutdown the clock
     }
 
-    public void init() {
+    public void initialize() {
         LOG.traceEntry();
 
         final RegisterFile registers = cpu.getRegisters();
 
-        registers.getFontSegment().set(MemoryModule.INTERPRETER_ROM_START);
+        registers.getFontSegment().set(0x0100);
         registers.getGraphicSegment().set(MemoryModule.DISPLAY_IO_START);
         registers.getStackSegment().set(MemoryModule.STACK_START);
 
         //TODO: load the font from file or integrate into bigger rom
         byte[] font = new Loader().loadFont();
         mmu.setBytes(registers.getFontSegment().get(), font, font.length);
+
+        loadProgram();
 
         cpu.initialize();
 
@@ -155,21 +156,41 @@ public class Board {
             audioReceiver.accept(so.getAsInt() == 1);
         });
 
+        //TODO: prepare a proper ROM
         ReadOnlyMemory interpreter = (ReadOnlyMemory) interpreterRom; //TODO: add check
+        interpreter.setWord(ushort(0), ushort(Ox00E0.opcode())); //cls
+        interpreter.setWord(ushort(2), ushort(0x1200)); //jump
         interpreter.setReadOnly(config::isEnforceMemoryRoRwState);
 
         LOG.traceExit();
     }
 
-    public void reset() {
-        clock.schedule(() -> reset0());
+    private void loadProgram(){
+        final byte[] data = programSupplier.get();
+
+        SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
+        programMemory.setStrict(false); //disable RO mode
+        program.setBytes(ushort(0x0), data, data.length);
+        programMemory.setSplit(data.length);
+        programMemory.setStrict(config::isEnforceMemoryRoRwState);
     }
 
-    /* package */ void reset0() {
-        // https://en.wikipedia.org/wiki/Hardware_reset
-        // Hard reset vs soft reset in nes: https://github.com/Parseus/nesimulare/blob/master/src/nesimulare/core/cpu/CPU.java#L287
-        mmu.clear(); // TODO:  hard reset clears whole memory and reloads roms?
-        cpu.reset();  //TODO: soft reset clears only display / registers
+    public void softReset() {
+        clock.schedule(() -> softReset0());
+    }
+
+    /* package */ void softReset0() {
+        cpu.reset();
+    }
+
+    public void hardReset() {
+        clock.schedule(() -> hardReset0());
+    }
+
+    /* package */ void hardReset0() {
+        mmu.clear(); //TODO: reload program ROM, clear the rest
+        loadProgram();
+        cpu.reset();
     }
 
     public void runOnScheduler(int maxCycles) {

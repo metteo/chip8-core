@@ -11,6 +11,7 @@ import javax.inject.Named;
 @Module
 public class UnitModule {
 
+    public static final String RANDOM = "random";
     public static final String DELAY = "delay";
     public static final String SOUND = "sound";
 

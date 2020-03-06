@@ -1,12 +1,11 @@
 package net.novaware.chip8.core.port;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface StoragePort extends InputPort, OutputPort {
 
-    //TODO: consider that the computer fetches data from tape instead of tape sending the data
-    // so maybe use here attach(Producer<byte[]> producer)? and call it from the board
-    void load(byte[] data);
+    void attachSource(Supplier<byte[]> source);
 
-    void setStoreCallback(Consumer<byte[]> callback);
+    void attachDestination(Consumer<byte[]> callback);
 }

@@ -34,12 +34,13 @@ class BoardCT extends Specification {
 
         when:
         def board = factory.newBoard()
-        board.init()
 
-        board.getStoragePort().load(infiniteLoop)
+        board.getStoragePort().attachSource({-> infiniteLoop})
         board.getKeyPort().updateKeyState(0b1 as short)
         board.getAudioPort().attach({on -> println "sound on: " + on})
         board.getDisplayPort().attach({ gc, buffer -> /* noop */})
+
+        board.initialize()
 
         board.runOnScheduler(10)
 
@@ -54,7 +55,7 @@ class BoardCT extends Specification {
     def "should properly fetch first instruction"() {
         given:
         def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
-        board.init()
+        board.initialize()
 
         def cpu = board.cpu
 
@@ -64,6 +65,8 @@ class BoardCT extends Specification {
         board.mmu.setWord(address, instruction)
 
         when:
+        cpu.cycle() //cls
+        cpu.cycle() //first one is jump to 0x200
         cpu.cycle()
 
         then:
@@ -74,7 +77,7 @@ class BoardCT extends Specification {
     def "should properly fetch 'last' instruction"() {
         given:
         def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
-        board.init()
+        board.initialize()
 
         def cpu = board.cpu
 
@@ -96,7 +99,7 @@ class BoardCT extends Specification {
     def "should properly decode MVI / LD I instruction"() {
         given:
         def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
-        board.init()
+        board.initialize()
 
         def cpu = board.cpu
 

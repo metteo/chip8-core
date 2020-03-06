@@ -1,11 +1,9 @@
 package net.novaware.chip8.core.cpu;
 
-import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
-import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -13,7 +11,9 @@ import net.novaware.chip8.core.util.uml.Used;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static net.novaware.chip8.core.cpu.CpuState.*;
+import static java.util.Arrays.stream;
+import static net.novaware.chip8.core.cpu.CpuState.OPERATING;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.VF_EMPTY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
@@ -22,7 +22,7 @@ import static net.novaware.chip8.core.memory.MemoryModule.MMU;
  * Central Processing Unit (CPU)
  */
 @BoardScope
-public class Cpu {
+public class Cpu implements Unit {
 
     public interface Config {
 
@@ -99,18 +99,18 @@ public class Cpu {
         this.soundTimer = soundTimer;
     }
 
+    @Override
     public void initialize() {
-        //TODO: move it to interpreter and start from 0x0000
-        //TODO: delegate to subunits what can't be done in interpreter
-        registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
-
+        lsu.initialize();
+        alu.initialize();
         agu.initialize();
         stackEngine.initialize();
+        powerMgmt.initialize();
+
+        controlUnit.initialize();
 
         delayTimer.initialize();
         soundTimer.initialize();
-
-        powerMgmt.setState(OPERATING);
 
         //unhalt / start clock after input change
         registers.getInput().setCallback(in -> {
@@ -127,21 +127,23 @@ public class Cpu {
         powerMgmt.wakeUp();
     }
 
+    @Override
     public void reset() {
+        lsu.reset();
+        alu.reset();
         agu.reset();
         stackEngine.reset();
+        powerMgmt.reset();
+        gpu.reset();
 
-        registers.getMemoryAddress().set(0);
-        registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
-        registers.getIndex().set(0);
-        registers.getDelay().set(0);
-        registers.getSound().set(0);
-        registers.getSoundOn().set(0);
+        controlUnit.reset();
 
-        ByteRegister[] vars = registers.getVariables();
-        for (int i = 0; i < vars.length; ++i) {
-            vars[i].set(0);
-        }
+        delayTimer.reset();
+        soundTimer.reset();
+
+        //TODO: reset of vars should be part of interpreter rom
+        stream(registers.getVariables()).forEach(br -> br.set(0));
+        registers.getStatusType().set(VF_EMPTY);
     }
 
     public RegisterFile getRegisters() {

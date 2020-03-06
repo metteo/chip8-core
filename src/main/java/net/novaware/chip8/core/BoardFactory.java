@@ -11,6 +11,8 @@ import net.novaware.chip8.core.util.di.BoardScope;
 import javax.inject.Named;
 import java.util.function.IntUnaryOperator;
 
+import static net.novaware.chip8.core.cpu.unit.UnitModule.RANDOM;
+
 @BoardScope
 @Component(modules = {
         RegisterModule.class,
@@ -40,7 +42,7 @@ public abstract class BoardFactory {
         public abstract Builder clock(ClockGenerator clock);
 
         @BindsInstance
-        public abstract Builder random(@Named("random") IntUnaryOperator random);
+        public abstract Builder random(@Named(RANDOM) IntUnaryOperator random);
 
         public abstract BoardFactory build();
     }

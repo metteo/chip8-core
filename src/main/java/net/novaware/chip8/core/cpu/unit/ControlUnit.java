@@ -14,6 +14,9 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.Arrays;
+
+import static java.util.Arrays.stream;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
@@ -24,18 +27,18 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 /**
  * Control Unit (CU)
  */
-public class ControlUnit {
+public class ControlUnit implements Unit {
 
     private static final Logger LOG = LogManager.getLogger();
 
     public interface Config {
-        boolean isLegacyShift();
 
+        boolean isLegacyShift();
         boolean isLegacyLoadStore();
 
         boolean isLegacyAddressSum();
-    }
 
+    }
     @Owned
     private final Config config;
 
@@ -105,6 +108,23 @@ public class ControlUnit {
 
         this.delayTimer = delayTimer;
         this.soundTimer = soundTimer;
+    }
+
+    @Override
+    public void initialize() {
+        zeroOutRegisters();
+    }
+
+    @Override
+    public void reset() {
+        zeroOutRegisters();
+    }
+
+    private void zeroOutRegisters() {
+        registers.getMemoryAddress().set(0);
+        registers.getProgramCounter().set(0);
+        registers.getCurrentInstruction().set(0);
+        stream(registers.getDecodedInstruction()).forEach(wr -> wr.set(0));
     }
 
     public void fetch() {

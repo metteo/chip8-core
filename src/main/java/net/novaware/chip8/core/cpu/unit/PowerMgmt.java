@@ -17,7 +17,7 @@ import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
  * Power Management Unit
  */
 @BoardScope
-public class PowerMgmt {
+public class PowerMgmt implements Unit {
 
     private static final Logger LOG = LogManager.getLogger();
 
@@ -28,6 +28,16 @@ public class PowerMgmt {
             @Named(CPU_STATE) final ByteRegister cpuState
     ) {
         this.cpuState = cpuState;
+    }
+
+    @Override
+    public void initialize() {
+        setState(OPERATING);
+    }
+
+    @Override
+    public void reset() {
+        setState(OPERATING);
     }
 
     public CpuState getState() {

@@ -60,6 +60,10 @@ public class Gpu {
         resultBuffer = new byte[MAX_SPRITE_HEIGHT];
     }
 
+    public void reset() {
+        registers.getGraphicChange().set(GC_IDLE);
+    }
+
     public void clearScreen() {
         final int gs = registers.getGraphicSegment().getAsInt();
 
