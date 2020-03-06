@@ -1,12 +1,12 @@
 package net.novaware.chip8.core.gpu
 
-import net.novaware.chip8.core.cpu.register.Registers
+import net.novaware.chip8.core.cpu.register.RegisterFile
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 import spock.lang.Unroll
 
 import static Gpu.MAX_SPRITE_HEIGHT
-import static net.novaware.chip8.core.cpu.register.Registers.*
+import static net.novaware.chip8.core.cpu.register.RegisterFile.*
 import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 import static net.novaware.chip8.core.util.HexUtil.toHexString
 
@@ -352,7 +352,7 @@ class GpuSpec extends Specification {
 
         then:
         registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == Registers.VF_COLLISION
+        registers.getStatusType().get() == RegisterFile.VF_COLLISION
 
         registers.getGraphicChange().get() == GC_MIX
     }

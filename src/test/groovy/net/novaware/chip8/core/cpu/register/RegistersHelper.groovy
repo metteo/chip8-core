@@ -4,8 +4,8 @@ import static net.novaware.chip8.core.cpu.register.RegisterModule.*
 
 class RegistersHelper {
 
-    static Registers newRegisters() {
-        new Registers(
+    static RegisterFile newRegisters() {
+        new RegisterFile(
                 provideCpuState(),
                 provideVariables(),
                 provideStatusType(),

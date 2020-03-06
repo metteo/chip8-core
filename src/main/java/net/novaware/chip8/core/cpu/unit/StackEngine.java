@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
-import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;

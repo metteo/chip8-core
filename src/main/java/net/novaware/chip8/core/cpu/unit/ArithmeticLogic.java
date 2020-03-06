@@ -14,7 +14,7 @@ import javax.inject.Named;
 import java.util.function.IntUnaryOperator;
 
 import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
-import static net.novaware.chip8.core.cpu.register.Registers.*;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.*;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.ubyte;

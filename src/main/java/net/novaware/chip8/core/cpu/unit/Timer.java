@@ -6,7 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static net.novaware.chip8.core.cpu.register.Registers.getVariable;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
 
 /**
  * Special unit attached to a timer register which decreases it

@@ -1,6 +1,6 @@
 package net.novaware.chip8.core.gpu;
 
-import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.gpu.ViewPort.Index;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
@@ -13,7 +13,7 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static net.novaware.chip8.core.cpu.register.Registers.*;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.*;
 import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
@@ -29,7 +29,7 @@ public class Gpu {
     public static final int MAX_SPRITE_HEIGHT = 0x10;
 
     @Uses
-    private final Registers registers;
+    private final RegisterFile registers;
 
     @Uses
     private final Memory memory;
@@ -50,7 +50,7 @@ public class Gpu {
     final boolean dump = true; //TODO: debugging UI
 
     @Inject
-    public Gpu(Registers registers, @Named(MMU) Memory memory) {
+    public Gpu(RegisterFile registers, @Named(MMU) Memory memory) {
         this.registers = registers;
         this.memory = memory;
 

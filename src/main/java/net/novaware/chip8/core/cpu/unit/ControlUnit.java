@@ -2,7 +2,7 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.instruction.InstructionDecoder;
 import net.novaware.chip8.core.cpu.instruction.InstructionType;
-import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
@@ -43,7 +43,7 @@ public class ControlUnit {
     private final InstructionDecoder decoder;
 
     @Uses
-    private final Registers registers;
+    private final RegisterFile registers;
 
     @Uses
     private final Memory memory;
@@ -77,7 +77,7 @@ public class ControlUnit {
             final Config config,
             final InstructionDecoder decoder,
 
-            final Registers registers,
+            final RegisterFile registers,
             @Named(MMU) final Memory memory,
 
             final LoadStore lsu,

@@ -2,7 +2,7 @@ package net.novaware.chip8.core;
 
 import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.cpu.Cpu;
-import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.memory.*;
 import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static net.novaware.chip8.core.cpu.register.Registers.GC_IDLE;
+import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
@@ -132,7 +132,7 @@ public class Board {
 
         cpu.initialize();
 
-        final Registers registers = cpu.getRegisters();
+        final RegisterFile registers = cpu.getRegisters();
 
         registers.getFontSegment().set(fontAddress);
 

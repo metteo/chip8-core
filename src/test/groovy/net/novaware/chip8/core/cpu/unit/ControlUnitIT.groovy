@@ -5,7 +5,7 @@ import net.novaware.chip8.core.BoardConfig
 import net.novaware.chip8.core.BoardFactory
 import net.novaware.chip8.core.clock.ClockGenerator
 import net.novaware.chip8.core.cpu.CpuState
-import net.novaware.chip8.core.cpu.register.Registers
+import net.novaware.chip8.core.cpu.register.RegisterFile
 import net.novaware.chip8.core.memory.Memory
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -13,7 +13,7 @@ import spock.lang.Unroll
 import java.util.function.IntUnaryOperator
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
-import static net.novaware.chip8.core.cpu.register.Registers.VF_COLLISION
+import static net.novaware.chip8.core.cpu.register.RegisterFile.VF_COLLISION
 
 class ControlUnitIT extends Specification {
 
@@ -62,7 +62,7 @@ class ControlUnitIT extends Specification {
         registers.getStatus().getAsInt() == 0x1
         registers.getStatusType().get() == VF_COLLISION
 
-        registers.getGraphicChange().get() == Registers.GC_ERASE
+        registers.getGraphicChange().get() == RegisterFile.GC_ERASE
     }
 
     def "should populate I register with address from instruction"() {
@@ -168,7 +168,7 @@ class ControlUnitIT extends Specification {
 
         if (overflowI) {
             registers.getStatus().getAsInt() == 0x00
-            registers.getStatusType().get() == Registers.VF_CARRY_I
+            registers.getStatusType().get() == RegisterFile.VF_CARRY_I
         }
 
         where:
@@ -195,7 +195,7 @@ class ControlUnitIT extends Specification {
 
         if (overflowI) {
             registers.getStatus().getAsInt() == 0x01
-            registers.getStatusType().get() == Registers.VF_CARRY_I
+            registers.getStatusType().get() == RegisterFile.VF_CARRY_I
         }
 
         where:
@@ -453,7 +453,7 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xA).getAsInt() == result
         registers.getStatus().getAsInt() == carry
-        registers.getStatusType().get() == Registers.VF_LSB
+        registers.getStatusType().get() == RegisterFile.VF_LSB
 
         where:
         useY  | xVal | yVal || result | carry | reg  | overflow
@@ -522,7 +522,7 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0xC).getAsInt() == 0x8A
         registers.getVariable(0xD).getAsInt() == 0x56
         registers.getStatus().getAsInt() == 0x00
-        registers.getStatusType().get() == Registers.VF_CARRY
+        registers.getStatusType().get() == RegisterFile.VF_CARRY
     }
 
     def "should properly ADD (with carry) value of Vy into Vx (overflow)"() {
@@ -546,7 +546,7 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0xC).getAsInt() == 0x65
         registers.getVariable(0xD).getAsInt() == 0xBB
         registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == Registers.VF_CARRY
+        registers.getStatusType().get() == RegisterFile.VF_CARRY
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (no borrow)"() {
@@ -570,7 +570,7 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0xC).getAsInt() == 0x22
         registers.getVariable(0xD).getAsInt() == 0x34
         registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == Registers.VF_NO_BORROW
+        registers.getStatusType().get() == RegisterFile.VF_NO_BORROW
     }
 
     def "should properly SUB (with borrow) value of Vy into Vx (borrow)"() {
@@ -594,7 +594,7 @@ class ControlUnitIT extends Specification {
         registers.getVariable(0xC).getAsInt() == 0xEF
         registers.getVariable(0xD).getAsInt() == 0xBB
         registers.getStatus().getAsInt() == 0x00
-        registers.getStatusType().get() == Registers.VF_NO_BORROW
+        registers.getStatusType().get() == RegisterFile.VF_NO_BORROW
     }
 
     def "should skip next instruction if V is NOT equal to number in instruction (SNE)"() {
@@ -1006,7 +1006,7 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xA).getAsInt() == 0x0A
         registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == Registers.VF_MSB
+        registers.getStatusType().get() == RegisterFile.VF_MSB
     }
 
     def "should properly shift Vx left (legacy mode) no overflow"() {
@@ -1028,7 +1028,7 @@ class ControlUnitIT extends Specification {
 
         registers.getVariable(0xA).getAsInt() == 0x8A
         registers.getStatus().getAsInt() == 0x00
-        registers.getStatusType().get() == Registers.VF_MSB
+        registers.getStatusType().get() == RegisterFile.VF_MSB
     }
 
 }

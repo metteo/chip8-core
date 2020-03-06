@@ -1,6 +1,7 @@
 package net.novaware.chip8.core.cpu.register;
 
 import net.novaware.chip8.core.util.di.BoardScope;
+import net.novaware.chip8.core.util.uml.Owns;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -9,11 +10,10 @@ import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 /**
- * Register file containing all the register references
- *
+ * Register File containing all the register references
  */
 @BoardScope
-public class Registers {
+public class RegisterFile {
 
     public static final byte GC_IDLE = 0x00;
     public static final byte GC_ERASE = 0x01;
@@ -32,25 +32,29 @@ public class Registers {
     /**
      * Describes the state of CPU
      */
+    @Owns
     private final ByteRegister cpuState;
 
     /**
      * General purpose registers (V0 - VE)
      * Status register (VF)
      */
+    @Owns
     private final ByteRegister[] variables;
 
     /**
      * Type of the value in the status register (VF)
      *
-     * @see {@link Registers#VF_EMPTY}
+     * @see {@link RegisterFile#VF_EMPTY}
      */
+    @Owns
     private final ByteRegister statusType;
 
     /**
      * Index register use for holding memory address
      * Accessible by the program
      */
+    @Owns
     private final TribbleRegister index;
 
     /**
@@ -61,6 +65,7 @@ public class Registers {
      *
      * @see <a href="https://en.wikipedia.org/wiki/Memory_address_register" >MAR</a>
      */
+    @Owns
     private final TribbleRegister memoryAddress;
 
     /**
@@ -68,27 +73,32 @@ public class Registers {
      *
      * Holds the address of the next instruction.
      */
+    @Owns
     private final TribbleRegister programCounter;
 
     /**
      * Stack segment value marks the start of the stack in memory
      * Does not change in Chip8
      */
+    @Owns
     private final TribbleRegister stackSegment;
 
     /**
      * Points to the top of the stack
      */
+    @Owns
     private final TribbleRegister stackPointer;
 
     /**
      * Start of the memory with font sprites
      */
+    @Owns
     private final TribbleRegister fontSegment;
 
     /**
      * Start of the part of memory (256 bytes) mapped to screen
      */
+    @Owns
     private final TribbleRegister graphicSegment;
 
     /**
@@ -97,42 +107,49 @@ public class Registers {
      * Rendering component can then figure out when to repaint the screen to
      * avoid blinking of sprites during repositioning
      */
+    @Owns
     private final ByteRegister graphicChange;
 
     /**
      * Dedicated Input register (16 bits) mapped to 16 CPU pins
      */
+    @Owns
     private final WordRegister input;
 
     /**
      * Delay timer register value
      */
+    @Owns
     private ByteRegister delay;
 
     /**
      * Sound timer register value
      */
+    @Owns
     private ByteRegister sound;
 
     // TODO: figure out a better name, or remove when possible to attach multiple callbacks?
     /**
      * Value 0x1 turns on the sound, 0x0 turns it off
      */
+    @Owns
     private ByteRegister soundOn;
 
     /**
      * Current Instruction Register
      * When instruction is fetched it's stored here.
      */
+    @Owns
     private final WordRegister currentInstruction;
 
     /**
      * Currently decoded instruction with parameters (up to 3)
      */
+    @Owns
     private final WordRegister[] decodedInstruction;
 
     @Inject
-    public Registers(
+    public RegisterFile(
         @Named(CPU_STATE) final ByteRegister cpuState,
         @Named(VARIABLES) final ByteRegister[] variables,
         @Named(STATUS_TYPE) final ByteRegister statusType,

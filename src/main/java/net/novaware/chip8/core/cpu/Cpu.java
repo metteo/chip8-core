@@ -1,7 +1,7 @@
 package net.novaware.chip8.core.cpu;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
-import net.novaware.chip8.core.cpu.register.Registers;
+import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.cpu.unit.*;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.memory.Memory;
@@ -32,7 +32,7 @@ public class Cpu {
     private final Config config;
 
     @Owns
-    private final Registers registers;
+    private final RegisterFile registers;
 
     @Owns
     private final ControlUnit controlUnit;
@@ -68,7 +68,7 @@ public class Cpu {
     public Cpu(
             final Config config,
             @Named(MMU) final Memory memory,
-            final Registers registers,
+            final RegisterFile registers,
 
             final LoadStore lsu,
             final ArithmeticLogic alu,
@@ -140,7 +140,7 @@ public class Cpu {
         }
     }
 
-    public Registers getRegisters() {
+    public RegisterFile getRegisters() {
         return registers;
     }
 
