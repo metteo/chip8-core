@@ -30,6 +30,7 @@ public class MemoryModule {
     public static final short  STACK_START             = 0x0EA0;
     public static final short  STACK_END               = 0x0ECF;
     public static final int    STACK_SIZE              = 48;     // max
+    public static final int    STACK_FRAME_SIZE        = 2;
 
     public static final String INTERPRETER_RAM         = "interpreterRam";
     public static final short  INTERPRETER_RAM_START   = 0x0ED0;
@@ -68,8 +69,9 @@ public class MemoryModule {
     @BoardScope
     @Named(STACK)
     static Memory provideStack() {
-        TribbleRegister[] stackRegisters = new TribbleRegister[STACK_SIZE / 2];
-        for(int i = 0; i < STACK_SIZE / 2; ++i) {
+        final int stackFrameCount = STACK_SIZE / STACK_FRAME_SIZE;
+        TribbleRegister[] stackRegisters = new TribbleRegister[stackFrameCount];
+        for(int i = 0; i < stackFrameCount; ++i) {
             stackRegisters[i] = new TribbleRegister("S" + i);
         }
 

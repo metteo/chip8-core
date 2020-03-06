@@ -11,7 +11,7 @@ import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
 /**
  * Special unit attached to a timer register which decreases it
  */
-public class Timer {
+public class Timer implements Unit {
 
     private static final Logger LOG = LogManager.getLogger();
 
@@ -39,7 +39,26 @@ public class Timer {
         this(variables, timerRegister, null);
     }
 
-    public void init() {
+    @Override
+    public void initialize() {
+        zeroOutRegisters();
+        configureOutput();
+    }
+
+    @Override
+    public void reset() {
+        zeroOutRegisters();
+    }
+
+    private void zeroOutRegisters() {
+        timerRegister.set(0);
+
+        if (outputRegister != null) {
+            outputRegister.set(0);
+        }
+    }
+
+    private void configureOutput() {
         LOG.debug(() -> "Configured with " + timerRegister.getName());
 
         if (outputRegister != null) {
@@ -59,6 +78,20 @@ public class Timer {
         }
     }
 
+    /**
+     * @return true if any work was done
+     */
+    public boolean tick() {
+        int intValue = timerRegister.getAsInt();
+
+        if (intValue > 0) {
+            timerRegister.set(intValue - 1);
+            return true;
+        }
+
+        return false;
+    }
+
     public void storeTimerIntoVariable(short x) {
         byte currentDelay = timerRegister.get();
         getVariable(variables, x).set(currentDelay);
@@ -67,13 +100,5 @@ public class Timer {
     public void loadVariableIntoTimer(short x) {
         byte delay = getVariable(variables, x).get();
         timerRegister.set(delay);
-    }
-
-    public void maybeDecrementValue() {
-        int intValue = timerRegister.getAsInt();
-
-        if (intValue > 0) {
-            timerRegister.set(intValue - 1);
-        }
     }
 }

@@ -99,14 +99,15 @@ public class Cpu {
         this.soundTimer = soundTimer;
     }
 
-    public void initialize() { //TODO: move it to interpreter and start from 0x0000
+    public void initialize() {
+        //TODO: move it to interpreter and start from 0x0000
+        //TODO: delegate to subunits what can't be done in interpreter
         registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
-        registers.getStackPointer().set(MemoryModule.STACK_START);
-        registers.getStackSegment().set(MemoryModule.STACK_START);
-        registers.getGraphicSegment().set(MemoryModule.DISPLAY_IO_START);
 
-        delayTimer.init();
-        soundTimer.init();
+        stackEngine.initialize();
+
+        delayTimer.initialize();
+        soundTimer.initialize();
 
         powerMgmt.setState(OPERATING);
 
@@ -126,9 +127,10 @@ public class Cpu {
     }
 
     public void reset() {
+        stackEngine.reset();
+
         registers.getMemoryAddress().set(0);
         registers.getProgramCounter().set(MemoryModule.PROGRAM_START);
-        registers.getStackPointer().set(MemoryModule.STACK_START);
         registers.getIndex().set(0);
         registers.getDelay().set(0);
         registers.getSound().set(0);
@@ -165,7 +167,7 @@ public class Cpu {
      */
     public void delayTick() {
         if (registers.getCpuState().get() == OPERATING.value()) {
-            delayTimer.maybeDecrementValue();
+            delayTimer.tick();
         }
     }
 
@@ -174,7 +176,7 @@ public class Cpu {
      */
     public void soundTick() {
         if (registers.getCpuState().get() == OPERATING.value()) {
-            soundTimer.maybeDecrementValue();
+            soundTimer.tick();
         }
     }
 }

@@ -125,16 +125,17 @@ public class Board {
     public void init() {
         LOG.traceEntry();
 
-        //TODO: load the font from file or integrate into bigger rom
-        short fontAddress = INTERPRETER_ROM_START;
-        byte[] font = new Loader().loadFont();
-        mmu.setBytes(fontAddress, font, font.length);
-
-        cpu.initialize();
-
         final RegisterFile registers = cpu.getRegisters();
 
-        registers.getFontSegment().set(fontAddress);
+        registers.getFontSegment().set(MemoryModule.INTERPRETER_ROM_START);
+        registers.getGraphicSegment().set(MemoryModule.DISPLAY_IO_START);
+        registers.getStackSegment().set(MemoryModule.STACK_START);
+
+        //TODO: load the font from file or integrate into bigger rom
+        byte[] font = new Loader().loadFont();
+        mmu.setBytes(registers.getFontSegment().get(), font, font.length);
+
+        cpu.initialize();
 
         registers.getGraphicChange().setCallback(gc -> {
             int change = gc.getAsInt();

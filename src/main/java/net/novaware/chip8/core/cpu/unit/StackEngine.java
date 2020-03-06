@@ -3,20 +3,25 @@ package net.novaware.chip8.core.cpu.unit;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Used;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 @BoardScope
-public class StackEngine {
+public class StackEngine implements Unit {
+
+    @Used
+    private final TribbleRegister stackSegment;
 
     @Used
     private final TribbleRegister stackPointer;
@@ -35,12 +40,14 @@ public class StackEngine {
 
     @Inject
     public StackEngine(
+            @Named(STACK_SEGMENT) final TribbleRegister stackSegment,
             @Named(STACK_POINTER) final TribbleRegister stackPointer,
             @Named(MEMORY_ADDRESS) final TribbleRegister memoryAddress,
             @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
             @Named(VARIABLES) final ByteRegister[] variables,
             @Named(MMU) final Memory memory
     ) {
+        this.stackSegment = stackSegment;
         this.stackPointer = stackPointer;
         this.memoryAddress = memoryAddress;
         this.programCounter = programCounter;
@@ -49,15 +56,43 @@ public class StackEngine {
         this.memory = memory;
     }
 
+    @Override
+    public void initialize() {
+        setupRegisters();
+    }
+
+    @Override
+    public void reset() {
+        setupRegisters();
+    }
+
+    private void setupRegisters() {
+        stackPointer.set(getStackBottom());
+    }
+
+    private short getStackBottom() {
+        return ushort(stackSegment.getAsInt() + MemoryModule.STACK_SIZE);
+    }
+
     /* package */ void call(final short address) {
-        stackPointer.increment(2); // 2 byte address
+        if (stackSegment.get() == stackPointer.get()) {
+            throw new IllegalStateException("Stack overflow at " + toHexString(memoryAddress.get()));
+        }
+
+        stackPointer.increment(-2); // 2 byte address
         memory.setWord(stackPointer.get(), memoryAddress.get());
         programCounter.set(address);
     }
 
     /* package */ void returnFromSubroutine() {
-        final short address = memory.getWord(stackPointer.get());
-        stackPointer.increment(-2);
+        final short sp = stackPointer.get();
+
+        if (sp == getStackBottom()) {
+            throw new IllegalStateException("Stack underflow at " + toHexString(memoryAddress.get()));
+        }
+
+        final short address = memory.getWord(sp);
+        stackPointer.increment(2);
 
         programCounter.set(address);
         programCounter.increment(2);

@@ -11,10 +11,10 @@ class TimerSpec extends Specification {
         given:
         def registers = newRegisters()
         Timer timer = new Timer(registers.getVariables(), registers.getDelay())
-        timer.init()
+        timer.initialize()
 
         when:
-        timer.maybeDecrementValue()
+        timer.tick()
 
         then:
         registers.getDelay().get() == 0x0 as byte
@@ -24,14 +24,14 @@ class TimerSpec extends Specification {
         given:
         def registers = newRegisters()
         Timer timer = new Timer(registers.getVariables(), registers.getDelay())
-        timer.init()
+        timer.initialize()
 
         registers.getDelay().set(0x1 as byte)
 
         when:
-        timer.maybeDecrementValue()
-        timer.maybeDecrementValue()
-        timer.maybeDecrementValue()
+        timer.tick()
+        timer.tick()
+        timer.tick()
 
         then:
         registers.getDelay().get() == 0x0 as byte
@@ -41,7 +41,7 @@ class TimerSpec extends Specification {
         given:
         def registers = newRegisters()
         Timer timer = new Timer(registers.getVariables(), registers.getDelay())
-        timer.init()
+        timer.initialize()
 
         def delay = registers.getDelay()
 
@@ -49,14 +49,19 @@ class TimerSpec extends Specification {
 
         expect:
         delay.get() == 0x3 as byte
-        timer.maybeDecrementValue()
+        tick(timer)
         delay.get() == 0x2 as byte
-        timer.maybeDecrementValue()
+        tick(timer)
         delay.get() == 0x1 as byte
-        timer.maybeDecrementValue()
+        tick(timer)
         delay.get() == 0x0 as byte
-        timer.maybeDecrementValue()
+        tick(timer)
         delay.get() == 0x0 as byte
+    }
+
+    //workaround for boolean return
+    void tick(Timer t) {
+        t.tick()
     }
 
     def "should trigger output register when more than 1"() {
@@ -67,7 +72,7 @@ class TimerSpec extends Specification {
         ByteRegister soundOn = registers.getSoundOn()
 
         Timer timer = new Timer(registers.getVariables(), sound, soundOn)
-        timer.init()
+        timer.initialize()
 
         when:
         sound.set(5)
@@ -92,10 +97,10 @@ class TimerSpec extends Specification {
         soundOn.set(1)
 
         Timer timer = new Timer(registers.getVariables(), sound, soundOn)
-        timer.init()
+        timer.initialize()
 
         when:
-        timer.maybeDecrementValue()
+        timer.tick()
 
         then:
         sound.getAsInt() == 0

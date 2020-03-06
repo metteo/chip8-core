@@ -13,6 +13,8 @@ class CpuSpec extends Specification {
 
     Memory memory = Mock()
 
+    StackEngine stackEngine = Mock()
+
     def registers = newRegisters()
 
     Cpu instance = new Cpu(
@@ -22,7 +24,7 @@ class CpuSpec extends Specification {
             Mock(LoadStore),
             Mock(ArithmeticLogic),
             Mock(AddressGeneration),
-            Mock(StackEngine),
+            stackEngine,
             Mock(PowerMgmt),
             Mock(Gpu),
             Mock(ControlUnit),
@@ -36,8 +38,7 @@ class CpuSpec extends Specification {
 
         then:
         MemoryModule.PROGRAM_START == instance.getRegisters().getProgramCounter().get()
-        MemoryModule.STACK_START == instance.getRegisters().getStackPointer().get()
-        MemoryModule.STACK_START == instance.getRegisters().getStackSegment().get()
+        1 * stackEngine.initialize()
     }
 
     def "should reset the registers"() {
@@ -57,7 +58,6 @@ class CpuSpec extends Specification {
         then:
         registers.getMemoryAddress().getAsInt() == 0
         registers.getProgramCounter().getAsInt() == 0x200
-        registers.getStackPointer().getAsInt() == MemoryModule.STACK_START
         registers.getIndex().getAsInt() == 0
         registers.getDelay().getAsInt() == 0
         registers.getSound().getAsInt() == 0
@@ -68,5 +68,6 @@ class CpuSpec extends Specification {
         }
 
         0 * memory._
+        1 * stackEngine.reset()
     }
 }

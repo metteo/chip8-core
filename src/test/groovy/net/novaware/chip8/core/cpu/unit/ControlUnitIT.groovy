@@ -242,7 +242,7 @@ class ControlUnitIT extends Specification {
         given:
         registers.getMemoryAddress().set(0x322)
         registers.getProgramCounter().set(0x324)
-        registers.getStackPointer().set(0xFE0)
+        registers.getStackPointer().set(0xFE2)
         registers.getStackSegment().set(0xFE0)
 
         def instruction = registers.getDecodedInstruction()
@@ -254,9 +254,9 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x400 as short
-        registers.getStackPointer().get() == 0xFE2 as short
-        memory.getByte(0xFE2 as short) == 0x3 as short
-        memory.getByte(0xFE3 as short) == 0x22 as short
+        registers.getStackPointer().get() == 0xFE0 as short
+        memory.getByte(0xFE0 as short) == 0x3 as short
+        memory.getByte(0xFE1 as short) == 0x22 as short
     }
 
     def "should populate register Vx with number from register Vy"() {
@@ -360,10 +360,10 @@ class ControlUnitIT extends Specification {
         registers.getStackSegment().set(0xFE0)
 
         registers.getProgramCounter().set(0x400)
-        registers.getStackPointer().set(0xFE2)
+        registers.getStackPointer().set(0xFE0)
 
-        memory.setByte(0xFE2 as short, 0x3 as byte)
-        memory.setByte(0xFE3 as short, 0x22 as byte)
+        memory.setByte(0xFE0 as short, 0x3 as byte)
+        memory.setByte(0xFE1 as short, 0x22 as byte)
 
         def instruction = registers.getDecodedInstruction()
         instruction[0].set(Ox00EE.opcode())
@@ -373,7 +373,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x324 as short //pc should be incremented here to prevent infinite loop
-        registers.getStackPointer().get() == 0xFE0 as short
+        registers.getStackPointer().get() == 0xFE2 as short
     }
 
     def "should set delay timer to given value" () {
