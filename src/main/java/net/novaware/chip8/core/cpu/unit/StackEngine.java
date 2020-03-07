@@ -17,6 +17,15 @@ import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
+/**
+ * Stack uses a segment of memory mapped to tribble registers.
+ * Stack pointer starts at the end of the segment (bottom) and
+ * moves closer to the beginning (top) as routine call locations
+ * are added to the stack. When the routine ends, the program
+ * continues execution at the location pointed by stack pointer
+ * + 2 (we store function call memory locations, not locations
+ * where execution should resume)
+ */
 @BoardScope
 public class StackEngine implements Unit {
 
@@ -40,12 +49,12 @@ public class StackEngine implements Unit {
 
     @Inject
     public StackEngine(
-            @Named(STACK_SEGMENT) final TribbleRegister stackSegment,
-            @Named(STACK_POINTER) final TribbleRegister stackPointer,
-            @Named(MEMORY_ADDRESS) final TribbleRegister memoryAddress,
-            @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
-            @Named(VARIABLES) final ByteRegister[] variables,
-            @Named(MMU) final Memory memory
+        @Named(STACK_SEGMENT) final TribbleRegister stackSegment,
+        @Named(STACK_POINTER) final TribbleRegister stackPointer,
+        @Named(MEMORY_ADDRESS) final TribbleRegister memoryAddress,
+        @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
+        @Named(VARIABLES) final ByteRegister[] variables,
+        @Named(MMU) final Memory memory
     ) {
         this.stackSegment = stackSegment;
         this.stackPointer = stackPointer;
@@ -74,7 +83,7 @@ public class StackEngine implements Unit {
         return ushort(stackSegment.getAsInt() + MemoryModule.STACK_SIZE);
     }
 
-    /* package */ void call(final short address) {
+    /* package */ void callRoutine(final short address) {
         if (stackSegment.get() == stackPointer.get()) {
             throw new IllegalStateException("Stack overflow at " + toHexString(memoryAddress.get()));
         }
@@ -84,7 +93,7 @@ public class StackEngine implements Unit {
         programCounter.set(address);
     }
 
-    /* package */ void returnFromSubroutine() {
+    /* package */ void returnFromRoutine() {
         final short sp = stackPointer.get();
 
         if (sp == getStackBottom()) {

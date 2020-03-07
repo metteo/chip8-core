@@ -66,21 +66,21 @@ public class Cpu implements Unit {
 
     @Inject
     public Cpu(
-            final Config config,
-            @Named(MMU) final Memory memory,
-            final RegisterFile registers,
+        final Config config,
+        @Named(MMU) final Memory memory,
+        final RegisterFile registers,
 
-            final LoadStore lsu,
-            final ArithmeticLogic alu,
-            final AddressGen agu,
-            final StackEngine stackEngine,
-            final PowerMgmt powerMgmt,
-            final Gpu gpu,
+        final LoadStore lsu,
+        final ArithmeticLogic alu,
+        final AddressGen agu,
+        final StackEngine stackEngine,
+        final PowerMgmt powerMgmt,
+        final Gpu gpu,
 
-            final ControlUnit controlUnit,
+        final ControlUnit controlUnit,
 
-            @Named(DELAY) final Timer delayTimer,
-            @Named(SOUND) final Timer soundTimer
+        @Named(DELAY) final Timer delayTimer,
+        @Named(SOUND) final Timer soundTimer
     ) {
         this.config = config;
         this.memory = memory;
@@ -152,18 +152,22 @@ public class Cpu implements Unit {
 
     /**
      * Virtual Chip8 Processor cycle.
-     *
+     * <p>
      * On the original - CDP18S711, single virtual instruction could take
      * multiple instructions / cycles to complete.
-     *
+     * <p>
      * Supports clock gating
      */
     public void cycle() {
         if (registers.getCpuState().get() == OPERATING.value()) {
-            controlUnit.fetch();
-            controlUnit.decode();
-            controlUnit.execute();
+            cycle0();
         }
+    }
+
+    private void cycle0() {
+        controlUnit.fetch();
+        controlUnit.decode();
+        controlUnit.execute();
     }
 
     /**

@@ -26,9 +26,9 @@ public class Timer implements Unit {
     private final ByteRegister outputRegister;
 
     public Timer(
-            final ByteRegister[] variables,
-            final ByteRegister timerRegister,
-            final @Nullable ByteRegister outputRegister
+        final ByteRegister[] variables,
+        final ByteRegister timerRegister,
+        final @Nullable ByteRegister outputRegister
     ) {
         this.variables = variables;
         this.timerRegister = timerRegister;
@@ -97,7 +97,7 @@ public class Timer implements Unit {
         getVariable(variables, x).set(currentDelay);
     }
 
-    public void loadVariableIntoTimer(short x) {
+    public void loadTimerWithVariable(short x) {
         byte delay = getVariable(variables, x).get();
         timerRegister.set(delay);
     }

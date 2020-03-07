@@ -51,7 +51,7 @@ class StackEngineSpec extends Specification {
         short sp = ushort(stackBottom() - 2)
 
         when:
-        instance.call(ushort(0x0300))
+        instance.callRoutine(ushort(0x0300))
 
         then:
         registers.programCounter.getAsInt() == 0x0300
@@ -64,7 +64,7 @@ class StackEngineSpec extends Specification {
         registers.stackPointer.set(MemoryModule.STACK_START)
 
         when:
-        instance.call(ushort(0x0300))
+        instance.callRoutine(ushort(0x0300))
 
         then:
         def ex = thrown(IllegalStateException)
@@ -79,7 +79,7 @@ class StackEngineSpec extends Specification {
         registers.stackPointer.set(sp)
 
         when:
-        instance.returnFromSubroutine()
+        instance.returnFromRoutine()
 
         then:
         1 * memory.getWord(sp) >> ushort(0x200)
@@ -93,7 +93,7 @@ class StackEngineSpec extends Specification {
         registers.stackPointer.set(stackBottom())
 
         when:
-        instance.returnFromSubroutine()
+        instance.returnFromRoutine()
 
         then:
         def ex = thrown(IllegalStateException)

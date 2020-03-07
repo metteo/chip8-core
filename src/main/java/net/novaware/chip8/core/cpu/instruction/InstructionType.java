@@ -19,6 +19,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
  * NOTE: Every instruction instance name starts with capital 'O', not '0' because of Java syntax rules
  *
  * @see <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">Cowgod's Chip-8 Tech Ref v1.0</a>
+ * @see <a href="http://mattmik.com/files/chip8/mastering/chip8.html">Mastering Chip-8 by mattmik</a>
  */
 public enum InstructionType {
     /**
@@ -40,7 +41,7 @@ public enum InstructionType {
      * 00EE - RET
      * Return from a subroutine.
      *
-     * The interpreter sets the program counter to the address popped from the stack.
+     * The interpreter sets the program counter to the address popped from the stack + 2.
      */
     Ox00EE (0x00EE, OxFFFF.value()),
 
@@ -48,7 +49,7 @@ public enum InstructionType {
      * 1MMM - JP addr
      * Jump to location MMM.
      *
-     * The interpreter sets the program counter to MMM. PC is NOT incremented.
+     * The interpreter sets the program counter to MMM. PC incremented during fetch is overridden.
      */
     Ox1MMM (0x1000, OxF000.value()),
 
@@ -56,7 +57,7 @@ public enum InstructionType {
      * 0x2MMM - CALL addr
      * Call subroutine at MMM.
      *
-     * The interpreter increments the stack pointer, then puts the current PC on the top of the stack.
+     * The interpreter decrements the stack pointer, then puts the current memory address on the top of the stack.
      * The PC is then set to MMM.
      */
     Ox2MMM (0x2000, OxF000.value()),

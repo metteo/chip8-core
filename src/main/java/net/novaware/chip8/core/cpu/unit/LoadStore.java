@@ -28,10 +28,10 @@ public class LoadStore implements Unit {
 
     @Inject
     public LoadStore(
-            @Named(VARIABLES) final ByteRegister[] variables,
-            @Named(INDEX) final TribbleRegister index,
-            @Named(INPUT) final WordRegister input,
-            @Named(MMU) final Memory memory
+        @Named(VARIABLES) final ByteRegister[] variables,
+        @Named(INDEX) final TribbleRegister index,
+        @Named(INPUT) final WordRegister input,
+        @Named(MMU) final Memory memory
     ) {
 
         this.variables = variables;
@@ -40,10 +40,9 @@ public class LoadStore implements Unit {
         this.memory = memory;
     }
 
-    /* package */ void loadMemoryIntoRegisters(final short x, final boolean incrementI) {
+    /* package */ void storeMemoryIntoVariables(final short x, final boolean incrementI) {
         int xIndex = uint(x);
         int iValue = index.getAsInt();
-
 
         for (int i = 0; i <= xIndex; ++i, ++iValue) {
             final byte data = memory.getByte(ushort(iValue));
@@ -58,7 +57,7 @@ public class LoadStore implements Unit {
     /**
      * @return true if input register is non-0
      */
-    /* package */ boolean loadInputIntoRegister(short x) {
+    /* package */ boolean storeInputIntoVariables(short x) {
         int inValue = input.getAsInt();
 
         if (inValue > 0) { //some bits are set
@@ -72,7 +71,7 @@ public class LoadStore implements Unit {
         return false;
     }
 
-    /* package */ void storeRegistersInMemory(final short x, final boolean incrementI) {
+    /* package */ void loadMemoryWithVariables(final short x, final boolean incrementI) {
         int xIndex = uint(x);
         int iValue = index.getAsInt();
 
@@ -86,7 +85,7 @@ public class LoadStore implements Unit {
         }
     }
 
-    /* package */ void storeRegisterInMemoryAsBcd(final short x) {
+    /* package */ void loadMemoryWithBcdVariable(final short x) {
         final int xValue = getVariable(variables, x).getAsInt();
         final int address = index.getAsInt();
 

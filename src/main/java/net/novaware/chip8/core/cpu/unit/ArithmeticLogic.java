@@ -44,11 +44,11 @@ public class ArithmeticLogic implements Unit {
 
     @Inject
     public ArithmeticLogic(
-            @Named(RANDOM) final IntUnaryOperator randomSource,
-            @Named(VARIABLES) final ByteRegister[] variables,
-            @Named(INPUT) final WordRegister input,
-            @Named(STATUS) final ByteRegister status,
-            @Named(STATUS_TYPE) final ByteRegister statusType
+        @Named(RANDOM) final IntUnaryOperator randomSource,
+        @Named(VARIABLES) final ByteRegister[] variables,
+        @Named(INPUT) final WordRegister input,
+        @Named(STATUS) final ByteRegister status,
+        @Named(STATUS_TYPE) final ByteRegister statusType
     ) {
         this.randomSource = randomSource;
 
@@ -60,11 +60,11 @@ public class ArithmeticLogic implements Unit {
 
     // Load operations --------------------------
 
-    /* package */ void loadValueIntoRegister(final short x, final short value) {
+    /* package */ void loadVariableWithValue(final short x, final short value) {
         getVariable(variables, x).set(value);
     }
 
-    /* package */ void copyRegisterIntoRegister(final short x, final short y) {
+    /* package */ void copyVariableIntoVariable(final short x, final short y) {
         final byte yValue = getVariable(variables, y).get();
 
         getVariable(variables, x).set(yValue);
@@ -72,7 +72,7 @@ public class ArithmeticLogic implements Unit {
 
     // Arithmetic operations --------------------
 
-    /* package */ void addValueToRegister(final short x, final short value) {
+    /* package */ void sumVariableWithValue(final short x, final short value) {
         int xValue = getVariable(variables, x).getAsInt();
 
         xValue = xValue + uint(value);
@@ -80,7 +80,7 @@ public class ArithmeticLogic implements Unit {
         getVariable(variables, x).set(xValue);
     }
 
-    /* package */ void addRegisterToRegister(final short x, final short y) {
+    /* package */ void sumVariableWithVariable(final short x, final short y) {
         int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
 
@@ -98,7 +98,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * target = x - y where target may be x or y:
      */
-    /* package */ void subtractRegisterFromRegister(final short target, final short x, final short y) {
+    /* package */ void subtractVariableFromVariable(final short target, final short x, final short y) {
         final int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
         int targetValue = xValue;
@@ -121,7 +121,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * Effectively divide by 2
      */
-    /* package */ void shiftRightRegisterIntoRegister(final short x, final short y) {
+    /* package */ void shiftRightVariableIntoVariable(final short x, final short y) {
         final int yValue = getVariable(variables, y).getAsInt();
 
         final byte leastSignificantBit = ubyte(0b1 & yValue);
@@ -136,7 +136,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * Effectively multiply by 2
      */
-    /* package */ void shiftLeftRegisterIntoRegister(final short x, final short y) {
+    /* package */ void shiftLeftVariableIntoVariable(final short x, final short y) {
         final int yValue = getVariable(variables, y).getAsInt();
 
         final byte mostSignificantBit = ubyte((0x80 & yValue) >>> 7);
@@ -153,7 +153,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * @return true if equal
      */
-    /* package */ boolean compareValueWithRegister(final short x, final short value) {
+    /* package */ boolean compareVariableWithValue(final short x, final short value) {
         final int xValue = getVariable(variables, x).getAsInt();
 
         return xValue == uint(value);
@@ -162,7 +162,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * @return true if equal
      */
-    /* package */ boolean compareRegisterWithRegister(final short x, final short y) {
+    /* package */ boolean compareVariableWithVariable(final short x, final short y) {
         final int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
 
@@ -172,7 +172,7 @@ public class ArithmeticLogic implements Unit {
     /**
      * @return true if Vx-th bit was set
      */
-    /* package */ boolean compareInputWithRegister(final short x) {
+    /* package */ boolean compareInputWithVariable(final short x) {
         final int inValue = input.getAsInt();
         final int bit = getVariable(variables, x).getAsInt();
 
@@ -188,7 +188,7 @@ public class ArithmeticLogic implements Unit {
 
     // Logical operations -----------------------
 
-    /* package */ void andRegisterToRegister(final short x, final short y) {
+    /* package */ void andVariableWithVariable(final short x, final short y) {
         int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
 
@@ -197,7 +197,7 @@ public class ArithmeticLogic implements Unit {
         getVariable(variables, x).set(xValue);
     }
 
-    /* package */ void orRegisterToRegister(final short x, final short y) {
+    /* package */ void orVariableWithVariable(final short x, final short y) {
         int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
 
@@ -206,7 +206,7 @@ public class ArithmeticLogic implements Unit {
         getVariable(variables, x).set(xValue);
     }
 
-    /* package */ void xorRegisterToRegister(final short x, final short y) {
+    /* package */ void xorVariableWithVariable(final short x, final short y) {
         int xValue = getVariable(variables, x).getAsInt();
         final int yValue = getVariable(variables, y).getAsInt();
 
@@ -217,7 +217,7 @@ public class ArithmeticLogic implements Unit {
 
     // Special operations -----------------------
 
-    /* package */ void andRandomToRegister(final short x, final short value) {
+    /* package */ void andVariableWithRandom(final short x, final short value) {
         int kkValue = uint(value);
         int random = randomSource.applyAsInt(256);
 

@@ -14,8 +14,6 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import java.util.Arrays;
-
 import static java.util.Arrays.stream;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
@@ -77,21 +75,21 @@ public class ControlUnit implements Unit {
 
     @Inject
     public ControlUnit(
-            final Config config,
-            final InstructionDecoder decoder,
+        final Config config,
+        final InstructionDecoder decoder,
 
-            final RegisterFile registers,
-            @Named(MMU) final Memory memory,
+        final RegisterFile registers,
+        @Named(MMU) final Memory memory,
 
-            final LoadStore lsu,
-            final ArithmeticLogic alu,
-            final AddressGen agu,
-            final StackEngine stackEngine,
-            final PowerMgmt powerMgmt,
-            final Gpu gpu,
+        final LoadStore lsu,
+        final ArithmeticLogic alu,
+        final AddressGen agu,
+        final StackEngine stackEngine,
+        final PowerMgmt powerMgmt,
+        final Gpu gpu,
 
-            @Named(DELAY) final Timer delayTimer,
-            @Named(SOUND) final Timer soundTimer
+        @Named(DELAY) final Timer delayTimer,
+        @Named(SOUND) final Timer soundTimer
     ) {
         this.config = config;
         this.decoder = decoder;
@@ -158,46 +156,46 @@ public class ControlUnit implements Unit {
 
         switch (instructionType) {
             case Ox00E0: gpu.clearScreen(); break;
-            case Ox00EE: stackEngine.returnFromSubroutine(); break;
+            case Ox00EE: stackEngine.returnFromRoutine(); break;
             case Ox0MMM: throw new RuntimeException("system call is unsupported, yet");
 
             case Ox1MMM: stackEngine.jump(p1); maybeStopClock(p1); break;
-            case Ox2MMM: stackEngine.call(p1); break;
-            case Ox3XKK: skip = alu.compareValueWithRegister(p1, p2) ? 2 : 0; break;
-            case Ox4XKK: skip = alu.compareValueWithRegister(p1, p2) ? 0 : 2; break;
-            case Ox5XY0: skip = alu.compareRegisterWithRegister(p1, p2) ? 2 : 0; break;
-            case Ox6XKK: alu.loadValueIntoRegister(p1, p2); break;
-            case Ox7XKK: alu.addValueToRegister(p1, p2); break;
+            case Ox2MMM: stackEngine.callRoutine(p1); break;
+            case Ox3XKK: skip = alu.compareVariableWithValue(p1, p2) ? 2 : 0; break;
+            case Ox4XKK: skip = alu.compareVariableWithValue(p1, p2) ? 0 : 2; break;
+            case Ox5XY0: skip = alu.compareVariableWithVariable(p1, p2) ? 2 : 0; break;
+            case Ox6XKK: alu.loadVariableWithValue(p1, p2); break;
+            case Ox7XKK: alu.sumVariableWithValue(p1, p2); break;
 
-            case Ox8XY0: alu.copyRegisterIntoRegister(p1, p2); break;
-            case Ox8XY1: alu.orRegisterToRegister(p1, p2); break;
-            case Ox8XY2: alu.andRegisterToRegister(p1, p2); break;
-            case Ox8XY3: alu.xorRegisterToRegister(p1, p2); break;
-            case Ox8XY4: alu.addRegisterToRegister(p1, p2); break;
-            case Ox8XY5: alu.subtractRegisterFromRegister(p1, p1, p2); break;
-            case Ox8XY6: alu.shiftRightRegisterIntoRegister(p1, useY ? p2 : p1); break;
-            case Ox8XY7: alu.subtractRegisterFromRegister(p1, p2, p1); break;
-            case Ox8XYE: alu.shiftLeftRegisterIntoRegister(p1, useY ? p2 : p1); break;
+            case Ox8XY0: alu.copyVariableIntoVariable(p1, p2); break;
+            case Ox8XY1: alu.orVariableWithVariable(p1, p2); break;
+            case Ox8XY2: alu.andVariableWithVariable(p1, p2); break;
+            case Ox8XY3: alu.xorVariableWithVariable(p1, p2); break;
+            case Ox8XY4: alu.sumVariableWithVariable(p1, p2); break;
+            case Ox8XY5: alu.subtractVariableFromVariable(p1, p1, p2); break;
+            case Ox8XY6: alu.shiftRightVariableIntoVariable(p1, useY ? p2 : p1); break;
+            case Ox8XY7: alu.subtractVariableFromVariable(p1, p2, p1); break;
+            case Ox8XYE: alu.shiftLeftVariableIntoVariable(p1, useY ? p2 : p1); break;
 
-            case Ox9XY0: skip = alu.compareRegisterWithRegister(p1, p2) ? 0 : 2; break;
-            case OxAMMM: agu.loadAddressIntoIndex(p1); break;
+            case Ox9XY0: skip = alu.compareVariableWithVariable(p1, p2) ? 0 : 2; break;
+            case OxAMMM: agu.loadIndexWithAddress(p1); break;
             case OxBMMM: stackEngine.jump(p1, ushort(0x0)); break;
-            case OxCXKK: alu.andRandomToRegister(p1, p2); break;
+            case OxCXKK: alu.andVariableWithRandom(p1, p2); break;
             case OxDXYK: gpu.drawSprite(p1, p2, p3); break;
 
-            case OxEX9E: skip = alu.compareInputWithRegister(p1) ? 2 : 0; break;
-            case OxEXA1: skip = alu.compareInputWithRegister(p1) ? 0 : 2; break;
+            case OxEX9E: skip = alu.compareInputWithVariable(p1) ? 2 : 0; break;
+            case OxEXA1: skip = alu.compareInputWithVariable(p1) ? 0 : 2; break;
 
             case OxFX07: delayTimer.storeTimerIntoVariable(p1); break;
             // decrement PC to retry in case of wake up from SLEEP instead of HALT
             case OxFX0A: skip = lsu_loadInputIntoRegister(p1) ? 0 : -2; break;
-            case OxFX15: delayTimer.loadVariableIntoTimer(p1); break;
-            case OxFX18: soundTimer.loadVariableIntoTimer(p1); break;
-            case OxFX1E: agu.addRegisterIntoIndex(p1, overflowI); break;
+            case OxFX15: delayTimer.loadTimerWithVariable(p1); break;
+            case OxFX18: soundTimer.loadTimerWithVariable(p1); break;
+            case OxFX1E: agu.sumIndexWithVariable(p1, overflowI); break;
             case OxFX29: gpu.loadFontAddressIntoRegister(p1); break;
-            case OxFX33: lsu.storeRegisterInMemoryAsBcd(p1); break;
-            case OxFX55: lsu.storeRegistersInMemory(p1, incrementI); break;
-            case OxFX65: lsu.loadMemoryIntoRegisters(p1, incrementI); break;
+            case OxFX33: lsu.loadMemoryWithBcdVariable(p1); break;
+            case OxFX55: lsu.loadMemoryWithVariables(p1, incrementI); break;
+            case OxFX65: lsu.storeMemoryIntoVariables(p1, incrementI); break;
 
             default: throw new RuntimeException("Unknown instruction: " + di[0].get());
         }
@@ -223,7 +221,7 @@ public class ControlUnit implements Unit {
      * @return true if input register is non-0
      */
     private boolean lsu_loadInputIntoRegister(short x) {
-        boolean nonZero = lsu.loadInputIntoRegister(x);
+        boolean nonZero = lsu.storeInputIntoVariables(x);
 
         if (nonZero) {
             LOG.debug(() -> "Got: " + toHexString(registers.getVariable(x).get()));

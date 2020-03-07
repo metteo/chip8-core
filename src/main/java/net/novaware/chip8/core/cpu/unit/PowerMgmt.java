@@ -25,7 +25,7 @@ public class PowerMgmt implements Unit {
 
     @Inject
     public PowerMgmt(
-            @Named(CPU_STATE) final ByteRegister cpuState
+        @Named(CPU_STATE) final ByteRegister cpuState
     ) {
         this.cpuState = cpuState;
     }

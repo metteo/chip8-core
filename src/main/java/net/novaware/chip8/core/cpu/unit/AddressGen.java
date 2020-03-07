@@ -9,8 +9,8 @@ import net.novaware.chip8.core.util.uml.Used;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 
 /**
  * Address Generation Unit (AGU)
@@ -36,10 +36,10 @@ public class AddressGen implements Unit {
 
     @Inject
     public AddressGen(
-            @Named(VARIABLES) final ByteRegister[] variables,
-            @Named(INDEX) final TribbleRegister index,
-            @Named(STATUS) final ByteRegister status,
-            @Named(STATUS_TYPE) final ByteRegister statusType
+        @Named(VARIABLES) final ByteRegister[] variables,
+        @Named(INDEX) final TribbleRegister index,
+        @Named(STATUS) final ByteRegister status,
+        @Named(STATUS_TYPE) final ByteRegister statusType
     ) {
         this.variables = variables;
         this.index = index;
@@ -61,11 +61,11 @@ public class AddressGen implements Unit {
         index.set(0);
     }
 
-    /* package */ void loadAddressIntoIndex(final short address) {
+    /* package */ void loadIndexWithAddress(final short address) {
         index.set(address);
     }
 
-    /* package */ void addRegisterIntoIndex(final short x, boolean overflowI) {
+    /* package */ void sumIndexWithVariable(final short x, boolean overflowI) {
         final int xValue = getVariable(variables, x).getAsInt();
         int iValue = index.getAsInt();
 
