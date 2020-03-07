@@ -57,7 +57,7 @@ public class LoadStore implements Unit {
     /**
      * @return true if input register is non-0
      */
-    /* package */ boolean storeInputIntoVariables(short x) {
+    /* package */ boolean storeInputIntoVariable(short x) {
         int inValue = input.getAsInt();
 
         if (inValue > 0) { //some bits are set

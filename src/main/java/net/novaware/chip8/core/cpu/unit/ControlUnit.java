@@ -188,7 +188,7 @@ public class ControlUnit implements Unit {
 
             case OxFX07: delayTimer.storeTimerIntoVariable(p1); break;
             // decrement PC to retry in case of wake up from SLEEP instead of HALT
-            case OxFX0A: skip = lsu_loadInputIntoRegister(p1) ? 0 : -2; break;
+            case OxFX0A: skip = lsu_storeInputIntoVariable(p1) ? 0 : -2; break;
             case OxFX15: delayTimer.loadTimerWithVariable(p1); break;
             case OxFX18: soundTimer.loadTimerWithVariable(p1); break;
             case OxFX1E: agu.sumIndexWithVariable(p1, overflowI); break;
@@ -220,8 +220,8 @@ public class ControlUnit implements Unit {
     /**
      * @return true if input register is non-0
      */
-    private boolean lsu_loadInputIntoRegister(short x) {
-        boolean nonZero = lsu.storeInputIntoVariables(x);
+    private boolean lsu_storeInputIntoVariable(short x) {
+        boolean nonZero = lsu.storeInputIntoVariable(x);
 
         if (nonZero) {
             LOG.debug(() -> "Got: " + toHexString(registers.getVariable(x).get()));
