@@ -8,10 +8,10 @@ class MappedMemoryHelper {
 
     static MappedMemory newMappedMemory(ByteRegister[] variables) {
         provideMmu(
-                provideInterpreterRom(),
+                provideBootloaderRom(),
                 provideProgram(),
                 provideStack(),
-                provideInterpreterRam(),
+                provideBootloaderRam(),
                 provideVariables(variables),
                 provideDisplayIo()
         ) as MappedMemory

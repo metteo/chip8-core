@@ -26,9 +26,9 @@ public class Loader {
 
     public byte[] loadFont() {
         final byte[] bytes = new byte[FONT.length];
-        //TODO: fonts are data and should be at the end of interpreter segment
+        //TODO: fonts are data and should be at the end of bootloader segment
         //TODO: create font segment register
-        for (int i = 0; i < FONT.length; i++) { //TODO: move to dedicated graphics memoryMap and copy single sprite into interpreter area when needed?
+        for (int i = 0; i < FONT.length; i++) { //TODO: move to dedicated graphics memoryMap and copy single sprite into bootloader RAM when needed?
             bytes[i] = ubyte(FONT[i]);
         }
 

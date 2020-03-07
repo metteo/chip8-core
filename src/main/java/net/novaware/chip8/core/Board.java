@@ -46,7 +46,7 @@ public class Board {
     private ClockGenerator clock;
 
     @Used
-    private final Memory interpreterRom;
+    private final Memory bootloaderRom;
 
     @Used
     private final Memory program;
@@ -84,17 +84,17 @@ public class Board {
 
     @Inject
     /* package */ Board(
-            final BoardConfig config,
-            @Named(PROGRAM) final Memory program,
-            @Named(INTERPRETER_ROM) final Memory interpreterRom,
-            @Named(MMU) final Memory mmu,
-            final ClockGenerator clock,
-            final Cpu cpu
+        final BoardConfig config,
+        @Named(PROGRAM) final Memory program,
+        @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
+        @Named(MMU) final Memory mmu,
+        final ClockGenerator clock,
+        final Cpu cpu
     ) {
         this.config = config;
 
         this.program = program;
-        this.interpreterRom = interpreterRom;
+        this.bootloaderRom = bootloaderRom;
         this.mmu = mmu;
 
         this.clock = clock;
@@ -157,10 +157,10 @@ public class Board {
         });
 
         //TODO: prepare a proper ROM
-        ReadOnlyMemory interpreter = (ReadOnlyMemory) interpreterRom; //TODO: add check
-        interpreter.setWord(ushort(0), ushort(Ox00E0.opcode())); //cls
-        interpreter.setWord(ushort(2), ushort(0x1200)); //jump
-        interpreter.setReadOnly(config::isEnforceMemoryRoRwState);
+        ReadOnlyMemory bootloader = (ReadOnlyMemory) bootloaderRom; //TODO: add check
+        bootloader.setWord(ushort(0), ushort(Ox00E0.opcode())); //cls
+        bootloader.setWord(ushort(2), ushort(0x1200)); //jump
+        bootloader.setReadOnly(config::isEnforceMemoryRoRwState);
 
         LOG.traceExit();
     }

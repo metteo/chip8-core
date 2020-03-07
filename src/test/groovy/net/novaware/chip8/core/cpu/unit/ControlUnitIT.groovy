@@ -352,7 +352,7 @@ class ControlUnitIT extends Specification {
         where:
         incrementI | iVal
         false      | 0xFFD
-        true       | 0x0 //overflow to interpreter (0xFFD + 0x3)
+        true       | 0x0 //overflow to bootloader (0xFFD + 0x3)
     }
 
     def "should return from instruction call"() {

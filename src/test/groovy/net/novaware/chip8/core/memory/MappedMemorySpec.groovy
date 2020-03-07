@@ -12,10 +12,10 @@ class MappedMemorySpec extends Specification {
 
     def "should properly size memory segments" () {
         expect:
-        memory.entries[0].ref.getSize() == MemoryModule.INTERPRETER_ROM_SIZE
+        memory.entries[0].ref.getSize() == MemoryModule.BOOTLOADER_ROM_SIZE
         memory.entries[1].ref.getSize() == MemoryModule.PROGRAM_SIZE
         memory.entries[2].ref.getSize() == MemoryModule.STACK_SIZE
-        memory.entries[3].ref.getSize() == MemoryModule.INTERPRETER_RAM_SIZE
+        memory.entries[3].ref.getSize() == MemoryModule.BOOTLOADER_RAM_SIZE
         memory.entries[4].ref.getSize() == MemoryModule.VARIABLES_SIZE
         memory.entries[5].ref.getSize() == MemoryModule.DISPLAY_IO_SIZE
         memory.getSize() == 4096
@@ -31,9 +31,9 @@ class MappedMemorySpec extends Specification {
         where:
 
         address                            || expectedSegment
-        MemoryModule.INTERPRETER_ROM_START || "Interpreter ROM"
-        (short) 0x002                      || "Interpreter ROM"
-        MemoryModule.INTERPRETER_ROM_END   || "Interpreter ROM"
+        MemoryModule.BOOTLOADER_ROM_START  || "Bootloader ROM"
+        (short) 0x002                      || "Bootloader ROM"
+        MemoryModule.BOOTLOADER_ROM_END    || "Bootloader ROM"
 
         MemoryModule.PROGRAM_START         || "Program"
         (short) 0x203                      || "Program"

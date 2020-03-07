@@ -12,13 +12,13 @@ class BoardSpec extends Specification {
 
     Cpu cpu = Mock()
 
-    Memory interpreter = Mock()
+    Memory bootloader = Mock()
     Memory program = Mock(SplittableMemory)
     Memory mmu = Mock()
 
     ClockGenerator clock = Mock()
 
-    Board instance = new Board(config, program, interpreter, mmu, clock, cpu)
+    Board instance = new Board(config, program, bootloader, mmu, clock, cpu)
 
     def "should reset cpu and memory"() {
         when:

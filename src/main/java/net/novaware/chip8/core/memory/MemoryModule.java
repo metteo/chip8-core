@@ -13,13 +13,18 @@ import java.util.List;
 
 import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 
+/**
+ * CDP based Chip-8 interpreter divided memory into several segments.
+ * Since this interpreter is implemented in java the memory reserved for
+ * interpreter ROM and RAM was repurposed for bootloader.
+ */
 @Module
 public class MemoryModule {
 
-    public static final String INTERPRETER_ROM         = "interpreterRom";
-    public static final short  INTERPRETER_ROM_START   = 0x0000;
-    public static final short  INTERPRETER_ROM_END     = 0x01FF;
-    public static final int    INTERPRETER_ROM_SIZE    = 512;
+    public static final String BOOTLOADER_ROM          = "bootloaderRom";
+    public static final short  BOOTLOADER_ROM_START    = 0x0000;
+    public static final short  BOOTLOADER_ROM_END      = 0x01FF;
+    public static final int    BOOTLOADER_ROM_SIZE     = 512;
 
     public static final String PROGRAM                 = "program";
     public static final short  PROGRAM_START           = 0x0200;
@@ -32,10 +37,10 @@ public class MemoryModule {
     public static final int    STACK_SIZE              = 48;     // max
     public static final int    STACK_FRAME_SIZE        = 2;
 
-    public static final String INTERPRETER_RAM         = "interpreterRam";
-    public static final short  INTERPRETER_RAM_START   = 0x0ED0;
-    public static final short  INTERPRETER_RAM_END     = 0x0EEF;
-    public static final int    INTERPRETER_RAM_SIZE    = 32;
+    public static final String BOOTLOADER_RAM          = "bootloaderRam";
+    public static final short  BOOTLOADER_RAM_START    = 0x0ED0;
+    public static final short  BOOTLOADER_RAM_END      = 0x0EEF;
+    public static final int    BOOTLOADER_RAM_SIZE     = 32;
 
     public static final String VARIABLES               = "variables";
     public static final short  VARIABLES_START         = 0x0EF0;
@@ -51,10 +56,10 @@ public class MemoryModule {
 
     @Provides
     @BoardScope
-    @Named(INTERPRETER_ROM)
-    static Memory provideInterpreterRom() {
-        final PhysicalMemory interpreterRom = new PhysicalMemory("Interpreter ROM", INTERPRETER_ROM_SIZE);
-        return new ReadOnlyMemory(interpreterRom);
+    @Named(BOOTLOADER_ROM)
+    static Memory provideBootloaderRom() {
+        final PhysicalMemory bootloaderRom = new PhysicalMemory("Bootloader ROM", BOOTLOADER_ROM_SIZE);
+        return new ReadOnlyMemory(bootloaderRom);
     }
 
     @Provides
@@ -80,9 +85,9 @@ public class MemoryModule {
 
     @Provides
     @BoardScope
-    @Named(INTERPRETER_RAM)
-    static Memory provideInterpreterRam() {
-        return new PhysicalMemory("Interpreter RAM", INTERPRETER_RAM_SIZE);
+    @Named(BOOTLOADER_RAM)
+    static Memory provideBootloaderRam() {
+        return new PhysicalMemory("Bootloader RAM", BOOTLOADER_RAM_SIZE);
     }
 
     @Provides
@@ -105,18 +110,18 @@ public class MemoryModule {
     @BoardScope
     @Named(MMU)
     static Memory provideMmu(
-            @Named(INTERPRETER_ROM) final Memory interpreterRom,
-            @Named(PROGRAM) final Memory program,
-            @Named(STACK) final Memory stack,
-            @Named(INTERPRETER_RAM) final Memory interpreterRam,
-            @Named(VARIABLES) final Memory variables,
-            @Named(DISPLAY_IO) final Memory displayIo
+        @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
+        @Named(PROGRAM) final Memory program,
+        @Named(STACK) final Memory stack,
+        @Named(BOOTLOADER_RAM) final Memory bootloaderRam,
+        @Named(VARIABLES) final Memory variables,
+        @Named(DISPLAY_IO) final Memory displayIo
     ) {
         List<MappedMemory.Entry> entries = new ArrayList<>();
-        entries.add(new MappedMemory.Entry(INTERPRETER_ROM_START, INTERPRETER_ROM_END, interpreterRom));
+        entries.add(new MappedMemory.Entry(BOOTLOADER_ROM_START, BOOTLOADER_ROM_END, bootloaderRom));
         entries.add(new MappedMemory.Entry(PROGRAM_START, PROGRAM_END, program));
         entries.add(new MappedMemory.Entry(STACK_START, STACK_END, stack));
-        entries.add(new MappedMemory.Entry(INTERPRETER_RAM_START, INTERPRETER_RAM_END, interpreterRam));
+        entries.add(new MappedMemory.Entry(BOOTLOADER_RAM_START, BOOTLOADER_RAM_END, bootloaderRam));
         entries.add(new MappedMemory.Entry(VARIABLES_START, VARIABLES_END, variables));
         entries.add(new MappedMemory.Entry(DISPLAY_IO_START, DISPLAY_IO_END, displayIo));
 
