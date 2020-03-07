@@ -42,16 +42,16 @@ public class Bootloader {
             0x1030, // GO 030           // def drawFont(x = VA, y=VB, font=VC) {
             0xFC29, // I=VC(LSDP)
             0xDAB5, // SHOW 5MI@VAVB
-            0x00EE, // RET              // } //52
+            0x00EE, // RET              // }
 
-            0x8000, //                  // sprite dot (h=1)                     //54
+            0x8000, //                  // sprite dot (h=1)
 
-            0x103A, // GO 03A           // def drawDot(x = VA, y=VB) {          //56
+            0x103A, // GO 03A           // def drawDot(x = VA, y=VB) {
             0xA036, // I=36
             0xDAB1, // SHOW 1MI@VAVB
-            0x00EE, // RET              // } //62
+            0x00EE, // RET              // }
 
-            0x00E0, // ERASE            // boot:                                //TODO: addr!
+            0x00E0, // ERASE            // boot:
 
             0x6A01, // VA=01            // x = 1
             0x6B02, // VB=02            // y = 2
