@@ -102,12 +102,6 @@ public class Board {
     }
 
     public void powerOn() {
-        // https://computer.howstuffworks.com/pc3.htm
-        // power on self test and beep
-        // hardware specs printed: cpu Hz, memory size, storage connected, logo?
-        // check the program in storage, if ok load it
-        // call the program
-
         initialize();
         runOnScheduler(Integer.MAX_VALUE);
     }
@@ -126,13 +120,13 @@ public class Board {
 
         final RegisterFile registers = cpu.getRegisters();
 
-        registers.getFontSegment().set(0x0100);
+        Bootloader bootloader = new Bootloader();
+        bootloader.fill(mmu);
+        ((ReadOnlyMemory) bootloaderRom).setReadOnly(config::isEnforceMemoryRoRwState); //TODO: add check
+
+        registers.getFontSegment().set(bootloader.getFontAddress());
         registers.getGraphicSegment().set(MemoryModule.DISPLAY_IO_START);
         registers.getStackSegment().set(MemoryModule.STACK_START);
-
-        //TODO: load the font from file or integrate into bigger rom
-        byte[] font = new Loader().loadFont();
-        mmu.setBytes(registers.getFontSegment().get(), font, font.length);
 
         loadProgram();
 
@@ -155,12 +149,6 @@ public class Board {
         registers.getSoundOn().setCallback(so -> {
             audioReceiver.accept(so.getAsInt() == 1);
         });
-
-        //TODO: prepare a proper ROM
-        ReadOnlyMemory bootloader = (ReadOnlyMemory) bootloaderRom; //TODO: add check
-        bootloader.setWord(ushort(0), ushort(Ox00E0.opcode())); //cls
-        bootloader.setWord(ushort(2), ushort(0x1200)); //jump
-        bootloader.setReadOnly(config::isEnforceMemoryRoRwState);
 
         LOG.traceExit();
     }

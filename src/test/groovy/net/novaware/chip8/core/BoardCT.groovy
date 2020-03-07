@@ -42,7 +42,7 @@ class BoardCT extends Specification {
 
         board.initialize()
 
-        board.runOnScheduler(10)
+        board.runOnScheduler(64)
 
         then:
         noExceptionThrown()
@@ -63,10 +63,9 @@ class BoardCT extends Specification {
         short instruction = 0x1234 //invalid but good for this test
 
         board.mmu.setWord(address, instruction)
+        cpu.registers.programCounter.set(address) //ignore bootloader
 
         when:
-        cpu.cycle() //cls
-        cpu.cycle() //first one is jump to 0x200
         cpu.cycle()
 
         then:
