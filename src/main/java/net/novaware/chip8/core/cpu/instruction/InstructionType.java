@@ -21,6 +21,9 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
  * @see <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">Cowgod's Chip-8 Tech Ref v1.0</a>
  * @see <a href="http://mattmik.com/files/chip8/mastering/chip8.html">Mastering Chip-8 by mattmik</a>
  * @see <a href="https://hc-ddr.hucki.net/wiki/doku.php/homecomputer/chip8">Chip-8 at Homecomputer DDR</a>
+ * @see <a href="https://github.com/trapexit/chip-8_documentation">Chip-8 docs by trapexit</a>
+ * @see <a href="http://chip8.sourceforge.net/">Chip-8 at Sourceforge by Peter Miller</a>
+ * @see <a href="http://www.pong-story.com/chip8/">CHIP8 by David Winter</a>
  */
 public enum InstructionType {
     /**

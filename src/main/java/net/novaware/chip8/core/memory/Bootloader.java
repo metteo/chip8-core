@@ -6,8 +6,8 @@ import static net.novaware.chip8.core.memory.MemoryModule.BOOTLOADER_ROM_START;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 // https://computer.howstuffworks.com/pc3.htm
-// TODO: power on self test and beep
-// TODO: hardware specs printed: cpu Hz, memory size, storage connected, logo?
+// TODO: power on self test and beep (test memory bytes by writing and then reading, see VIP manual)
+// TODO: hardware specs printed: cpu Hz, memory size, (hardware spec registers)
 // TODO: check the program in storage, if ok load it
 public class Bootloader {
 
