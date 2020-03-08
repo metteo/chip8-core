@@ -25,7 +25,7 @@ class ControlUnitSpec extends Specification {
             ),
             registers,
             memory,
-            null, null, null, null, null, null, null, null
+            null, null, null, null, null, null, null, null, null
     )
 
     def "should fetch instruction from memory pointed by PC"() {

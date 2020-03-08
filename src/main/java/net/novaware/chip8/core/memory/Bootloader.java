@@ -90,9 +90,25 @@ public class Bootloader {
             0x2038, // DO 038           // drawDot()
             0x2038, // DO 038           // drawDot()
 
-            0x2002, // DO 002           // reset()
+            0xF00A, // V0=KEY           //
+            0x400F, // SKIP;V0 NE 0F    // skip next if last key != F
+            0x1100, // GO 100           // goto boot128
 
-            0x2200  // DO 200           // main()
+            0x2002, // DO 002           // reset()
+            0x1200  // GO 200           // goto main
+    };
+
+    //Boot-128 by David Winter (Postware license)
+    private static final int BOOT_128_START = 0x100;
+    private static final int[] BOOT_128 = new int[] {
+            0x0001, 0x6302, 0x3500, 0x1124, 0xF329, 0x2170, 0x8040, 0x8006,
+            0x8006, 0x8006, 0x8006, 0xF029, 0x2170, 0xF429, 0x2170, 0xA176,
+            0x2170, 0x75FF, 0x2166, 0x8780, 0x870E, 0x870E, 0x870E, 0x870E,
+            0x2166, 0x8874, 0xA000, 0xF41E, 0x8030, 0x6180, 0xF11E, 0xF11E,
+            0x70FF, 0x3000, 0x113C, 0x8080, 0xF055, 0x7401, 0x4400, 0x7301,
+            0x4310, 0x1200, 0x3527, 0x1104, 0x6500, 0x4618, 0x1162, 0x7606,
+            0x1104, 0x0000, 0x1104, 0xA17A, 0xD566, 0xF80A, 0xD566, 0xF829,
+            0xD565, 0x7505, 0x00EE, 0x0040, 0x0040, 0x0000, 0x0000, 0x00F0
     };
 
     private static final int[] BASIC_FONT = {
@@ -121,6 +137,11 @@ public class Bootloader {
         for (int i = 0; i < CODE.length; ++i) {
             final short addr = ushort(codeStart + i * BYTES_PER_INSTRUCTION);
             memory.setWord(addr, ushort(CODE[i]));
+        }
+
+        for (int i = 0; i < BOOT_128.length; ++i) {
+            final short addr = ushort(BOOT_128_START + i * BYTES_PER_INSTRUCTION);
+            memory.setWord(addr, ushort(BOOT_128[i]));
         }
 
         final int basicFontStart = getFontAddress();

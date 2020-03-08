@@ -4,6 +4,8 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 
 public class UnsignedUtil {
 
+    //TODO: make constants for unsigned byte 0 / short 0 etc
+
     @Unsigned
     public static int uint(short s) {
         return s & 0xFFFF;

@@ -68,6 +68,9 @@ public class ControlUnit implements Unit {
     private final Gpu gpu;
 
     @Used
+    private final NativeUnit nativeUnit;
+
+    @Used
     private final Timer delayTimer;
 
     @Used
@@ -87,6 +90,7 @@ public class ControlUnit implements Unit {
         final StackEngine stackEngine,
         final PowerMgmt powerMgmt,
         final Gpu gpu,
+        final NativeUnit nativeUnit,
 
         @Named(DELAY) final Timer delayTimer,
         @Named(SOUND) final Timer soundTimer
@@ -103,6 +107,7 @@ public class ControlUnit implements Unit {
         this.stackEngine = stackEngine;
         this.powerMgmt = powerMgmt;
         this.gpu = gpu;
+        this.nativeUnit = nativeUnit;
 
         this.delayTimer = delayTimer;
         this.soundTimer = soundTimer;
@@ -157,8 +162,7 @@ public class ControlUnit implements Unit {
         switch (instructionType) {
             case Ox00E0: gpu.clearScreen(); break;
             case Ox00EE: stackEngine.returnFromRoutine(); break;
-            case Ox0MMM: throw new RuntimeException("system call is unsupported, yet");
-
+            case Ox0MMM: nativeUnit.callMls(p1); break;
             case Ox1MMM: stackEngine.jump(p1); maybeStopClock(p1); break;
             case Ox2MMM: stackEngine.callRoutine(p1); break;
             case Ox3XKK: skip = alu.compareVariableWithValue(p1, p2) ? 2 : 0; break;

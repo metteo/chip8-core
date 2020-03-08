@@ -67,7 +67,7 @@ public class Gpu {
     public void clearScreen() {
         final int gs = registers.getGraphicSegment().getAsInt();
 
-        for(int i = 0; i < 32 * 64 / 8; ++i) {
+        for(int i = 0; i < 32 * 64 / 8; ++i) { //TODO: extract constants
             memory.setByte(ushort(gs + i), ubyte(0));
         }
 
@@ -75,6 +75,23 @@ public class Gpu {
         registers.getStatusType().set(VF_COLLISION);
 
         registers.getGraphicChange().set(GC_ERASE);
+    }
+
+    //TODO: unit test
+    public void scrollUp(final short n) {
+        final int gs = registers.getGraphicSegment().getAsInt();
+
+        int lines = uint(n);
+        int bytes = lines * 8;
+        int gfxSize = 32 * 64 / 8;
+
+        for(int b = 0; b < gfxSize; ++b) {
+            if (b < gfxSize - bytes) {
+                memory.setByte(ushort(gs + b), memory.getByte(ushort(gs + b + bytes)));
+            } else {
+                memory.setByte(ushort(gs + b), ubyte(0));
+            }
+        }
     }
 
     public void loadFontAddressIntoRegister(final short x) {
