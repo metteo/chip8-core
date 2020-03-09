@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.cpu.unit;
 
+import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.gpu.Gpu;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Used;
@@ -7,7 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
+import static net.novaware.chip8.core.cpu.register.RegisterModule.OUTPUT;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
@@ -17,12 +20,22 @@ public class NativeUnit implements Unit {
     private static final Logger LOG = LogManager.getLogger();
 
     @Used
+    private final WordRegister output;
+
+    @Used
+    private final PowerMgmt powerMgmt;
+
+    @Used
     private final Gpu gpu;
 
     @Inject
     public NativeUnit(
+            @Named(OUTPUT) final WordRegister output,
+            final PowerMgmt powerMgmt,
             final Gpu gpu
     ) {
+        this.output = output;
+        this.powerMgmt = powerMgmt;
         this.gpu = gpu;
     }
 
@@ -35,16 +48,13 @@ public class NativeUnit implements Unit {
             case 0x000:
                 gpu.scrollUp(ushort(6));
                 break;
-            case 0x001: //TODO: verify what this address did in Boot128
-                gpu.clearScreen();
+            case 0x001:
+                //TODO: figure out what it did and fix Boot-128 after 0x20E
                 break;
             case 0x010:
-                //TODO: exit emulator with code 0
-                LOG.warn("Emulator should exit with 0");
-                break;
             case 0x011:
-                //TODO: exit emulator with code 1
-                LOG.warn("Emulator should exit with 1");
+                output.set(address);
+                powerMgmt.sleep();
                 break;
             default:
                 throw new RuntimeException("Unknown MLS to address: " + toHexString(address));

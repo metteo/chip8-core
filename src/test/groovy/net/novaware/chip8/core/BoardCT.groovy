@@ -52,6 +52,36 @@ class BoardCT extends Specification {
         }
     }
 
+    def "should stop after reaching MLS@011" () {
+        given:
+        def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
+
+        def clock = new ClockGeneratorJvmImpl("Test");
+        def factory = newBoardFactory(config, clock, new Random().&nextInt)
+
+        byte[] infiniteLoop = [0x00, 0x11] //exit with 1
+
+        when:
+        def board = factory.newBoard()
+
+        board.getStoragePort().attachSource({-> infiniteLoop})
+        board.getKeyPort().updateKeyState(0b1 as short)
+        board.getAudioPort().attach({on -> /* noop */})
+        board.getDisplayPort().attach({ gc, buffer -> /* noop */})
+
+        board.initialize()
+
+        board.runOnScheduler(256)
+
+        then:
+        noExceptionThrown()
+
+        conditions.eventually {
+            assert !board.isRunning()
+            assert board.cpu.registers.output.getAsInt() == 0x11
+        }
+    }
+
     def "should properly fetch first instruction"() {
         given:
         def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()

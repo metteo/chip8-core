@@ -21,6 +21,7 @@ import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 @Module
 public class MemoryModule {
 
+    //TODO: memory module should accept memory layout instead of constants below.
     public static final String BOOTLOADER_ROM          = "bootloaderRom";
     public static final short  BOOTLOADER_ROM_START    = 0x0000;
     public static final short  BOOTLOADER_ROM_END      = 0x01FF;

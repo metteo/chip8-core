@@ -28,6 +28,7 @@ public class RegisterModule {
     public static final String GRAPHIC_CHANGE = "graphicChange";
 
     public static final String INPUT = "input";
+    public static final String OUTPUT = "output";
 
     public static final String DELAY = "delay";
     public static final String SOUND = "sound";
@@ -132,6 +133,13 @@ public class RegisterModule {
     @Named(INPUT)
     static WordRegister provideInput() {
         return new WordRegister("IN");
+    }
+
+    @Provides
+    @BoardScope
+    @Named(OUTPUT)
+    static WordRegister provideOutput() {
+        return new WordRegister("OUT");
     }
 
     @Provides

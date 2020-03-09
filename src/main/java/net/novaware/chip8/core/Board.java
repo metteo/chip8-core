@@ -21,9 +21,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static net.novaware.chip8.core.cpu.instruction.InstructionType.Ox00E0;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 //TODO: public methods should schedule commands to clock generator
@@ -106,13 +106,15 @@ public class Board {
         runOnScheduler(Integer.MAX_VALUE);
     }
 
-    public void powerOff(boolean force) {
+    private void powerOff0(boolean force) {
         cycleHandle.cancel(force);
+        cycleHandle = null;
         delayHandle.cancel(force);
+        delayHandle = null;
         soundHandle.cancel(force);
+        soundHandle = null;
 
-        hardReset0();
-        //TODO: shutdown the clock
+        clock.shutdown();
     }
 
     public void initialize() {
@@ -148,6 +150,16 @@ public class Board {
 
         registers.getSoundOn().setCallback(so -> {
             audioReceiver.accept(so.getAsInt() == 1);
+        });
+
+        registers.getOutput().setCallback(out -> {
+            int output = out.getAsInt();
+
+            if (output == 0x11) {
+                LOG.error("CPU stopped abruptly at " + toHexString(registers.getMemoryAddress().get()));
+                powerOff0(false);
+                //TODO: report this somehow outside (exception handler, outputport?)
+            }
         });
 
         LOG.traceExit();
@@ -205,14 +217,7 @@ public class Board {
                 if (currentCycles >= maxCycles && cycleHandle != null) {
                     LOG.warn("Reached maxCycles: {}", maxCycles);
 
-                    cycleHandle.cancel(false);
-                    cycleHandle = null;
-
-                    delayHandle.cancel(false);
-                    delayHandle = null;
-
-                    soundHandle.cancel(false);
-                    soundHandle = null;
+                    powerOff0(false);
                 }
             }
         }, config.getCpuFrequency());

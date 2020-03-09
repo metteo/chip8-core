@@ -117,6 +117,12 @@ public class RegisterFile {
     private final WordRegister input;
 
     /**
+     * Dedicated Output register (16 bits) mapped to 16 CPU pins
+     */
+    @Owned
+    private final WordRegister output;
+
+    /**
      * Delay timer register value
      */
     @Owned
@@ -162,6 +168,7 @@ public class RegisterFile {
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(INPUT) final WordRegister input,
+        @Named(OUTPUT) final WordRegister output,
         @Named(DELAY) final ByteRegister delay,
         @Named(SOUND) final ByteRegister sound,
         @Named(SOUND_ON) final ByteRegister soundOn,
@@ -187,6 +194,7 @@ public class RegisterFile {
         this.graphicChange = graphicChange;
 
         this.input = input;
+        this.output = output;
 
         this.delay = delay;
         this.sound = sound;
@@ -262,6 +270,10 @@ public class RegisterFile {
 
     public WordRegister getInput() {
         return input;
+    }
+
+    public WordRegister getOutput() {
+        return output;
     }
 
     public ByteRegister getDelay() {
