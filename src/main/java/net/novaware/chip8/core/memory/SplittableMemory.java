@@ -75,7 +75,7 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
         boolean rom = isRom(address);
 
         if (rom) {
-            assertState(strict.get(), "can not write in ROM");
+            assertState(!strict.get(), "can not write in ROM");
             LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
             LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));
@@ -96,7 +96,7 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
         boolean rom = isRom(address);
 
         if (rom) {
-            assertState(strict.get(), "can not write in ROM");
+            assertState(!strict.get(), "can not write in ROM");
             LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
             LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));
@@ -117,7 +117,7 @@ public class SplittableMemory extends MemoryDecorator implements Memory {
         boolean rom = isRom(address);
 
         if (rom) {
-            assertState(strict.get(), "can not write in ROM");
+            assertState(!strict.get(), "can not write in ROM");
             LOG.warn(() -> memory.getName() + " ROM " + toHexString(address));
         } else {
             LOG.trace(() -> memory.getName() + " RAM " + toHexString(address));

@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.CpuState.*;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.CPU_STATE;
-import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 
 /**
  * Power Management Unit
@@ -45,7 +45,7 @@ public class PowerMgmt implements Unit {
     }
 
     public void setState(CpuState state) {
-        assertArgument(state == null, "state must not be null");
+        requireNonNull(state, "state must not be null");
 
         LOG.info("Switching CPU to " + state + " state.");
         cpuState.set(state.value());

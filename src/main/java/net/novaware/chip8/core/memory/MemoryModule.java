@@ -95,7 +95,7 @@ public class MemoryModule {
     @BoardScope
     @Named(VARIABLES)
     static Memory provideVariables(@Named(RegisterModule.VARIABLES) final ByteRegister[] variables) {
-        assertArgument(variables.length != VARIABLES_SIZE, "variables.length should be " + VARIABLES_SIZE);
+        assertArgument(variables.length == VARIABLES_SIZE, () -> "variables.length should be " + VARIABLES_SIZE);
 
         return new ByteRegisterMemory("Variables", variables);
     }

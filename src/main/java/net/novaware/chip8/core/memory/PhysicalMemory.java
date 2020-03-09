@@ -35,7 +35,7 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
     private int getArrayIndex(short address) {
         int arrayIndex = uint(address);
 
-        assertArgument(arrayIndex >= size, "address is outside memory limits");
+        assertArgument(arrayIndex < size, "address is outside memory limits");
 
         return arrayIndex;
     }
@@ -79,7 +79,7 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
     @Override
     public void getBytes(short address, byte[] destination, int length) {
         requireNonNull(destination, "destination must not be null");
-        assertArgument(length < 0, "length must not be negative");
+        assertArgument(length >= 0, "length must not be negative");
 
         final int arrayIndex = getArrayIndex(address);
 
@@ -89,7 +89,7 @@ public class PhysicalMemory extends AbstractMemory implements Memory {
     @Override
     public void setBytes(short address, byte[] source, int length) {
         requireNonNull(source, "source must not be null");
-        assertArgument(length < 0, "length must not be negative");
+        assertArgument(length >= 0, "length must not be negative");
 
         final int arrayIndex = getArrayIndex(address);
 

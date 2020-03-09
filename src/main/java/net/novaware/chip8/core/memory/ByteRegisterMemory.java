@@ -25,7 +25,7 @@ public class ByteRegisterMemory extends AbstractMemory implements Memory {
     private int getArrayIndex(short address) {
         int arrayIndex = uint(address);
 
-        assertArgument(arrayIndex >= registers.length, "register memory access outside limits");
+        assertArgument(arrayIndex < registers.length, "register memory access outside limits");
 
         return arrayIndex;
     }

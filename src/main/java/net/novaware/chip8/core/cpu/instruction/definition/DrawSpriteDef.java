@@ -16,7 +16,7 @@ public class DrawSpriteDef extends AbstractDefinition implements InstructionDefi
     public DrawSpriteDef(final InstructionType instructionType) {
         super(instructionType);
 
-        assertArgument(instructionType != OxDXYK, "only OxDXYK is supported");
+        assertArgument(instructionType == OxDXYK, "only OxDXYK is supported");
     }
 
     private short getRegisterX(final short instruction) {

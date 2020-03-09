@@ -25,8 +25,8 @@ public class TribbleRegisterMemory extends AbstractMemory {
         int arrayIndex = uint(address) / 2;
         boolean crossRegister = uint(address) % 2 != 0;
 
-        assertArgument(crossRegister, "register memory access unaligned");
-        assertArgument(arrayIndex >= registers.length, "register memory access outside limits");
+        assertArgument(!crossRegister, "register memory access unaligned");
+        assertArgument(arrayIndex < registers.length, "register memory access outside limits");
 
         return arrayIndex;
     }

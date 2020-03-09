@@ -29,21 +29,21 @@ public class ReadOnlyMemory extends MemoryDecorator implements Memory {
 
     @Override
     public void setByte(short address, byte value) {
-        assertState(readOnly.get(), getName() + " is in RO mode");
+        assertState(!readOnly.get(), () -> getName() + " is in RO mode");
 
         super.setByte(address, value);
     }
 
     @Override
     public void setWord(short address, short word) {
-        assertState(readOnly.get(), getName() + " is in RO mode");
+        assertState(!readOnly.get(), () -> getName() + " is in RO mode");
 
         super.setWord(address, word);
     }
 
     @Override
     public void setBytes(short address, byte[] source, int length) {
-        assertState(readOnly.get(), getName() + " is in RO mode");
+        assertState(!readOnly.get(), () -> getName() + " is in RO mode");
 
         super.setBytes(address, source, length);
     }

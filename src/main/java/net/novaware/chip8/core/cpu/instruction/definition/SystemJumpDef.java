@@ -11,7 +11,7 @@ public class SystemJumpDef extends AddressOnlyDef {
     public SystemJumpDef(final InstructionType instructionType) {
         super(instructionType);
 
-        assertArgument(instructionType != Ox0MMM, "only Ox0MMM is supported");
+        assertArgument(instructionType == Ox0MMM, "only Ox0MMM is supported");
     }
 
     @Override

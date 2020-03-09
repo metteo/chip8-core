@@ -1,7 +1,7 @@
 module net.novaware.chip8.core {
     requires static java.compiler; // @j.a.p.Generated
-    requires dagger; //TODO: filename-based
-    requires javax.inject; //TODO: filename-based, should be transitive of dagger
+    requires dagger; //FIXME: filename-based
+    requires javax.inject; //FIXME: filename-based, should be transitive of dagger
 
     requires org.checkerframework.checker.qual;
 
@@ -14,5 +14,5 @@ module net.novaware.chip8.core {
 
     uses net.novaware.chip8.core.clock.ClockGenerator;
 
-    exports net.novaware.chip8.core.gpu; //TODO: temporary, screen should not need internal ViewPort
+    exports net.novaware.chip8.core.gpu;
 }
