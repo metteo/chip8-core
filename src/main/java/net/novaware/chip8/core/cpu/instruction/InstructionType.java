@@ -339,24 +339,20 @@ public enum InstructionType {
     private static final Map<Short, InstructionType> byOpCode = getInstances().stream()
             .collect(toUnmodifiableMap(InstructionType::opcode, identity()));
 
-    @Unsigned
-    private final short opcode;
+    private final @Unsigned short opcode;
 
-    @Unsigned
-    private final short mask;
+    private final @Unsigned short mask;
 
     InstructionType(final int opcode, final int mask) {
         this.opcode = ushort(opcode);
         this.mask = ushort(mask);
     }
 
-    @Unsigned
-    public short opcode() {
+    public @Unsigned short opcode() {
         return opcode;
     }
 
-    @Unsigned
-    public short mask() {
+    public @Unsigned short mask() {
         return mask;
     }
 
@@ -365,8 +361,7 @@ public enum InstructionType {
      *
      * @return null if opcode is unrecognized
      */
-    @Nullable
-    public static InstructionType valueOf(int opcode) {
+    public static @Nullable InstructionType valueOf(int opcode) {
         return byOpCode.get(ushort(opcode));
     }
 
@@ -375,8 +370,7 @@ public enum InstructionType {
      *
      * @return null if opcode is unrecognized
      */
-    @Nullable
-    public static InstructionType valueOf(short opcode) {
+    public static @Nullable InstructionType valueOf(short opcode) {
         return byOpCode.get(opcode);
     }
 

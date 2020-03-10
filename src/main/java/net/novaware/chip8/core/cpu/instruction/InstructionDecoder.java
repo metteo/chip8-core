@@ -35,8 +35,7 @@ public class InstructionDecoder {
     }
 
     public void decode() {
-        @Unsigned
-        final short instruction = currentInstruction.get();
+        final @Unsigned short instruction = currentInstruction.get();
         final InstructionDefinition def = registry.getDefinition(instruction);
 
         if (def != null) {

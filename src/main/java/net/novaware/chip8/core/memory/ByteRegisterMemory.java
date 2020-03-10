@@ -2,11 +2,11 @@ package net.novaware.chip8.core.memory;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.copyOf;
 import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+import static org.checkerframework.checker.nullness.NullnessUtil.castNonNullDeep;
 
 /**
  * Uses Byte Registers as a backend
@@ -19,7 +19,7 @@ public class ByteRegisterMemory extends AbstractMemory implements Memory {
         super(name);
 
         //defensive copy, won't affect cpu loop
-        this.registers = Arrays.copyOf(registers, registers.length, ByteRegister[].class);
+        this.registers = castNonNullDeep(copyOf(registers, registers.length, ByteRegister[].class));
     }
 
     private int getArrayIndex(short address) {

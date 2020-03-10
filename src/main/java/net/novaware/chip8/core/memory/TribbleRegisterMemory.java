@@ -2,10 +2,10 @@ package net.novaware.chip8.core.memory;
 
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
 
-import java.util.Arrays;
-
+import static java.util.Arrays.copyOf;
 import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static org.checkerframework.checker.nullness.NullnessUtil.castNonNullDeep;
 
 /**
  * Uses Word Registers as a backend
@@ -18,7 +18,7 @@ public class TribbleRegisterMemory extends AbstractMemory {
         super(name);
 
         //defensive copy, won't affect cpu loop
-        this.registers = Arrays.copyOf(registers, registers.length, TribbleRegister[].class);
+        this.registers = castNonNullDeep(copyOf(registers, registers.length, TribbleRegister[].class));
     }
 
     private int getArrayIndex(short address) {

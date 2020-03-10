@@ -9,14 +9,14 @@ import java.util.function.Consumer;
 /**
  * Base register class. Contains name property which is only used for debugging
  */
-public abstract class Register<T extends Register> {
+public abstract class Register<T extends Register<?>> {
 
     private static final Logger LOG = LogManager.getLogger();
 
     private final String name;
 
     //TODO: replace with some callback manager
-    private Consumer<T> callback;
+    private @Nullable Consumer<T> callback;
 
     protected Register(String name) {
         this.name = name;

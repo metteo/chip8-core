@@ -145,10 +145,20 @@ public class ControlUnit implements Unit {
         decoder.decode();
     }
 
+    private InstructionType toInstructionType(final short instruction) {
+        final InstructionType instructionType = InstructionType.valueOf(instruction);
+
+        if (instructionType == null) {
+            throw new RuntimeException("Unknown instruction: " + toHexString(instruction));
+        }
+
+        return instructionType;
+    }
+
     public void execute() {
         final WordRegister[] di = registers.getDecodedInstruction();
 
-        final InstructionType instructionType = InstructionType.valueOf(di[0].get());
+        final InstructionType instructionType = toInstructionType(di[0].get());
         final short p1 = di[1].get(), p2 = di[2].get(), p3 = di[3].get();
 
         int skip = 0;

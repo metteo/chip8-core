@@ -10,6 +10,7 @@ configuration:
 
   loggers:
     root:
-      level: trace
+      # switch to trace if needed
+      level: info
       appenderRef:
         ref: console

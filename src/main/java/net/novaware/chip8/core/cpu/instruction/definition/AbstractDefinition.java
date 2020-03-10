@@ -18,18 +18,16 @@ public abstract class AbstractDefinition implements InstructionDefinition {
     }
 
     @Override
-    public boolean isRecognized(@Unsigned final short instruction) {
+    public boolean isRecognized(final @Unsigned short instruction) {
         return (instruction & this.instructionType.mask()) == this.instructionType.opcode();
     }
 
     @Override
-    @Unsigned
-    public short getOpCode() {
+    public @Unsigned short getOpCode() {
         return instructionType.opcode();
     }
 
     public abstract int getParamCount();
 
-    @Unsigned
-    public abstract short getParam(final int index, @Unsigned final short instruction);
+    public abstract @Unsigned short getParam(final int index, final @Unsigned short instruction);
 }

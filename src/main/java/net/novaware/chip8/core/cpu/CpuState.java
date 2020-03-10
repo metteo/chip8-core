@@ -42,15 +42,13 @@ public enum CpuState {
     private static final Map<Byte, CpuState> byValue = getInstances().stream()
             .collect(toUnmodifiableMap(CpuState::value, identity()));
 
-    @Unsigned
-    private final byte value;
+    private final @Unsigned byte value;
 
     CpuState(final int value) {
         this.value = ubyte(value);
     }
 
-    @Unsigned
-    public byte value() {
+    public @Unsigned byte value() {
         return value;
     }
 
@@ -59,8 +57,7 @@ public enum CpuState {
      *
      * @return null if opcode is unrecognized
      */
-    @Nullable
-    public static CpuState valueOf(byte value) {
+    public static @Nullable CpuState valueOf(byte value) {
         return byValue.get(value);
     }
 

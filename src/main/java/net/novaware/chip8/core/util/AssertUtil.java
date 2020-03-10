@@ -1,7 +1,5 @@
 package net.novaware.chip8.core.util;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
@@ -19,7 +17,7 @@ public final class AssertUtil {
         //utility class
     }
 
-    public static void assertArgument(final boolean assertion, @NonNull final String message) {
+    public static void assertArgument(final boolean assertion, final String message) {
         requireNonNull(message, MESSAGE_NOT_NULL);
 
         if (!assertion) {
@@ -27,13 +25,13 @@ public final class AssertUtil {
         }
     }
 
-    public static void assertArgument(final boolean assertion, @NonNull final Supplier<String> message) {
+    public static void assertArgument(final boolean assertion, final Supplier<String> message) {
         requireNonNull(message, MESSAGE_SUPPLIER_NOT_NULL);
 
         assertArgument(assertion, message.get());
     }
 
-    public static void assertState(final boolean assertion, @NonNull final String message) {
+    public static void assertState(final boolean assertion, final String message) {
         requireNonNull(message, MESSAGE_NOT_NULL);
 
         if (!assertion) {
@@ -41,7 +39,7 @@ public final class AssertUtil {
         }
     }
 
-    public static void assertState(final boolean assertion, @NonNull final Supplier<String> message) {
+    public static void assertState(final boolean assertion, final Supplier<String> message) {
         requireNonNull(message, MESSAGE_SUPPLIER_NOT_NULL);
 
         assertState(assertion, message.get());

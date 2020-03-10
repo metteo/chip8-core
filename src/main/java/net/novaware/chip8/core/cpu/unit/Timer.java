@@ -62,20 +62,24 @@ public class Timer implements Unit {
         LOG.debug(() -> "Configured with " + timerRegister.getName());
 
         if (outputRegister != null) {
-            LOG.debug(() -> "Will report values higher than 1 to " + outputRegister.getName());
-            timerRegister.setCallback(r -> {
-                final int timer = timerRegister.getAsInt();
-                final int state = outputRegister.getAsInt();
-
-                if (timer > 1 && state == 0) {
-                    outputRegister.set(1);
-                }
-
-                if (timer < 1 && state != 0) {
-                    outputRegister.set(0);
-                }
-            });
+            configureOutput(outputRegister);
         }
+    }
+
+    private void configureOutput(final ByteRegister register) {
+        LOG.debug(() -> "Will report values higher than 1 to " + register.getName());
+        timerRegister.setCallback(r -> {
+            final int timer = timerRegister.getAsInt();
+            final int state = register.getAsInt();
+
+            if (timer > 1 && state == 0) {
+                register.set(1);
+            }
+
+            if (timer < 1 && state != 0) {
+                register.set(0);
+            }
+        });
     }
 
     /**

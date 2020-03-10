@@ -41,7 +41,13 @@ public class PowerMgmt implements Unit {
     }
 
     public CpuState getState() {
-        return CpuState.valueOf(cpuState.get());
+        final CpuState cpuState = valueOf(this.cpuState.get());
+
+        if (cpuState == null) {
+            throw new IllegalStateException("unknown cpu state");
+        }
+
+        return cpuState;
     }
 
     public void setState(CpuState state) {

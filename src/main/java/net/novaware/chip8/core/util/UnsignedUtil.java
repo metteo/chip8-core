@@ -6,35 +6,29 @@ public class UnsignedUtil {
 
     //TODO: make constants for unsigned byte 0 / short 0 etc
 
-    @Unsigned
-    public static int uint(short s) {
+    public static @Unsigned int uint(short s) {
         return s & 0xFFFF;
     }
 
-    @Unsigned
-    public static int uint(byte b) {
+    public static @Unsigned int uint(byte b) {
         return b & 0xFF;
     }
 
-    @Unsigned
-    public static short ushort(int i) {
+    public static @Unsigned short ushort(int i) {
         //TODO: maybe log truncation?
         return (short) i;
     }
 
-    @Unsigned
-    public static short ushort(byte b) {
+    public static @Unsigned short ushort(byte b) {
         return (short) (b & 0xFF);
     }
 
-    @Unsigned
-    public static byte ubyte(int i) {
+    public static @Unsigned byte ubyte(int i) {
         //TODO: maybe log truncation?
         return (byte) i;
     }
 
-    @Unsigned
-    public static byte ubyte(short s) {
+    public static @Unsigned byte ubyte(short s) {
         //TODO: maybe log truncation?
         return (byte) s;
     }

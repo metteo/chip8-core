@@ -13,6 +13,7 @@ import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -52,9 +53,10 @@ public class Board {
     private final Memory program;
 
     //TODO: class for managing handles
-    private volatile ClockGenerator.Handle cycleHandle;
-    private volatile ClockGenerator.Handle delayHandle;
-    private volatile ClockGenerator.Handle soundHandle;
+
+    private volatile ClockGenerator.@Nullable Handle cycleHandle;
+    private volatile ClockGenerator.@Nullable Handle delayHandle;
+    private volatile ClockGenerator.@Nullable Handle soundHandle;
 
     private KeyPort keyPort = new KeyPort() {
         @Override
@@ -76,9 +78,10 @@ public class Board {
     };
 
     private byte[] displayBuffer = new byte[MemoryModule.DISPLAY_IO_SIZE];
-    private BiConsumer<Integer, byte[]> displayReceiver;
 
-    private Consumer<Boolean> audioReceiver;
+    private @Nullable BiConsumer<Integer, byte[]> displayReceiver;
+
+    private @Nullable Consumer<Boolean> audioReceiver;
 
     private Supplier<byte[]> programSupplier = () -> new byte[0];
 
@@ -107,12 +110,20 @@ public class Board {
     }
 
     private void powerOff0(boolean force) {
-        cycleHandle.cancel(force);
-        cycleHandle = null;
-        delayHandle.cancel(force);
-        delayHandle = null;
-        soundHandle.cancel(force);
-        soundHandle = null;
+        if (cycleHandle != null) {
+            cycleHandle.cancel(force);
+            cycleHandle = null;
+        }
+
+        if (delayHandle != null) {
+            delayHandle.cancel(force);
+            delayHandle = null;
+        }
+
+        if (soundHandle != null) {
+            soundHandle.cancel(force);
+            soundHandle = null;
+        }
 
         clock.shutdown();
     }
@@ -149,7 +160,9 @@ public class Board {
         });
 
         registers.getSoundOn().setCallback(so -> {
-            audioReceiver.accept(so.getAsInt() == 1);
+            if (audioReceiver != null) {
+                audioReceiver.accept(so.getAsInt() == 1);
+            }
         });
 
         registers.getOutput().setCallback(out -> {

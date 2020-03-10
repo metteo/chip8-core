@@ -66,8 +66,7 @@ public class InstructionRegistry {
         }
     }
 
-    @Nullable
-    public InstructionDefinition getDefinition(@Unsigned final short instruction) {
+    public @Nullable InstructionDefinition getDefinition(final @Unsigned short instruction) {
         final List<InstructionMask> masks = InstructionMask.getInstances();
         int masksSize = masks.size();
 
@@ -79,7 +78,13 @@ public class InstructionRegistry {
             @Unsigned
             short opcode = ushort(mask & instruction);
 
-            final InstructionDefinition instructionDefinition = defsIndex.get(mask).get(opcode);
+            var instrPerMask = defsIndex.get(mask);
+            if (instrPerMask == null) {
+                throw new AssertionError("impossible"); // we iterate over masks, checker...
+            }
+
+            final InstructionDefinition instructionDefinition = instrPerMask.get(opcode);
+
             if (instructionDefinition != null) {
                 boolean recognized = instructionDefinition.isRecognized(instruction);
 

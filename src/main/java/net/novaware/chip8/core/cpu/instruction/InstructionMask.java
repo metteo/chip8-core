@@ -31,15 +31,13 @@ public enum InstructionMask {
 
     private static final List<InstructionMask> instances = List.of(values());
 
-    @Unsigned
-    private final short value;
+    private final @Unsigned short value;
 
     InstructionMask(final int value) {
         this.value = ushort(value);
     }
 
-    @Unsigned
-    public short value() {
+    public @Unsigned short value() {
         return value;
     }
 
