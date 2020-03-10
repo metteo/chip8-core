@@ -43,8 +43,15 @@
                     <annotationProcessors>
                         <annotationProcessor>dagger.internal.codegen.ComponentProcessor</annotationProcessor>
                         <annotationProcessor>org.checkerframework.checker.nullness.NullnessChecker</annotationProcessor>
-                        <!-- TODO: enable -->
+                        <annotationProcessor>org.checkerframework.checker.optional.OptionalChecker</annotationProcessor>
+                        <annotationProcessor>org.checkerframework.checker.interning.InterningChecker</annotationProcessor>
+                        <annotationProcessor>org.checkerframework.checker.lock.LockChecker</annotationProcessor>
+                        <annotationProcessor>org.checkerframework.checker.fenum.FenumChecker</annotationProcessor>
+                        <annotationProcessor>org.checkerframework.checker.formatter.FormatterChecker</annotationProcessor>
+                        <annotationProcessor>org.checkerframework.checker.units.UnitsChecker</annotationProcessor>
+                        <!-- TODO: enable and fix errors -->
                         <!-- <annotationProcessor>org.checkerframework.checker.signedness.SignednessChecker</annotationProcessor> -->
+                        <!-- <annotationProcessor>org.checkerframework.checker.index.IndexChecker</annotationProcessor> -->
                     </annotationProcessors>
                     <compilerArgs>
                         <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
