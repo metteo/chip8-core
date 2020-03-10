@@ -12,6 +12,8 @@ public class RegisterModule {
     public static final String CPU_STATE = "cpuState";
 
     public static final String VARIABLES = "variables";
+    public static final int VARIABLES_SIZE = 16;
+
 
     public static final String STATUS = "status";
     public static final String STATUS_TYPE = "statusType";
@@ -49,7 +51,7 @@ public class RegisterModule {
     @BoardScope
     @Named(VARIABLES)
     static ByteRegister[] provideVariables() {
-        final ByteRegister[] variables = new ByteRegister[16];
+        final ByteRegister[] variables = new ByteRegister[VARIABLES_SIZE];
 
         for(int i = 0; i < variables.length; ++i) {
             variables[i] = new ByteRegister("V" + i);

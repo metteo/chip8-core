@@ -68,7 +68,7 @@ public class Gpu {
         final int gs = registers.getGraphicSegment().getAsInt();
 
         for(int i = 0; i < 32 * 64 / 8; ++i) { //TODO: extract constants
-            memory.setByte(ushort(gs + i), ubyte(0));
+            memory.setByte(ushort(gs + i), UBYTE_0);
         }
 
         registers.getStatus().set(0x1);
@@ -89,7 +89,7 @@ public class Gpu {
             if (b < gfxSize - bytes) {
                 memory.setByte(ushort(gs + b), memory.getByte(ushort(gs + b + bytes)));
             } else {
-                memory.setByte(ushort(gs + b), ubyte(0));
+                memory.setByte(ushort(gs + b), UBYTE_0);
             }
         }
     }

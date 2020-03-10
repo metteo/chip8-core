@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
-import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+import static net.novaware.chip8.core.util.UnsignedUtil.USHORT_0;
 
 //TODO: public methods should schedule commands to clock generator
 //TODO: don't forget to handle exceptions in the Future
@@ -183,7 +183,7 @@ public class Board {
 
         SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
         programMemory.setStrict(false); //disable RO mode
-        program.setBytes(ushort(0x0), data, data.length);
+        program.setBytes(USHORT_0, data, data.length);
         programMemory.setSplit(data.length);
         programMemory.setStrict(config::isEnforceMemoryRoRwState);
     }

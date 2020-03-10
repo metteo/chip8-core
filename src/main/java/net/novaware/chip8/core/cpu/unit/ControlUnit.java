@@ -19,8 +19,7 @@ import static net.novaware.chip8.core.cpu.unit.UnitModule.DELAY;
 import static net.novaware.chip8.core.cpu.unit.UnitModule.SOUND;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
-import static net.novaware.chip8.core.util.UnsignedUtil.uint;
-import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
+import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 /**
  * Control Unit (CU)
@@ -193,7 +192,7 @@ public class ControlUnit implements Unit {
 
             case Ox9XY0: skip = alu.compareVariableWithVariable(p1, p2) ? 0 : 2; break;
             case OxAMMM: agu.loadIndexWithAddress(p1); break;
-            case OxBMMM: stackEngine.jump(p1, ushort(0x0)); break;
+            case OxBMMM: stackEngine.jump(p1, USHORT_0); break;
             case OxCXKK: alu.andVariableWithRandom(p1, p2); break;
             case OxDXYK: gpu.drawSprite(p1, p2, p3); break;
 
