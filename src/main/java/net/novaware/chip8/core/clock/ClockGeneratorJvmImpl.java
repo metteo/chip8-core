@@ -34,15 +34,14 @@ public class ClockGeneratorJvmImpl implements ClockGenerator {
         return future::cancel;
     }
 
-    // TODO: https://stackoverflow.com/questions/9748710/how-to-pause-resume-all-threads-in-an-executorservice-in-java
     @Override
     public boolean isPaused() {
-        throw new UnsupportedOperationException("not implemented"); // TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void setPaused(boolean paused) {
-        throw new UnsupportedOperationException("not implemented"); // TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override

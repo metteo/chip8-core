@@ -50,7 +50,6 @@ class ClockGeneratorJvmImplSpec extends Specification {
 
         conditions.eventually {
             assert execTimes.size() > 30
-            // TODO: consider checking the difference between nanostamps
 
             def uniqueThreadNames = threadNames.unique()
             assert uniqueThreadNames.size() == 1

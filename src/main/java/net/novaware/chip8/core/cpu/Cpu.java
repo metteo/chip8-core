@@ -141,8 +141,6 @@ public class Cpu implements Unit {
         delayTimer.reset();
         soundTimer.reset();
 
-        //TODO: reset of vars should be part of bootloader rom
-        stream(registers.getVariables()).forEach(br -> br.set(0));
         registers.getStatusType().set(VF_EMPTY);
     }
 

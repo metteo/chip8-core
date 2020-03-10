@@ -1,3 +1,4 @@
+@SuppressWarnings("module") // 8 in chip8 is not a version
 module net.novaware.chip8.core {
     requires static java.compiler; // @j.a.p.Generated
     requires dagger; //FIXME: filename-based

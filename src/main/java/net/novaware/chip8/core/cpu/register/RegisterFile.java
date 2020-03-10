@@ -134,7 +134,6 @@ public class RegisterFile {
     @Owned
     private ByteRegister sound;
 
-    // TODO: figure out a better name, or remove when possible to attach multiple callbacks?
     /**
      * Value 0x1 turns on the sound, 0x0 turns it off
      */

@@ -55,9 +55,6 @@ class CpuSpec extends Specification {
 
     def "should reset the registers"() {
         given:
-        for (def v in registers.getVariables()) {
-            v.set(1)
-        }
 
         when:
         instance.reset()
@@ -72,9 +69,5 @@ class CpuSpec extends Specification {
         1 * delay.reset()
         1 * sound.reset()
         1 * cu.reset()
-
-        for (def v in registers.getVariables()) {
-            assert v.get() == 0 as byte
-        }
     }
 }

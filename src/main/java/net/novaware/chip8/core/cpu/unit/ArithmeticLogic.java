@@ -222,7 +222,7 @@ public class ArithmeticLogic implements Unit {
         int random = randomSource.applyAsInt(256);
 
         int xValue = kkValue & random;
-        //xValue = random % (kkValue + 1); //TODO: Rocket2 requires this implementation
+        //xValue = random % (kkValue + 1); //Rocket2 requires this implementation
 
         getVariable(variables, x).set(xValue);
     }
