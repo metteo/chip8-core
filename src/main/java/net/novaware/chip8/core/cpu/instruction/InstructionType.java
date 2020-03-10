@@ -343,9 +343,9 @@ public enum InstructionType {
 
     private final @Unsigned short mask;
 
-    InstructionType(final int opcode, final int mask) {
+    InstructionType(final int opcode, final short mask) {
         this.opcode = ushort(opcode);
-        this.mask = ushort(mask);
+        this.mask = mask;
     }
 
     public @Unsigned short opcode() {

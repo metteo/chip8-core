@@ -7,6 +7,9 @@ public class UnsignedUtil {
     public static final @Unsigned short USHORT_0 = ushort(0x0000);
     public static final @Unsigned byte UBYTE_0 = ubyte(0x00);
 
+    public static final @Unsigned short USHORT_MAX_VALUE = ushort(0xFFFF);
+    public static final @Unsigned byte UBYTE_MAX_VALUE = ubyte(0xFF);
+
     public static @Unsigned int uint(short s) {
         return s & 0xFFFF;
     }
@@ -16,7 +19,6 @@ public class UnsignedUtil {
     }
 
     public static @Unsigned short ushort(int i) {
-        //TODO: maybe log truncation?
         return (short) i;
     }
 
@@ -25,12 +27,10 @@ public class UnsignedUtil {
     }
 
     public static @Unsigned byte ubyte(int i) {
-        //TODO: maybe log truncation?
         return (byte) i;
     }
 
     public static @Unsigned byte ubyte(short s) {
-        //TODO: maybe log truncation?
         return (byte) s;
     }
 }
