@@ -38,12 +38,12 @@ public class TribbleRegisterMemory extends AbstractMemory {
 
     @Override
     public byte getByte(short address) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void setByte(short address, byte value) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
@@ -62,11 +62,11 @@ public class TribbleRegisterMemory extends AbstractMemory {
 
     @Override
     public void getBytes(short address, byte[] destination, int length) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void setBytes(short address, byte[] source, int length) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 }

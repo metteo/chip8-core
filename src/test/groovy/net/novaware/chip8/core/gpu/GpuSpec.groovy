@@ -215,7 +215,6 @@ class GpuSpec extends Specification {
         [0xFF, 0xFF] | [0xFF, 0xFF] || [0x00, 0x00] | GC_ERASE  | "all collision"
     }
 
-    //TODO: add cases with preexisting data (check if it's preserved)
     @Unroll
     def "should properly store painted area in memory (byte aligned: #xBit, #yBit, #height)"() {
         given:

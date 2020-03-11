@@ -22,8 +22,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
+import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.USHORT_0;
 
@@ -81,7 +83,7 @@ public class Board {
 
     private @Nullable BiConsumer<Integer, byte[]> displayReceiver;
 
-    private @Nullable Consumer<Boolean> audioReceiver;
+    private @Nullable Consumer<AudioPort.Packet> audioReceiver;
 
     private Supplier<byte[]> programSupplier = () -> new byte[0];
 
@@ -161,7 +163,7 @@ public class Board {
 
         registers.getSoundOn().setCallback(so -> {
             if (audioReceiver != null) {
-                audioReceiver.accept(so.getAsInt() == 1);
+                audioReceiver.accept(() -> so.getAsInt() == 1);
             }
         });
 
@@ -245,11 +247,39 @@ public class Board {
     }
 
     public AudioPort getAudioPort() {
-        return consumer -> audioReceiver = consumer;
+        return new AudioPort() {
+            @Override
+            public void connect(Consumer<Packet> receiver) {
+                audioReceiver = receiver;
+            }
+
+            @Override
+            public void disconnect() {
+                audioReceiver = null;
+            }
+        };
     }
 
-    public DisplayPort getDisplayPort() {
-        return receiver -> displayReceiver = receiver;
+    public DisplayPort getDisplayPort(final DisplayPort.Type type) {
+        requireNonNull(type, "type must not be null");
+        assertArgument(type == DisplayPort.Type.PRIMARY, "only primary screen is supported");
+
+        return new DisplayPort() {
+            @Override
+            public void attach(BiConsumer<Integer, byte[]> receiver) {
+                displayReceiver = receiver;
+            }
+
+            @Override
+            public void connect(Consumer<Packet> receiver) {
+                throw new UnsupportedOperationException("not implemented");
+            }
+
+            @Override
+            public void disconnect() {
+                displayReceiver = null;
+            }
+        };
     }
 
     public KeyPort getKeyPort() {

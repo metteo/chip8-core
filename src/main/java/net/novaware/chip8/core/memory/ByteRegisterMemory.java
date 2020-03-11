@@ -59,16 +59,16 @@ public class ByteRegisterMemory extends AbstractMemory implements Memory {
 
     @Override
     public void setWord(short address, short word) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void getBytes(short address, byte[] destination, int length) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 
     @Override
     public void setBytes(short address, byte[] source, int length) {
-        throw new UnsupportedOperationException("not implemented"); //TODO: implement
+        throw new UnsupportedOperationException("not implemented");
     }
 }

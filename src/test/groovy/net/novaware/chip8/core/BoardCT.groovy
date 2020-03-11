@@ -1,6 +1,7 @@
 package net.novaware.chip8.core
 
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
+import net.novaware.chip8.core.port.DisplayPort
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -37,8 +38,8 @@ class BoardCT extends Specification {
 
         board.getStoragePort().attachSource({-> infiniteLoop})
         board.getKeyPort().updateKeyState(0b1 as short)
-        board.getAudioPort().attach({on -> println "sound on: " + on})
-        board.getDisplayPort().attach({ gc, buffer -> /* noop */})
+        board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
+        board.getDisplayPort(DisplayPort.Type.PRIMARY).attach({ gc, buffer -> /* noop */})
 
         board.initialize()
 
@@ -66,8 +67,8 @@ class BoardCT extends Specification {
 
         board.getStoragePort().attachSource({-> infiniteLoop})
         board.getKeyPort().updateKeyState(0b1 as short)
-        board.getAudioPort().attach({on -> /* noop */})
-        board.getDisplayPort().attach({ gc, buffer -> /* noop */})
+        board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
+        board.getDisplayPort(DisplayPort.Type.PRIMARY).attach({ gc, buffer -> /* noop */})
 
         board.initialize()
 

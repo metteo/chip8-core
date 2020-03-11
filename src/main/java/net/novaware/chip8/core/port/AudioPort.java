@@ -4,5 +4,11 @@ import java.util.function.Consumer;
 
 public interface AudioPort extends OutputPort {
 
-    void attach(Consumer<Boolean> consumer);
+    interface Packet {
+        boolean isSoundOn();
+    }
+
+    void connect(Consumer<Packet> receiver);
+
+    void disconnect();
 }

@@ -92,9 +92,9 @@ class MappedMemorySpec extends Specification {
         memory.getName() == "MMU"
     }
 
-    def "should save and retrieve byte of data (end of large memory)"() {
+    def "should save and retrieve byte of data (not in the beginning)"() {
         given:
-        short address = 0x007 //TODO: update data to really write to end
+        short address = 0x007
         byte data = 42
 
         short address2 = 0x006

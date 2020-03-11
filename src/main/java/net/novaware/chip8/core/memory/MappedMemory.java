@@ -56,15 +56,13 @@ public class MappedMemory extends AbstractMemory implements Memory {
 
     @Override
     public int getSize() {
-        return entries.stream().mapToInt(e -> e.ref.getSize()).sum(); //TODO: should not be called in cpu loop!
+        return entries.stream().mapToInt(e -> e.ref.getSize()).sum();
     }
 
     @Override
     public void clear() {
-        //TODO: implement and test properly
-        //TODO: figure out what to do with roms which write to ROM area (reload the rom?)
         for (int i = 0; i < entries.size(); ++i) {
-            entries.get(i).ref.clear(); //TODO: should we clear all entries?
+            entries.get(i).ref.clear();
         }
     }
 
@@ -98,7 +96,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        assert segment.ref.getSize() >= length : "getting data across segments is not supported"; //TODO: maybe implement?
+        assert segment.ref.getSize() >= length : "getting data across segments is not supported";
 
         LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 
@@ -120,7 +118,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
-        assert segment.ref.getSize() >= length : "getting data across segments is not supported"; //TODO: maybe implement?
+        assert segment.ref.getSize() >= length : "getting data across segments is not supported";
 
         LOG.trace(() -> segment.ref.getName() + " @ " + toHexString(address));
 

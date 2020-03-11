@@ -3,6 +3,7 @@ package net.novaware.chip8.core.gpu;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.gpu.ViewPort.Index;
 import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -45,9 +46,9 @@ public class Gpu {
 
     private byte[] resultBuffer;
 
-    final boolean wrapping = true; //TODO: make configurable
-    final boolean clipping = false; //TODO: make configurable
-    final boolean dump = true; //TODO: debugging UI
+    final boolean wrapping = true;
+    final boolean clipping = false;
+    final boolean dump = true;
 
     @Inject
     public Gpu(RegisterFile registers, @Named(MMU) Memory memory) {
@@ -67,7 +68,7 @@ public class Gpu {
     public void clearScreen() {
         final int gs = registers.getGraphicSegment().getAsInt();
 
-        for(int i = 0; i < 32 * 64 / 8; ++i) { //TODO: extract constants
+        for(int i = 0; i < MemoryModule.DISPLAY_IO_SIZE; ++i) {
             memory.setByte(ushort(gs + i), UBYTE_0);
         }
 
@@ -83,7 +84,7 @@ public class Gpu {
 
         int lines = uint(n);
         int bytes = lines * 8;
-        int gfxSize = 32 * 64 / 8;
+        int gfxSize = MemoryModule.DISPLAY_IO_SIZE;
 
         for(int b = 0; b < gfxSize; ++b) {
             if (b < gfxSize - bytes) {
@@ -222,7 +223,6 @@ public class Gpu {
         return gc;
     }
 
-    //TODO: refactor when covered with more tests
     /* package */ void storePaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
         //TODO: get rid of these instantiations from emulator loop, maybe use pooling
         final Bit bit = new Bit(xBit, yBit);
