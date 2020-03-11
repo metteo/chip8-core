@@ -8,6 +8,7 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.instruction.InstructionDefinition.notSupported;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.CURRENT_INSTRUCTION;
 import static net.novaware.chip8.core.cpu.register.RegisterModule.DECODED_INSTRUCTION;
@@ -36,15 +37,12 @@ public class InstructionDecoder {
 
     public void decode() {
         final @Unsigned short instruction = currentInstruction.get();
-        final InstructionDefinition def = registry.getDefinition(instruction);
+        final InstructionDefinition def = requireNonNull(
+                registry.getDefinition(instruction), notSupported(instruction));
 
-        if (def != null) {
-            decodedInstruction[0].set(def.getOpCode());
-            decodedInstruction[1].set(def.getParam(0, instruction));
-            decodedInstruction[2].set(def.getParam(1, instruction));
-            decodedInstruction[3].set(def.getParam(2, instruction));
-        } else {
-            throw new RuntimeException(notSupported(instruction));
-        }
+        decodedInstruction[0].set(def.getOpCode());
+        decodedInstruction[1].set(def.getParam(0, instruction));
+        decodedInstruction[2].set(def.getParam(1, instruction));
+        decodedInstruction[3].set(def.getParam(2, instruction));
     }
 }

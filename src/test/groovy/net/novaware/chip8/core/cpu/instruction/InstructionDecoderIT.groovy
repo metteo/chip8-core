@@ -15,51 +15,30 @@ class InstructionDecoderIT extends Specification {
             new InstructionRegistry()
     )
 
-    def "should properly decode MVI / LD I instruction"() {
+    def "should properly decode an instruction"() {
         given:
-        registers.getCurrentInstruction().set(0xA123)
+        registers.getCurrentInstruction().set(0xD123)
 
         when:
         decoder.decode()
 
         then:
         WordRegister[] decoded = registers.getDecodedInstruction()
-        decoded[0].get() == (short)0xA000
-        decoded[1].get() == (short)0x0123
-        decoded[2].get() == (short)0x0000
-        decoded[3].get() == (short)0x0000
+        decoded[0].get() == (short)0xD000
+        decoded[1].get() == (short)0x0001
+        decoded[2].get() == (short)0x0002
+        decoded[3].get() == (short)0x0003
 
     }
 
-    def "should properly decode JMP instruction"() {
+    def "should throw an exception for unknown instruction"() {
         given:
-        registers.getCurrentInstruction().set(0x1234)
+        registers.getCurrentInstruction().set(0xE123)
 
         when:
         decoder.decode()
 
         then:
-        WordRegister[] decoded = registers.getDecodedInstruction()
-        decoded[0].get() == (short)0x1000
-        decoded[1].get() == (short)0x0234
-        decoded[2].get() == (short)0x0000
-        decoded[3].get() == (short)0x0000
-
-    }
-
-    def "should properly decode SE X KK instruction"() {
-        given:
-        registers.getCurrentInstruction().set(0x3456)
-
-        when:
-        decoder.decode()
-
-        then:
-        WordRegister[] decoded = registers.getDecodedInstruction()
-        decoded[0].get() == (short)0x3000
-        decoded[1].get() == (short)0x0004
-        decoded[2].get() == (short)0x0056
-        decoded[3].get() == (short)0x0000
-
+        thrown(RuntimeException)
     }
 }

@@ -2,6 +2,7 @@ package net.novaware.chip8.core.cpu.unit
 
 import net.novaware.chip8.core.cpu.instruction.InstructionDecoder
 import net.novaware.chip8.core.cpu.instruction.InstructionRegistry
+import net.novaware.chip8.core.gpu.Gpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
@@ -25,7 +26,15 @@ class ControlUnitSpec extends Specification {
             ),
             registers,
             memory,
-            null, null, null, null, null, null, null, null, null
+            Mock(LoadStore),
+            Mock(ArithmeticLogic),
+            Mock(AddressGen),
+            Mock(StackEngine),
+            Mock(PowerMgmt),
+            Mock(Gpu),
+            Mock(NativeUnit),
+            Mock(Timer),
+            Mock(Timer)
     )
 
     def "should fetch instruction from memory pointed by PC"() {

@@ -31,6 +31,7 @@ class InstructionRegistryIT extends Specification {
         (short) param1 == instance.getParam(0, instruction)
         (short) param2 ==  instance.getParam(1, instruction)
         (short) param3 == instance.getParam(2, instruction)
+        (short) 0 == instance.getParam(3, instruction);
 
         where:
 

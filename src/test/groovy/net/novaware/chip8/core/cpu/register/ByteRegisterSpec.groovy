@@ -8,7 +8,7 @@ class ByteRegisterSpec extends Specification {
 
     def "should trigger callback on value change"() {
         given:
-        Register<WordRegister> reportedRegister = null
+        Register<ByteRegister> reportedRegister = null
 
         register.setCallback({ r -> reportedRegister = r})
 
@@ -18,6 +18,7 @@ class ByteRegisterSpec extends Specification {
         then:
         reportedRegister.getName() == "V1"
         reportedRegister.is(register)
+        register.getAsInt() == 1
     }
 
     def "should ignore null callback"() {
@@ -25,9 +26,10 @@ class ByteRegisterSpec extends Specification {
         register.setCallback(null)
 
         when:
-        register.set(2)
+        register.set(2 as short)
 
         then:
         noExceptionThrown()
+        register.get() == 2 as short
     }
 }

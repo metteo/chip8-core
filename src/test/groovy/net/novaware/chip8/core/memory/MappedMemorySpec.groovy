@@ -53,7 +53,7 @@ class MappedMemorySpec extends Specification {
     }
 
     //TODO: refactor to allow testing, (mocking of memory segments)
-    def "should clear writeable memory segments"() {
+    def "should clear display and maybe other memory segments"() {
         given:
         for (int i = MemoryModule.DISPLAY_IO_START; i <= MemoryModule.DISPLAY_IO_END; ++i) {
             memory.setByte(ushort(i), ubyte(0xFF))

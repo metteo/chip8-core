@@ -18,6 +18,7 @@ class TribbleRegisterSpec extends Specification {
         then:
         reportedRegister.getName() == "PC"
         reportedRegister.is(register)
+        register.get() == 1 as short
     }
 
     def "should ignore null callback"() {

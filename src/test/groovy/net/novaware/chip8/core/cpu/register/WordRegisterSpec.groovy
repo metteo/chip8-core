@@ -18,6 +18,7 @@ class WordRegisterSpec extends Specification {
         then:
         reportedRegister.getName() == "IR"
         reportedRegister.is(register)
+        register.get() == 1 as short
     }
 
     def "should ignore null callback"() {
@@ -29,5 +30,6 @@ class WordRegisterSpec extends Specification {
 
         then:
         noExceptionThrown()
+        register.getAsInt() == 1
     }
 }

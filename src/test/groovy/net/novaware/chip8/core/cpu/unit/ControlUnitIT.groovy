@@ -24,9 +24,7 @@ class ControlUnitIT extends Specification {
     Board board = BoardFactory.newBoardFactory(config, Mock(ClockGenerator), randomSource).newBoard()
 
     ControlUnit cu = board.cpu.controlUnit
-
     Memory memory = board.mmu
-
     def registers = board.cpu.registers
 
     def "should clear the screen"() {
