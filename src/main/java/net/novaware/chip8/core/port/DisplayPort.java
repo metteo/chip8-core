@@ -1,11 +1,6 @@
 package net.novaware.chip8.core.port;
 
-import net.novaware.chip8.core.cpu.register.RegisterFile;
-
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import static net.novaware.chip8.core.util.UnsignedUtil.uint;
 
 public interface DisplayPort extends OutputPort {
 
@@ -13,6 +8,34 @@ public interface DisplayPort extends OutputPort {
         PRIMARY,
         SECONDARY,
         ;
+    }
+
+    /**
+     * @see <a href="https://chip8.fandom.com/wiki/Flicker">Chip8 Flicker</a>
+     */
+    enum Mode {
+
+        /**
+         * Every draw instruction is reflected on the screen immediately.
+         * Causes flicker
+         */
+        DIRECT,
+
+        /**
+         * Detect when the app switches from drawing to erasing and trigger refresh
+         * Clock helps in cases when drawing is not followed by erasing for longer period.
+         */
+        FALLING_EDGE,
+
+        /**
+         * Merge 2 (or more) frames (current + n previous) using OR to show deleted items.
+         */
+        MERGE_FRAME,
+
+        /**
+         * Alter app code on the fly to insert explicit refresh at the end of the screen loop.
+         */
+        EXPLICIT;
     }
 
     interface Packet {
@@ -35,25 +58,17 @@ public interface DisplayPort extends OutputPort {
         boolean getPixel(int column, int row);
     }
 
-    @Deprecated(forRemoval = true)
-    int GC_IDLE = uint(RegisterFile.GC_IDLE);
-    @Deprecated(forRemoval = true)
-    int GC_ERASE = uint(RegisterFile.GC_ERASE);
-    @Deprecated(forRemoval = true)
-    int GC_NOOP = uint(RegisterFile.GC_NOOP);
-    @Deprecated(forRemoval = true)
-    int GC_DRAW = uint(RegisterFile.GC_DRAW);
-    @Deprecated(forRemoval = true)
-    int GC_MIX = uint(RegisterFile.GC_MIX);
-
-    @Deprecated(forRemoval = true)
-    void attach(BiConsumer<Integer, byte[]> receiver);
-
     /**
      * Connects the consuming device to the port. Consumer should not hold on to the Packet (Flyweight)
      * @param receiver
      */
     void connect(Consumer<Packet> receiver);
+
+    //TODO: add consumer of fps and draw instrution calls to show indicator that something is happening in the back buffer
+
+    Mode getMode();
+
+    void setMode(Mode mode);
 
     /**
      * Disconnect any previously connected receiver.

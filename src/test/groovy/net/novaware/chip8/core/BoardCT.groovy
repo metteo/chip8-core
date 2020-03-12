@@ -39,7 +39,7 @@ class BoardCT extends Specification {
         board.getStoragePort().attachSource({-> infiniteLoop})
         board.getKeyPort().updateKeyState(0b1 as short)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
-        board.getDisplayPort(DisplayPort.Type.PRIMARY).attach({ gc, buffer -> /* noop */})
+        board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
         board.initialize()
 
@@ -68,7 +68,7 @@ class BoardCT extends Specification {
         board.getStoragePort().attachSource({-> infiniteLoop})
         board.getKeyPort().updateKeyState(0b1 as short)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
-        board.getDisplayPort(DisplayPort.Type.PRIMARY).attach({ gc, buffer -> /* noop */})
+        board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
         board.initialize()
 

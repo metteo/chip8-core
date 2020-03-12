@@ -8,17 +8,18 @@ import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
+import net.novaware.chip8.core.port.impl.DisplayPortImpl;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.initialization.qual.NotOnlyInitialized;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -49,6 +50,9 @@ public class Board {
     private ClockGenerator clock;
 
     @Used
+    private final Memory displayIo;
+
+    @Used
     private final Memory bootloaderRom;
 
     @Used
@@ -59,6 +63,10 @@ public class Board {
     private volatile ClockGenerator.@Nullable Handle cycleHandle;
     private volatile ClockGenerator.@Nullable Handle delayHandle;
     private volatile ClockGenerator.@Nullable Handle soundHandle;
+    private volatile ClockGenerator.@Nullable Handle renderHandle;
+
+    private @NotOnlyInitialized DisplayPortImpl primaryDisplayPort;
+    private @NotOnlyInitialized DisplayPortImpl secondaryDisplayPort;
 
     private KeyPort keyPort = new KeyPort() {
         @Override
@@ -79,10 +87,6 @@ public class Board {
         }
     };
 
-    private byte[] displayBuffer = new byte[MemoryModule.DISPLAY_IO_SIZE];
-
-    private @Nullable BiConsumer<Integer, byte[]> displayReceiver;
-
     private @Nullable Consumer<AudioPort.Packet> audioReceiver;
 
     private Supplier<byte[]> programSupplier = () -> new byte[0];
@@ -92,6 +96,7 @@ public class Board {
         final BoardConfig config,
         @Named(PROGRAM) final Memory program,
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
+        @Named(DISPLAY_IO) final Memory displayIo,
         @Named(MMU) final Memory mmu,
         final ClockGenerator clock,
         final Cpu cpu
@@ -100,10 +105,14 @@ public class Board {
 
         this.program = program;
         this.bootloaderRom = bootloaderRom;
+        this.displayIo = displayIo;
         this.mmu = mmu;
 
         this.clock = clock;
         this.cpu = cpu;
+
+        primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
+        secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
     }
 
     public void powerOn() {
@@ -127,6 +136,11 @@ public class Board {
             soundHandle = null;
         }
 
+        if (renderHandle != null) {
+            renderHandle.cancel(false);
+            renderHandle = null;
+        }
+
         clock.shutdown();
     }
 
@@ -147,20 +161,6 @@ public class Board {
 
         cpu.initialize();
 
-        registers.getGraphicChange().setCallback(gc -> {
-            int change = gc.getAsInt();
-
-            if (change > 0) {
-                mmu.getBytes(DISPLAY_IO_START, displayBuffer, displayBuffer.length);
-
-                if (displayReceiver != null) {
-                    displayReceiver.accept(change, displayBuffer);
-                }
-
-                gc.set(GC_IDLE);
-            }
-        });
-
         registers.getSoundOn().setCallback(so -> {
             if (audioReceiver != null) {
                 audioReceiver.accept(() -> so.getAsInt() == 1);
@@ -175,6 +175,13 @@ public class Board {
                 powerOff0(false);
                 //TODO: report this somehow outside (exception handler, outputport?)
             }
+        });
+
+        registers.getGraphicChange().setCallback(gcr -> {
+            if (gcr.getAsInt() == GC_IDLE) { return; } // prevent recursive loop
+            primaryDisplayPort.onGraphicChange();
+            secondaryDisplayPort.onGraphicChange();
+            gcr.set(GC_IDLE);
         });
 
         LOG.traceExit();
@@ -215,6 +222,10 @@ public class Board {
         // TODO: handle threading of handle references xD
         delayHandle = clock.schedule(cpu::delayTick, config.getDelayTimerFrequency());
         soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
+        renderHandle = clock.schedule(() -> {
+            primaryDisplayPort.tick();
+            secondaryDisplayPort.tick();
+        }, config.getRenderTimerFrequency());
 
         //TODO: react to cpu state and control the clock properly
         cycleHandle = clock.schedule(() -> {
@@ -262,24 +273,13 @@ public class Board {
 
     public DisplayPort getDisplayPort(final DisplayPort.Type type) {
         requireNonNull(type, "type must not be null");
-        assertArgument(type == DisplayPort.Type.PRIMARY, "only primary screen is supported");
-
-        return new DisplayPort() {
-            @Override
-            public void attach(BiConsumer<Integer, byte[]> receiver) {
-                displayReceiver = receiver;
-            }
-
-            @Override
-            public void connect(Consumer<Packet> receiver) {
-                throw new UnsupportedOperationException("not implemented");
-            }
-
-            @Override
-            public void disconnect() {
-                displayReceiver = null;
-            }
-        };
+        switch (type) {
+            case SECONDARY:
+                return secondaryDisplayPort;
+            case PRIMARY:
+            default:
+                return primaryDisplayPort;
+        }
     }
 
     public KeyPort getKeyPort() {

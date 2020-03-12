@@ -6,6 +6,8 @@ import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.SplittableMemory
 import spock.lang.Specification
 
+import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
+
 class BoardSpec extends Specification {
 
     BoardConfig config = new BoardConfig()
@@ -18,7 +20,13 @@ class BoardSpec extends Specification {
 
     ClockGenerator clock = Mock()
 
-    Board instance = new Board(config, program, bootloader, mmu, clock, cpu)
+    Board instance
+
+    void setup() {
+        cpu.getRegisters() >> newRegisters()
+
+        instance = new Board(config, program, bootloader, Mock(Memory), mmu, clock, cpu)
+    }
 
     def "should reset cpu and memory"() {
         when:

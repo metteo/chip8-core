@@ -11,6 +11,8 @@ public class BoardConfig {
 
     private int soundTimerFrequency = 60; // Hz
 
+    private int renderTimerFrequency = 60; // Hz
+
     private boolean strictMode = true;
 
     private boolean enforceMemoryRoRwState = true; //strict
@@ -77,6 +79,14 @@ public class BoardConfig {
 
     public void setSoundTimerFrequency(int soundTimerFrequency) {
         this.soundTimerFrequency = soundTimerFrequency;
+    }
+
+    public int getRenderTimerFrequency() {
+        return renderTimerFrequency;
+    }
+
+    public void setRenderTimerFrequency(int renderTimerFrequency) {
+        this.renderTimerFrequency = renderTimerFrequency;
     }
 
     public boolean isLegacyShift() {
