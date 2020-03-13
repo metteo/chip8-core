@@ -3,6 +3,7 @@ package net.novaware.chip8.core;
 /**
  * DIP Switch working at runtime
  */
+//TODO: move to config package, allow reconfiguration of frequencies
 public class BoardConfig {
 
     private int cpuFrequency = 500; // Hz
