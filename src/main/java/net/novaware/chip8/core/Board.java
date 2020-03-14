@@ -8,13 +8,13 @@ import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
+import net.novaware.chip8.core.port.impl.AudioPortImpl;
 import net.novaware.chip8.core.port.impl.DisplayPortImpl;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.initialization.qual.NotOnlyInitialized;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Inject;
@@ -26,7 +26,6 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
-import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.USHORT_0;
 
@@ -65,8 +64,10 @@ public class Board {
     private volatile ClockGenerator.@Nullable Handle soundHandle;
     private volatile ClockGenerator.@Nullable Handle renderHandle;
 
-    private @NotOnlyInitialized DisplayPortImpl primaryDisplayPort;
-    private @NotOnlyInitialized DisplayPortImpl secondaryDisplayPort;
+    private DisplayPortImpl primaryDisplayPort;
+    private DisplayPortImpl secondaryDisplayPort;
+
+    private AudioPortImpl audioPort;
 
     private KeyPort keyPort = new KeyPort() {
         @Override
@@ -86,8 +87,6 @@ public class Board {
             throw new UnsupportedOperationException("unimplemented");
         }
     };
-
-    private @Nullable Consumer<AudioPort.Packet> audioReceiver;
 
     private Supplier<byte[]> programSupplier = () -> new byte[0];
 
@@ -113,6 +112,7 @@ public class Board {
 
         primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
+        audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
     }
 
     public void powerOn() {
@@ -161,12 +161,6 @@ public class Board {
 
         cpu.initialize();
 
-        registers.getSoundOn().setCallback(so -> {
-            if (audioReceiver != null) {
-                audioReceiver.accept(() -> so.getAsInt() == 1);
-            }
-        });
-
         registers.getOutput().setCallback(out -> {
             int output = out.getAsInt();
 
@@ -183,6 +177,8 @@ public class Board {
             secondaryDisplayPort.onGraphicChange();
             gcr.set(GC_IDLE);
         });
+
+        audioPort.attachToRegister();
 
         LOG.traceExit();
     }
@@ -258,17 +254,7 @@ public class Board {
     }
 
     public AudioPort getAudioPort() {
-        return new AudioPort() {
-            @Override
-            public void connect(Consumer<Packet> receiver) {
-                audioReceiver = receiver;
-            }
-
-            @Override
-            public void disconnect() {
-                audioReceiver = null;
-            }
-        };
+        return audioPort;
     }
 
     public DisplayPort getDisplayPort(final DisplayPort.Type type) {
