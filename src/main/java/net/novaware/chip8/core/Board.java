@@ -74,6 +74,16 @@ public class Board {
         public void updateKeyState(short state) {
             clock.schedule(() -> cpu.getRegisters().getInput().set(state));
         }
+
+        @Override
+        public Consumer<Packet> connect() {
+            throw new UnsupportedOperationException("not implemented");
+        }
+
+        @Override
+        public void disconnect() {
+            throw new UnsupportedOperationException("not implemented");
+        }
     };
 
     private StoragePort storagePort = new StoragePort() {
