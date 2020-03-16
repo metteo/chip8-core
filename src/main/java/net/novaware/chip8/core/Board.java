@@ -10,6 +10,7 @@ import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
 import net.novaware.chip8.core.port.impl.AudioPortImpl;
 import net.novaware.chip8.core.port.impl.DisplayPortImpl;
+import net.novaware.chip8.core.port.impl.KeyPortImpl;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -69,22 +70,7 @@ public class Board {
 
     private AudioPortImpl audioPort;
 
-    private KeyPort keyPort = new KeyPort() {
-        @Override
-        public void updateKeyState(short state) {
-            clock.schedule(() -> cpu.getRegisters().getInput().set(state));
-        }
-
-        @Override
-        public Consumer<Packet> connect() {
-            throw new UnsupportedOperationException("not implemented");
-        }
-
-        @Override
-        public void disconnect() {
-            throw new UnsupportedOperationException("not implemented");
-        }
-    };
+    private KeyPortImpl keyPort;
 
     private StoragePort storagePort = new StoragePort() {
         @Override
@@ -123,6 +109,7 @@ public class Board {
         primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
+        keyPort = new KeyPortImpl(cpu.getRegisters().getInput());
     }
 
     public void powerOn() {
@@ -189,6 +176,7 @@ public class Board {
         });
 
         audioPort.attachToRegister();
+        keyPort.attachToRegister();
 
         LOG.traceExit();
     }

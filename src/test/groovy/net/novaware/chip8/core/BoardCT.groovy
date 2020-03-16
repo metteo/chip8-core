@@ -2,6 +2,7 @@ package net.novaware.chip8.core
 
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
 import net.novaware.chip8.core.port.DisplayPort
+import net.novaware.chip8.core.port.KeyPort
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
@@ -23,6 +24,18 @@ class BoardCT extends Specification {
             legacyAddressSum: false
     )
 
+    def inputPacket = new KeyPort.InputPacket() {
+        @Override
+        KeyPort.Direction getDirection() {
+            return KeyPort.Direction.DOWN
+        }
+
+        @Override
+        byte getKeyCode() {
+            return 0x1
+        }
+    }
+
     def "should be created and run few cycles without exceptions" () {
         given:
         def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
@@ -37,7 +50,7 @@ class BoardCT extends Specification {
         def board = factory.newBoard()
 
         board.getStoragePort().attachSource({-> infiniteLoop})
-        board.getKeyPort().updateKeyState(0b1 as short)
+        board.getKeyPort().connect({p -> println "key output: " + p.isKeyActive(0x1 as byte)}).accept(inputPacket)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
@@ -66,7 +79,7 @@ class BoardCT extends Specification {
         def board = factory.newBoard()
 
         board.getStoragePort().attachSource({-> infiniteLoop})
-        board.getKeyPort().updateKeyState(0b1 as short)
+        board.getKeyPort().connect({p -> println "key output: " + p.isKeyActive(0x1 as byte)}).accept(inputPacket)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
