@@ -10,8 +10,9 @@ jobs:
     steps:
     - name: git
       uses: actions/checkout@v2
-      
+
     - name: maven
-      uses: "xlui/action-maven-cli/jdk11@master"
+      uses: actions/setup-java@v1.3
       with:
-        args: -B clean verify --file pom.xml
+        java-version: '11.0.6+10'
+      run: ./mvnw -B clean verify
