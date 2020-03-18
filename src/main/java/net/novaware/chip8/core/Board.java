@@ -109,7 +109,7 @@ public class Board {
         primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
-        keyPort = new KeyPortImpl(cpu.getRegisters().getInput());
+        keyPort = new KeyPortImpl(cpu.getRegisters().getInput(), cpu.getRegisters().getInputCheck());
     }
 
     public void powerOn() {

@@ -117,6 +117,12 @@ public class RegisterFile {
     private final WordRegister input;
 
     /**
+     * Holds info about which input bits were checked by the app
+     */
+    @Owned
+    private final WordRegister inputCheck;
+
+    /**
      * Dedicated Output register (16 bits) mapped to 16 CPU pins
      */
     @Owned
@@ -167,6 +173,7 @@ public class RegisterFile {
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(INPUT) final WordRegister input,
+        @Named(INPUT_CHECK) final WordRegister inputCheck,
         @Named(OUTPUT) final WordRegister output,
         @Named(DELAY) final ByteRegister delay,
         @Named(SOUND) final ByteRegister sound,
@@ -193,6 +200,7 @@ public class RegisterFile {
         this.graphicChange = graphicChange;
 
         this.input = input;
+        this.inputCheck = inputCheck;
         this.output = output;
 
         this.delay = delay;
@@ -269,6 +277,10 @@ public class RegisterFile {
 
     public WordRegister getInput() {
         return input;
+    }
+
+    public WordRegister getInputCheck() {
+        return inputCheck;
     }
 
     public WordRegister getOutput() {

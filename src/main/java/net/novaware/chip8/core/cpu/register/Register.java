@@ -36,6 +36,10 @@ public abstract class Register<T extends Register<?>> {
         this.callback = callback;
     }
 
+    public boolean hasCallback() {
+        return callback != null;
+    }
+
     @SuppressWarnings("unchecked")
     void fireCallback() {
         if (callback != null) {

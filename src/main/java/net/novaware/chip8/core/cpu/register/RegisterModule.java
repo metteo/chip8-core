@@ -30,6 +30,8 @@ public class RegisterModule {
     public static final String GRAPHIC_CHANGE = "graphicChange";
 
     public static final String INPUT = "input";
+    public static final String INPUT_CHECK = "inputCheck";
+
     public static final String OUTPUT = "output";
 
     public static final String DELAY = "delay";
@@ -135,6 +137,13 @@ public class RegisterModule {
     @Named(INPUT)
     static WordRegister provideInput() {
         return new WordRegister("IN");
+    }
+
+    @Provides
+    @BoardScope
+    @Named(INPUT_CHECK) //TODO: should be byte since we only store bit index
+    static WordRegister provideInputCheck() {
+        return new WordRegister("IC");
     }
 
     @Provides

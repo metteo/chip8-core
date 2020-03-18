@@ -18,6 +18,7 @@ class RegistersHelper {
                 provideGraphicSegment(),
                 provideGraphicChange(),
                 provideInput(),
+                provideInputCheck(),
                 provideOutput(),
                 provideDelay(),
                 provideSound(),

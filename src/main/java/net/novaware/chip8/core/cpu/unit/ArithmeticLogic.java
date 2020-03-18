@@ -37,6 +37,9 @@ public class ArithmeticLogic implements Unit {
     private final WordRegister input;
 
     @Used
+    private final WordRegister inputCheck;
+
+    @Used
     private final ByteRegister status;
 
     @Used
@@ -47,6 +50,7 @@ public class ArithmeticLogic implements Unit {
         @Named(RANDOM) final IntUnaryOperator randomSource,
         @Named(VARIABLES) final ByteRegister[] variables,
         @Named(INPUT) final WordRegister input,
+        @Named(INPUT_CHECK) final WordRegister inputCheck,
         @Named(STATUS) final ByteRegister status,
         @Named(STATUS_TYPE) final ByteRegister statusType
     ) {
@@ -54,6 +58,7 @@ public class ArithmeticLogic implements Unit {
 
         this.variables = variables;
         this.input = input;
+        this.inputCheck = inputCheck;
         this.status = status;
         this.statusType = statusType;
     }
@@ -182,6 +187,8 @@ public class ArithmeticLogic implements Unit {
         final boolean bitSet = (inValue & bitMask) != 0;
 
         LOG.debug(() -> toHexString(ubyte(bit)) + "th input bit was " + (bitSet ? "" : "UN") + "SET");
+
+        inputCheck.set(bit); // report which input bit was checked
 
         return bitSet;
     }

@@ -293,6 +293,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
+        registers.getInputCheck().getAsInt() == 0x4
     }
 
     def "should NOT skip instruction if key with value of Vx is pressed"() {
@@ -312,6 +313,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x200 as short
+        registers.getInputCheck().getAsInt() == 0x4
     }
 
     def "should fill registers V0 - VX with memory starting at I"() {
@@ -478,6 +480,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x202 as short
+        registers.getInputCheck().getAsInt() == 0x3
     }
 
     def "should NOT skip instruction if key with value of Vx is NOT pressed"() {
@@ -497,6 +500,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x200 as short
+        registers.getInputCheck().getAsInt() == 0xA
     }
 
     def "should properly ADD (with carry) value of Vy into Vx (no overflow)"() {

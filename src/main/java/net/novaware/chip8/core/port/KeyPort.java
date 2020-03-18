@@ -22,7 +22,7 @@ public interface KeyPort extends InputPort, OutputPort {
          * @param keyCode
          * @return
          */
-        boolean isKeyActive(byte keyCode);
+        boolean isKeyUsed(byte keyCode);
     }
 
     /**
