@@ -72,6 +72,7 @@ public class Board {
 
     private KeyPortImpl keyPort;
 
+    //TODO: refactor out into own class, use original cosmac vip rom addressing
     private StoragePort storagePort = new StoragePort() {
         @Override
         public void attachSource(Supplier<byte[]> source) {
