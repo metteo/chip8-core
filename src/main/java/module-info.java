@@ -8,6 +8,8 @@ module net.novaware.chip8.core {
 
     requires org.apache.logging.log4j;
 
+    requires owner; //FIXME: filename-based
+
     exports net.novaware.chip8.core;
     exports net.novaware.chip8.core.port;
     exports net.novaware.chip8.core.clock;
