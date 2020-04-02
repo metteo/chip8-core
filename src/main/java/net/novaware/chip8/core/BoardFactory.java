@@ -3,6 +3,8 @@ package net.novaware.chip8.core;
 import dagger.BindsInstance;
 import dagger.Component;
 import net.novaware.chip8.core.clock.ClockGenerator;
+import net.novaware.chip8.core.config.ConfigModule;
+import net.novaware.chip8.core.config.CoreConfig;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.cpu.unit.UnitModule;
 import net.novaware.chip8.core.memory.MemoryModule;
@@ -18,11 +20,11 @@ import static net.novaware.chip8.core.cpu.unit.UnitModule.RANDOM;
         RegisterModule.class,
         MemoryModule.class,
         UnitModule.class,
-        BoardModule.class
+        ConfigModule.class
 })
 public abstract class BoardFactory {
 
-    public static BoardFactory newBoardFactory(BoardConfig config, ClockGenerator clock, IntUnaryOperator random) {
+    public static BoardFactory newBoardFactory(CoreConfig config, ClockGenerator clock, IntUnaryOperator random) {
         return DaggerBoardFactory.builder()
                 .config(config)
                 .clock(clock)
@@ -36,7 +38,7 @@ public abstract class BoardFactory {
     public static abstract class Builder {
 
         @BindsInstance
-        public abstract Builder config(BoardConfig config);
+        public abstract Builder config(CoreConfig config);
 
         @BindsInstance
         public abstract Builder clock(ClockGenerator clock);

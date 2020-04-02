@@ -1,9 +1,9 @@
 package net.novaware.chip8.core.cpu.unit
 
 import net.novaware.chip8.core.Board
-import net.novaware.chip8.core.BoardConfig
 import net.novaware.chip8.core.BoardFactory
 import net.novaware.chip8.core.clock.ClockGenerator
+import net.novaware.chip8.core.config.CoreConfig
 import net.novaware.chip8.core.cpu.CpuState
 import net.novaware.chip8.core.cpu.register.RegisterFile
 import net.novaware.chip8.core.memory.Memory
@@ -19,7 +19,7 @@ class ControlUnitIT extends Specification {
 
     IntUnaryOperator randomSource = Mock()
 
-    BoardConfig config = Mock()
+    CoreConfig config = Mock()
 
     Board board = BoardFactory.newBoardFactory(config, Mock(ClockGenerator), randomSource).newBoard()
 

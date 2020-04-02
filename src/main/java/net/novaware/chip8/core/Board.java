@@ -1,6 +1,7 @@
 package net.novaware.chip8.core;
 
 import net.novaware.chip8.core.clock.ClockGenerator;
+import net.novaware.chip8.core.config.CoreConfig;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.memory.*;
@@ -37,8 +38,20 @@ public class Board {
 
     private static final Logger LOG = LogManager.getLogger();
 
+    public interface Config {
+        boolean isEnforceMemoryRoRwState();
+
+        int getDelayTimerFrequency();
+
+        int getSoundTimerFrequency();
+
+        int getRenderTimerFrequency();
+
+        int getCpuFrequency();
+    }
+
     @Owned
-    private final BoardConfig config;
+    private final CoreConfig config;
 
     @Owned
     private final Memory mmu;
@@ -89,7 +102,7 @@ public class Board {
 
     @Inject
     /* package */ Board(
-        final BoardConfig config,
+        final CoreConfig config,
         @Named(PROGRAM) final Memory program,
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
         @Named(DISPLAY_IO) final Memory displayIo,

@@ -1,6 +1,8 @@
 package net.novaware.chip8.core
 
 import net.novaware.chip8.core.clock.ClockGenerator
+import net.novaware.chip8.core.config.CoreConfig
+import net.novaware.chip8.core.config.MutableConfig
 import net.novaware.chip8.core.cpu.Cpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.SplittableMemory
@@ -10,7 +12,7 @@ import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
 
 class BoardSpec extends Specification {
 
-    BoardConfig config = new BoardConfig()
+    CoreConfig config = new MutableConfig()
 
     Cpu cpu = Mock()
 

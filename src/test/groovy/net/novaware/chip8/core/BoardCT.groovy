@@ -1,6 +1,8 @@
 package net.novaware.chip8.core
 
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
+import net.novaware.chip8.core.config.CoreConfig
+import net.novaware.chip8.core.config.MutableConfig
 import net.novaware.chip8.core.port.DisplayPort
 import net.novaware.chip8.core.port.KeyPort
 import spock.lang.Specification
@@ -14,7 +16,7 @@ import static net.novaware.chip8.core.BoardFactory.newBoardFactory
 //TODO: refactor this test
 class BoardCT extends Specification {
 
-    BoardConfig config = new BoardConfig(
+    CoreConfig config = new MutableConfig(
             cpuFrequency: 600,
             delayTimerFrequency: 61,
             soundTimerFrequency: 59,
