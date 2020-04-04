@@ -89,7 +89,7 @@ class MappedMemorySpec extends Specification {
         then:
         dest[0] == data
         dest2 == data2
-        memory.getName() == "MMU"
+        memory.getName() == "RAM"
     }
 
     def "should save and retrieve byte of data (not in the beginning)"() {

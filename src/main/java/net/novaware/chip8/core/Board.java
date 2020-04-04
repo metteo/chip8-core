@@ -1,7 +1,6 @@
 package net.novaware.chip8.core;
 
 import net.novaware.chip8.core.clock.ClockGenerator;
-import net.novaware.chip8.core.config.CoreConfig;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.memory.*;
@@ -51,7 +50,7 @@ public class Board {
     }
 
     @Owned
-    private final CoreConfig config;
+    private final Board.Config config;
 
     @Owned
     private final Memory mmu;
@@ -102,7 +101,7 @@ public class Board {
 
     @Inject
     /* package */ Board(
-        final CoreConfig config,
+        final Board.Config config,
         @Named(PROGRAM) final Memory program,
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
         @Named(DISPLAY_IO) final Memory displayIo,

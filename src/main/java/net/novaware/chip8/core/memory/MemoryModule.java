@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.novaware.chip8.core.util.AssertUtil.assertArgument;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 /**
  * CDP based Chip-8 interpreter divided memory into several segments.
@@ -52,6 +53,14 @@ public class MemoryModule {
     public static final short  DISPLAY_IO_START        = 0x0F00;
     public static final short  DISPLAY_IO_END          = 0x0FFF;
     public static final int    DISPLAY_IO_SIZE         = 256;
+
+    public static final String OS_ROM                  = "osRom";
+    public static final short  OS_ROM_START            = (short) 0x8000;
+    public static final short  OS_ROM_END              = (short) 0x81FF;
+    public static final int    OS_ROM_SIZE             = 512;
+
+    public static final String RAM                     = "ram";
+    public static final String ROM                     = "rom";
 
     public static final String MMU                     = "mmu";
 
@@ -109,8 +118,23 @@ public class MemoryModule {
 
     @Provides
     @BoardScope
-    @Named(MMU)
-    static Memory provideMmu(
+    @Named(OS_ROM)
+    static Memory provideOsRom() {
+        final PhysicalMemory osRom = new PhysicalMemory("Operating System ROM", OS_ROM_SIZE);
+        return new ReadOnlyMemory(osRom);
+    }
+
+    @Provides
+    @BoardScope
+    @Named(ROM)
+    static Memory provideRom(@Named(OS_ROM) final Memory osRom) {
+        return osRom;
+    }
+
+    @Provides
+    @BoardScope
+    @Named(RAM)
+    static Memory provideRam(
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
         @Named(PROGRAM) final Memory program,
         @Named(STACK) final Memory stack,
@@ -125,6 +149,21 @@ public class MemoryModule {
         entries.add(new MappedMemory.Entry(BOOTLOADER_RAM_START, BOOTLOADER_RAM_END, bootloaderRam));
         entries.add(new MappedMemory.Entry(VARIABLES_START, VARIABLES_END, variables));
         entries.add(new MappedMemory.Entry(DISPLAY_IO_START, DISPLAY_IO_END, displayIo));
+
+        return new MappedMemory("RAM", entries);
+    }
+
+    @Provides
+    @BoardScope
+    @Named(MMU)
+    static Memory provideMmu(
+            @Named(RAM) final Memory ram,
+            @Named(ROM) final Memory rom
+    ) {
+        List<MappedMemory.Entry> entries = new ArrayList<>();
+        entries.add(new MappedMemory.Entry(BOOTLOADER_ROM_START, DISPLAY_IO_END, ram));
+        entries.add(new MappedMemory.Entry(ushort(0x1000), ushort(0x7FFF), new UnusedMemory(0x7000)));
+        entries.add(new MappedMemory.Entry(OS_ROM_START, OS_ROM_END, rom));
 
         return new MappedMemory("MMU", entries);
     }

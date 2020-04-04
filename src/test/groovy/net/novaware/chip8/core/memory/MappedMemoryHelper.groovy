@@ -7,7 +7,7 @@ import static net.novaware.chip8.core.memory.MemoryModule.*
 class MappedMemoryHelper {
 
     static MappedMemory newMappedMemory(ByteRegister[] variables) {
-        provideMmu(
+        provideRam(
                 provideBootloaderRom(),
                 provideProgram(),
                 provideStack(),
