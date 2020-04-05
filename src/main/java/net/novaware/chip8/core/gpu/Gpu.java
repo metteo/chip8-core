@@ -17,6 +17,8 @@ import javax.inject.Named;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.*;
 import static net.novaware.chip8.core.gpu.ViewPort.Bit;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
+import static net.novaware.chip8.core.util.AssertUtil.assertState;
+import static net.novaware.chip8.core.util.HexUtil.toHexString;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 /**
@@ -28,6 +30,18 @@ public class Gpu {
     private static final Logger LOG = LogManager.getLogger();
 
     public static final int MAX_SPRITE_HEIGHT = 0x10;
+
+    public interface Config {
+        /**
+         * Boot-128 expects this to be true. Without the value in V4 would overflow a nibble
+         * so the font address loading routine which doesn't check it, would load the address
+         * after font area...
+         */
+        boolean isTrimVarForFont();
+    }
+
+    @Owned
+    private final Config config;
 
     @Used
     private final RegisterFile registers;
@@ -51,7 +65,8 @@ public class Gpu {
     final boolean dump = true;
 
     @Inject
-    public Gpu(RegisterFile registers, @Named(MMU) Memory memory) {
+    public Gpu(Config config, RegisterFile registers, @Named(MMU) Memory memory) {
+        this.config = config;
         this.registers = registers;
         this.memory = memory;
 
@@ -96,12 +111,48 @@ public class Gpu {
     }
 
     public void loadFontAddressIntoRegister(final short x) {
-        final int xValue = registers.getVariable(x).getAsInt();
+        int xValue = registers.getVariable(x).getAsInt();
+
+        boolean validXValue = xValue >= 0 && xValue <= 0xF;
+
+        if (config.isTrimVarForFont()) {
+            if (!validXValue) {
+                LOG.warn("Trimming V" + x + " value: " + toHexString(ubyte(xValue)));
+                xValue &= 0xF;
+            }
+        } else {
+            assertState(validXValue, "V" + x + " register should be between 0 and 0xF");
+        }
+
         final int fontSegment = registers.getFontSegment().getAsInt();
+        int offset = getFontOffset(xValue);
 
-        final int fontAddress = fontSegment +  xValue * 5 /* bits of height */;
-
+        final int fontAddress = (fontSegment & 0xFF00) | (0xFF & offset);
         registers.getIndex().set(fontAddress);
+    }
+
+    private int getFontOffset(int xValue) {
+        int offset;
+        switch(xValue) {
+            case 0x0: offset = 0x30; break;
+            case 0x1: offset = 0x39; break;
+            case 0x2: offset = 0x22; break;
+            case 0x3: offset = 0x2A; break;
+            case 0x4: offset = 0x3E; break;
+            case 0x5: offset = 0x20; break;
+            case 0x6: offset = 0x24; break;
+            case 0x7: offset = 0x34; break;
+            case 0x8: offset = 0x26; break;
+            case 0x9: offset = 0x28; break;
+            case 0xA: offset = 0x2E; break;
+            case 0xB: offset = 0x18; break;
+            case 0xC: offset = 0x14; break;
+            case 0xD: offset = 0x1C; break;
+            case 0xE: offset = 0x10; break;
+            case 0xF: offset = 0x12; break;
+            default: throw new AssertionError("should not happen");
+        }
+        return offset;
     }
 
     public void drawSprite(short x, short y, short height) {

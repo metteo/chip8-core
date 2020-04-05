@@ -79,8 +79,8 @@ public class RegisterModule {
     @Provides
     @BoardScope
     @Named(INDEX)
-    static TribbleRegister provideIndex() {
-        return new TribbleRegister("I");
+    static WordRegister provideIndex() {
+        return new WordRegister("I");
     }
 
     @Provides
@@ -114,8 +114,8 @@ public class RegisterModule {
     @Provides
     @BoardScope
     @Named(FONT_SEGMENT)
-    static TribbleRegister provideFontSegment() {
-        return new TribbleRegister("FS");
+    static WordRegister provideFontSegment() {
+        return new WordRegister("FS");
     }
 
     @Provides

@@ -17,6 +17,7 @@ class ImmutableConfigSpec extends Specification {
             .setLegacyLoadStore(false)
             .setLegacyAddressSum(true)
             .setEnforceMemoryRoRwState(false)
+            .setTrimVarForFont(false)
             .build()
 
         then:
@@ -29,6 +30,7 @@ class ImmutableConfigSpec extends Specification {
             !isLegacyLoadStore()
             isLegacyAddressSum()
             !isEnforceMemoryRoRwState()
+            !isTrimVarForFont()
         }
     }
 }

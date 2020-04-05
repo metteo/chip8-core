@@ -177,7 +177,7 @@ class ControlUnitIT extends Specification {
         given:
         config.isLegacyAddressSum() >> overflowI
 
-        registers.getIndex().set(0x0FF9)
+        registers.getIndex().set(0xFFF9)
         registers.getVariable(4).set(0xEE as byte)
 
         def instruction = registers.getDecodedInstruction()
@@ -352,7 +352,7 @@ class ControlUnitIT extends Specification {
         where:
         incrementI | iVal
         false      | 0xFFD
-        true       | 0x0 //overflow to bootloader (0xFFD + 0x3)
+        true       | 0x1000 //overflow to unused addresses (0xFFD + 0x3)
     }
 
     def "should return from instruction call"() {
@@ -734,8 +734,7 @@ class ControlUnitIT extends Specification {
 
     def "should load address of the font sprite"() {
         given:
-        def fontStartAddress = 0x5
-        def spriteSize = 5 //bytes
+        def fontStartAddress = 0x1234
 
         registers.getProgramCounter().set(0x208)
         registers.getFontSegment().set(fontStartAddress)
@@ -750,7 +749,7 @@ class ControlUnitIT extends Specification {
 
         then:
         registers.getProgramCounter().get() == 0x208 as short
-        registers.getIndex().getAsInt() == fontStartAddress + 9 * spriteSize
+        registers.getIndex().getAsInt() == 0x1228
     }
 
     def "should generate random number from 0 - 255"() {

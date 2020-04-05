@@ -37,6 +37,8 @@ public class MutableConfig implements CoreConfig {
      */
     private boolean legacyAddressSum = true;
 
+    private boolean trimVarForFont = true;
+
     private boolean haltOnInfJump;
 
     private boolean stickyKeys;
@@ -109,5 +111,10 @@ public class MutableConfig implements CoreConfig {
 
     public void setLegacyAddressSum(boolean legacyAddressSum) {
         this.legacyAddressSum = legacyAddressSum;
+    }
+
+    @Override
+    public boolean isTrimVarForFont() {
+        return trimVarForFont;
     }
 }

@@ -51,11 +51,11 @@ public class RegisterFile {
     private final ByteRegister statusType;
 
     /**
-     * Index register use for holding memory address
+     * Index register use for holding memory address (ROM / RAM)
      * Accessible by the program
      */
     @Owned
-    private final TribbleRegister index;
+    private final WordRegister index;
 
     /**
      * Memory Address Register
@@ -90,10 +90,10 @@ public class RegisterFile {
     private final TribbleRegister stackPointer;
 
     /**
-     * Start of the memory with font sprites
+     * Start of the ROM memory with font sprites
      */
     @Owned
-    private final TribbleRegister fontSegment;
+    private final WordRegister fontSegment;
 
     /**
      * Start of the part of memory (256 bytes) mapped to screen
@@ -164,12 +164,12 @@ public class RegisterFile {
         @Named(CPU_STATE) final ByteRegister cpuState,
         @Named(VARIABLES) final ByteRegister[] variables,
         @Named(STATUS_TYPE) final ByteRegister statusType,
-        @Named(INDEX) final TribbleRegister index,
+        @Named(INDEX) final WordRegister index,
         @Named(MEMORY_ADDRESS) final TribbleRegister memoryAddress,
         @Named(PROGRAM_COUNTER) final TribbleRegister programCounter,
         @Named(STACK_SEGMENT) final TribbleRegister stackSegment,
         @Named(STACK_POINTER) final TribbleRegister stackPointer,
-        @Named(FONT_SEGMENT) final TribbleRegister fontSegment,
+        @Named(FONT_SEGMENT) final WordRegister fontSegment,
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(INPUT) final WordRegister input,
@@ -243,7 +243,7 @@ public class RegisterFile {
         return statusType;
     }
 
-    public TribbleRegister getIndex() {
+    public WordRegister getIndex() {
         return index;
     }
 
@@ -263,7 +263,7 @@ public class RegisterFile {
         return stackPointer;
     }
 
-    public TribbleRegister getFontSegment() {
+    public WordRegister getFontSegment() {
         return fontSegment;
     }
 

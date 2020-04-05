@@ -1,6 +1,5 @@
 package net.novaware.chip8.core.gpu
 
-import net.novaware.chip8.core.cpu.register.RegisterFile
 import net.novaware.chip8.core.memory.PhysicalMemory
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -14,11 +13,13 @@ class GpuSpec extends Specification {
 
     private static final boolean DUMP_MEMORY = Boolean.getBoolean(GpuSpec.getSimpleName() + ".DUMP_MEMORY")
 
+    def config = Mock(Gpu.Config)
+
     def registers = newRegisters()
 
     def memory = new PhysicalMemory("GFX", 256)
 
-    def instance = new Gpu(registers, memory)
+    def instance = new Gpu(config, registers, memory)
 
     def "should properly extract sprite from memory"() {
         given:
@@ -351,9 +352,44 @@ class GpuSpec extends Specification {
 
         then:
         registers.getStatus().getAsInt() == 0x01
-        registers.getStatusType().get() == RegisterFile.VF_COLLISION
+        registers.getStatusType().get() == VF_COLLISION
 
         registers.getGraphicChange().get() == GC_MIX
+    }
+
+    @Unroll
+    def "should properly assign font address for #c" () {
+        given:
+        registers.getFontSegment().set(0x8110)
+        registers.getVariable(0x0).set(c)
+
+        config.isTrimVarForFont() >> trim
+
+        when:
+        instance.loadFontAddressIntoRegister(0x0 as short)
+
+        then:
+        registers.getIndex().getAsInt() == addr
+
+        where:
+        c   | trim  || addr
+        0x0 | false || 0x8130
+        0x1 | false || 0x8139
+        0x2 | false || 0x8122
+        0x3 | false || 0x812A
+        0x4 | false || 0x813E
+        0x5 | false || 0x8120
+        0x6 | false || 0x8124
+        0x7 | false || 0x8134
+        0x8 | false || 0x8126
+        0x9 | false || 0x8128
+        0xA | false || 0x812E
+        0xB | false || 0x8118
+        0xC | false || 0x8114
+        0xD | false || 0x811C
+        0xE | false || 0x8110
+        0xF | false || 0x8112
+        0xAF| true  || 0x8112
     }
 
     void dumpGraphicsSegment() {

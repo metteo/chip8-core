@@ -1,7 +1,6 @@
 package net.novaware.chip8.core.memory;
 
 import static java.util.Objects.requireNonNull;
-import static net.novaware.chip8.core.memory.MemoryModule.BOOTLOADER_ROM_END;
 import static net.novaware.chip8.core.memory.MemoryModule.BOOTLOADER_ROM_START;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
@@ -90,26 +89,6 @@ public class Bootloader {
             0x1200  // GO 200           // goto main
     };
 
-
-    private static final int[] BASIC_FONT = {
-            0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
-            0x20, 0x60, 0x20, 0x20, 0x70, // 1
-            0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
-            0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
-            0x90, 0x90, 0xF0, 0x10, 0x10, // 4
-            0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
-            0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
-            0xF0, 0x10, 0x20, 0x40, 0x40, // 7
-            0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
-            0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
-            0xF0, 0x90, 0xF0, 0x90, 0x90, // A
-            0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
-            0xF0, 0x80, 0x80, 0x80, 0xF0, // C
-            0xE0, 0x90, 0x90, 0x90, 0xE0, // D
-            0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-            0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-    };
-
     public void fill(Memory memory) {
         requireNonNull(memory, "memory must not be null");
 
@@ -124,14 +103,13 @@ public class Bootloader {
             memory.setWord(addr, ushort(Boot128.CODE[i]));
         }
 
-        final int basicFontStart = getFontAddress();
-        for (int i = 0; i < BASIC_FONT.length; ++i) {
-            final short addr = ushort(basicFontStart + i);
-            memory.setByte(addr, ubyte(BASIC_FONT[i]));
+        for (int i = 0; i < VipOs.CODE.length; ++i) {
+            final short addr = ushort(VipOs.MEMORY_START + (i * 2));
+            memory.setWord(addr, ushort(VipOs.CODE[i]));
         }
     }
 
     public short getFontAddress() {
-        return ushort(uint(BOOTLOADER_ROM_END) - BASIC_FONT.length + 1);
+        return ushort(VipOs.FONT_START);
     }
 }

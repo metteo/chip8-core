@@ -1,7 +1,6 @@
 package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
-import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
@@ -10,8 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.math.BigInteger;
 
-import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.getVariable;
+import static net.novaware.chip8.core.cpu.register.RegisterModule.*;
 import static net.novaware.chip8.core.memory.MemoryModule.MMU;
 import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
@@ -22,14 +21,14 @@ import static net.novaware.chip8.core.util.UnsignedUtil.*;
 public class LoadStore implements Unit {
 
     private final ByteRegister[] variables;
-    private final TribbleRegister index;
+    private final WordRegister index;
     private final WordRegister input;
     private final Memory memory;
 
     @Inject
     public LoadStore(
         @Named(VARIABLES) final ByteRegister[] variables,
-        @Named(INDEX) final TribbleRegister index,
+        @Named(INDEX) final WordRegister index,
         @Named(INPUT) final WordRegister input,
         @Named(MMU) final Memory memory
     ) {

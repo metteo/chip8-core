@@ -2,7 +2,7 @@ package net.novaware.chip8.core.cpu.unit;
 
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
-import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Used;
 
@@ -26,7 +26,7 @@ public class AddressGen implements Unit {
     private final ByteRegister[] variables;
 
     @Used
-    private final TribbleRegister index;
+    private final WordRegister index;
 
     @Used
     private final ByteRegister status;
@@ -37,7 +37,7 @@ public class AddressGen implements Unit {
     @Inject
     public AddressGen(
         @Named(VARIABLES) final ByteRegister[] variables,
-        @Named(INDEX) final TribbleRegister index,
+        @Named(INDEX) final WordRegister index,
         @Named(STATUS) final ByteRegister status,
         @Named(STATUS_TYPE) final ByteRegister statusType
     ) {

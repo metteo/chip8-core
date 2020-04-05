@@ -19,6 +19,7 @@ public abstract class ImmutableConfig implements CoreConfig {
         abstract Builder setSoundTimerFrequency(int value);
         abstract Builder setRenderTimerFrequency(int value);
         abstract Builder setCpuFrequency(int value);
+        abstract Builder setTrimVarForFont(boolean value);
 
         abstract ImmutableConfig build();
     }
