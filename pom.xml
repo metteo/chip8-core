@@ -110,6 +110,7 @@
                         ${jpms.opens}.memory=ALL-UNNAMED
                         ${jpms.opens}.port=ALL-UNNAMED
                         ${jpms.opens}.port.impl=ALL-UNNAMED
+                        ${jpms.opens}.storage=ALL-UNNAMED
                         ${jpms.opens}.util=ALL-UNNAMED
                     </argLine>
                 </configuration>

@@ -1,8 +1,11 @@
-package net.novaware.chip8.core.memory;
+package net.novaware.chip8.core.storage;
+
+import net.novaware.chip8.core.memory.Memory;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.memory.MemoryModule.BOOTLOADER_ROM_START;
-import static net.novaware.chip8.core.util.UnsignedUtil.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
 public class Bootloader {
 

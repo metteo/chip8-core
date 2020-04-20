@@ -3,14 +3,16 @@ package net.novaware.chip8.core;
 import net.novaware.chip8.core.clock.ClockGenerator;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
-import net.novaware.chip8.core.memory.*;
+import net.novaware.chip8.core.memory.Memory;
+import net.novaware.chip8.core.memory.MemoryModule;
+import net.novaware.chip8.core.memory.ReadOnlyMemory;
+import net.novaware.chip8.core.memory.SplittableMemory;
 import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
-import net.novaware.chip8.core.port.impl.AudioPortImpl;
-import net.novaware.chip8.core.port.impl.DisplayPortImpl;
-import net.novaware.chip8.core.port.impl.KeyPortImpl;
+import net.novaware.chip8.core.port.impl.*;
+import net.novaware.chip8.core.storage.Bootloader;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -21,14 +23,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
-import static net.novaware.chip8.core.util.UnsignedUtil.USHORT_0;
+import static net.novaware.chip8.core.util.UnsignedUtil.*;
 
 //TODO: public methods should schedule commands to clock generator
 //TODO: don't forget to handle exceptions in the Future
@@ -84,20 +84,7 @@ public class Board {
 
     private KeyPortImpl keyPort;
 
-    //TODO: refactor out into own class, use original cosmac vip rom addressing
-    private StoragePort storagePort = new StoragePort() {
-        @Override
-        public void attachSource(Supplier<byte[]> source) {
-            programSupplier = source;
-        }
-
-        @Override
-        public void attachDestination(Consumer<byte[]> callback) {
-            throw new UnsupportedOperationException("unimplemented");
-        }
-    };
-
-    private Supplier<byte[]> programSupplier = () -> new byte[0];
+    private StoragePortImpl storagePort;
 
     @Inject
     /* package */ Board(
@@ -105,6 +92,7 @@ public class Board {
         @Named(PROGRAM) final Memory program,
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
         @Named(DISPLAY_IO) final Memory displayIo,
+        @Named(STORAGE_ROM) final Memory storageRom,
         @Named(MMU) final Memory mmu,
         final ClockGenerator clock,
         final Cpu cpu
@@ -123,6 +111,7 @@ public class Board {
         secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
         keyPort = new KeyPortImpl(cpu.getRegisters().getInput(), cpu.getRegisters().getInputCheck());
+        storagePort = new StoragePortImpl((StorageMemory) storageRom);
     }
 
     public void powerOn() {
@@ -195,12 +184,19 @@ public class Board {
     }
 
     private void loadProgram(){
-        final byte[] data = programSupplier.get();
+        //TODO: rewrite loading procedure as copying from ROM into RAM (all: bootloader, boot-128, program from tape)
 
         SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
         programMemory.setStrict(false); //disable RO mode
-        program.setBytes(USHORT_0, data, data.length);
-        programMemory.setSplit(data.length);
+
+        int sourceAddr = uint(STORAGE_ROM_START);
+        for (int addr = 0; addr < PROGRAM_SIZE; ++addr) {
+            byte b = mmu.getByte(ushort(sourceAddr));
+            program.setByte(ushort(addr), b);
+            ++sourceAddr;
+        }
+
+        //programMemory.setSplit(data.length); //TODO: reactivate split, get program size from packet?
         programMemory.setStrict(config::isEnforceMemoryRoRwState);
     }
 
@@ -287,6 +283,7 @@ public class Board {
         return storagePort;
     }
 
+    //TODO: maybe use cpu state register?
     public boolean isRunning() {
         return cycleHandle != null;
     }

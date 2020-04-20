@@ -3,12 +3,12 @@
  *
  * (All rights reserved under Pan-American Copyright Convention)
  */
-package net.novaware.chip8.core.memory;
+package net.novaware.chip8.core.storage;
 
 /**
  * Operating system of COSMAC VIP-311. Includes font
  */
-public interface VipOs {
+interface VipOs {
     int MEMORY_START = 0x8000;
     int FONT_START = 0x8110;
 

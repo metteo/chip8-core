@@ -1,11 +1,20 @@
 package net.novaware.chip8.core.port;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public interface StoragePort extends InputPort, OutputPort {
+public interface StoragePort extends InputPort {
 
-    void attachSource(Supplier<byte[]> source);
+    interface Packet {
 
-    void attachDestination(Consumer<byte[]> callback);
+        int getSize();
+
+        byte getByte(short address);
+    }
+
+    void connect(Supplier<Packet> source);
+
+    /**
+     * Disconnect any previously connected data source.
+     */
+    void disconnect();
 }

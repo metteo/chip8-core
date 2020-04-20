@@ -5,6 +5,7 @@ import dagger.Provides;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.cpu.register.TribbleRegister;
+import net.novaware.chip8.core.port.impl.StorageMemory;
 import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
@@ -54,13 +55,18 @@ public class MemoryModule {
     public static final short  DISPLAY_IO_END          = 0x0FFF;
     public static final int    DISPLAY_IO_SIZE         = 256;
 
+    public static final String STORAGE_ROM             = "storageRom";
+    public static final short  STORAGE_ROM_START       = (short) 0x4000;
+    public static final short  STORAGE_ROM_END         = (short) 0x4FFF;
+    public static final int    STORAGE_ROM_SIZE        = 4096;
+
     public static final String OS_ROM                  = "osRom";
     public static final short  OS_ROM_START            = (short) 0x8000;
     public static final short  OS_ROM_END              = (short) 0x81FF;
     public static final int    OS_ROM_SIZE             = 512;
 
     public static final String RAM                     = "ram";
-    public static final String ROM                     = "rom";
+    //public static final String ROM                     = "rom";
 
     public static final String MMU                     = "mmu";
 
@@ -126,9 +132,10 @@ public class MemoryModule {
 
     @Provides
     @BoardScope
-    @Named(ROM)
-    static Memory provideRom(@Named(OS_ROM) final Memory osRom) {
-        return osRom;
+    @Named(STORAGE_ROM)
+    static Memory provideStorageRom() {
+        final StorageMemory storageRom = new StorageMemory("Storage ROM", STORAGE_ROM_SIZE);
+        return storageRom;
     }
 
     @Provides
@@ -158,12 +165,15 @@ public class MemoryModule {
     @Named(MMU)
     static Memory provideMmu(
             @Named(RAM) final Memory ram,
-            @Named(ROM) final Memory rom
+            @Named(OS_ROM) final Memory osRom,
+            @Named(STORAGE_ROM) final Memory storageRom
     ) {
         List<MappedMemory.Entry> entries = new ArrayList<>();
         entries.add(new MappedMemory.Entry(BOOTLOADER_ROM_START, DISPLAY_IO_END, ram));
-        entries.add(new MappedMemory.Entry(ushort(0x1000), ushort(0x7FFF), new UnusedMemory(0x7000)));
-        entries.add(new MappedMemory.Entry(OS_ROM_START, OS_ROM_END, rom));
+        entries.add(new MappedMemory.Entry(ushort(0x1000), ushort(0x3FFF), new UnusedMemory(0x3000)));
+        entries.add(new MappedMemory.Entry(STORAGE_ROM_START, STORAGE_ROM_END, storageRom));
+        entries.add(new MappedMemory.Entry(ushort(0x5000), ushort(0x7FFF), new UnusedMemory(0x3000)));
+        entries.add(new MappedMemory.Entry(OS_ROM_START, OS_ROM_END, osRom));
 
         return new MappedMemory("MMU", entries);
     }

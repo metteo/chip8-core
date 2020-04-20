@@ -5,10 +5,12 @@ import net.novaware.chip8.core.config.CoreConfig
 import net.novaware.chip8.core.config.MutableConfig
 import net.novaware.chip8.core.port.DisplayPort
 import net.novaware.chip8.core.port.KeyPort
+import net.novaware.chip8.core.port.StoragePort
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
 import static net.novaware.chip8.core.BoardFactory.newBoardFactory
+import static net.novaware.chip8.core.util.UnsignedUtil.uint
 
 /**
  * Component Test for {@link Board}
@@ -46,12 +48,24 @@ class BoardCT extends Specification {
 
         def factory = newBoardFactory(config, clock, new Random().&nextInt)
 
-        byte[] infiniteLoop = [0x12, 0x00] //jump to 0x200
+        def data = [0x12, 0x00] //jump to 0x200
+
+        def infiniteLoop = new StoragePort.Packet() {
+            @Override
+            int getSize() {
+                return data.size()
+            }
+
+            @Override
+            byte getByte(short address) {
+                return data[uint(address)]
+            }
+        }
 
         when:
         def board = factory.newBoard()
 
-        board.getStoragePort().attachSource({-> infiniteLoop})
+        board.getStoragePort().connect({-> infiniteLoop})
         board.getKeyPort().connect({p -> println "key output: " + p.isKeyUsed(0x1 as byte)}).accept(inputPacket)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
@@ -75,12 +89,24 @@ class BoardCT extends Specification {
         def clock = new ClockGeneratorJvmImpl("Test");
         def factory = newBoardFactory(config, clock, new Random().&nextInt)
 
-        byte[] infiniteLoop = [0x00, 0x11] //exit with 1
+        byte[] data = [0x00, 0x11] //exit with 1
+
+        def mls011 = new StoragePort.Packet() {
+            @Override
+            int getSize() {
+                return data.size()
+            }
+
+            @Override
+            byte getByte(short address) {
+                return data[uint(address)]
+            }
+        }
 
         when:
         def board = factory.newBoard()
 
-        board.getStoragePort().attachSource({-> infiniteLoop})
+        board.getStoragePort().connect({-> mls011})
         board.getKeyPort().connect({p -> println "key output: " + p.isKeyUsed(0x1 as byte)}).accept(inputPacket)
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})

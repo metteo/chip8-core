@@ -21,7 +21,7 @@
  * This software may be distributed on CD-ROM, diskette, tape or free server
  * ONLY if you agree with this entire section.
  */
-package net.novaware.chip8.core.memory;
+package net.novaware.chip8.core.storage;
 
 /**
  * Memory editing app loaded by CHIP8 Emulator if no other ROM was provided.
