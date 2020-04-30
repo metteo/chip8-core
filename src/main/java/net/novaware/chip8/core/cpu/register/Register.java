@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.cpu.register;
 
+import net.novaware.chip8.core.util.PubSub;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -15,10 +16,17 @@ public abstract class Register<T extends Register<?>> {
 
     private final String name;
 
-    private @Nullable Consumer<T> callback;
+    protected PubSub<T> pubSub;
 
     protected Register(String name) {
+        this(name, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Register(String name, boolean preventRecursivePublish) {
         this.name = name;
+
+        pubSub = new PubSub<>((T) this, preventRecursivePublish);
     }
 
     public String getName() {
@@ -27,23 +35,15 @@ public abstract class Register<T extends Register<?>> {
 
     /**
      * Will be called after register value change.
-     * @param callback
+     * @param subscriber
      */
-    public void setCallback(@Nullable Consumer<T> callback) {
-        String setOrUpdate = this.callback != null ? "Updating" : "Setting";
-        LOG.info(() -> setOrUpdate + " " + name + " callback");
-
-        this.callback = callback;
-    }
-
-    public boolean hasCallback() {
-        return callback != null;
-    }
-
-    @SuppressWarnings("unchecked")
-    void fireCallback() {
-        if (callback != null) {
-            callback.accept((T) this);
+    public void subscribe(@Nullable Consumer<T> subscriber) {
+        if (subscriber == null) {
+            return; // ignore null
         }
+
+        LOG.info(() -> "Subscribing to " + name + " register events");
+
+        this.pubSub.subscribe(subscriber);
     }
 }

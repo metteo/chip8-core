@@ -10,7 +10,7 @@ class TribbleRegisterSpec extends Specification {
         given:
         Register<TribbleRegister> reportedRegister = null
 
-        register.setCallback({ r -> reportedRegister = r})
+        register.subscribe({ r -> reportedRegister = r})
 
         when:
         register.increment(1)
@@ -23,7 +23,7 @@ class TribbleRegisterSpec extends Specification {
 
     def "should ignore null callback"() {
         given:
-        register.setCallback(null)
+        register.subscribe(null)
 
         when:
         register.increment(1)

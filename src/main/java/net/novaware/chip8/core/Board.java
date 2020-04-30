@@ -107,6 +107,7 @@ public class Board {
         this.clock = clock;
         this.cpu = cpu;
 
+        //TODO: inject those
         primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
         audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
@@ -160,7 +161,7 @@ public class Board {
 
         cpu.initialize();
 
-        registers.getOutput().setCallback(out -> {
+        registers.getOutput().subscribe(out -> {
             int output = out.getAsInt();
 
             if (output == 0x11) {
@@ -170,7 +171,7 @@ public class Board {
             }
         });
 
-        registers.getGraphicChange().setCallback(gcr -> {
+        registers.getGraphicChange().subscribe(gcr -> {
             if (gcr.getAsInt() == GC_IDLE) { return; } // prevent recursive loop
             primaryDisplayPort.onGraphicChange();
             secondaryDisplayPort.onGraphicChange();

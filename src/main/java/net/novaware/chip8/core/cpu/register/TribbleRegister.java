@@ -43,7 +43,7 @@ public class TribbleRegister extends Register<TribbleRegister> {
             this.data = data;
         }
 
-        fireCallback();
+        pubSub.publish();
     }
 
     public void set(int data) {

@@ -80,7 +80,7 @@ public class DisplayPortImpl implements DisplayPort {
      * clear the register afterwards
      */
     public void attachToRegister(){
-        this.graphicChange.setCallback(gc -> onGraphicChange());
+        this.graphicChange.subscribe(gc -> onGraphicChange());
         attachedToRegister = true;
     }
 

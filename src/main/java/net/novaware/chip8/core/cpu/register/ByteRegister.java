@@ -14,6 +14,10 @@ public class ByteRegister extends Register<ByteRegister> {
         super(name);
     }
 
+    public ByteRegister(String name, boolean preventRecursivePublish) {
+        super(name, preventRecursivePublish);
+    }
+
     public byte get() {
         return data;
     }
@@ -25,7 +29,7 @@ public class ByteRegister extends Register<ByteRegister> {
     public void set(byte data) {
         this.data = data;
 
-        fireCallback();
+        pubSub.publish();
     }
 
     public void set(short data) {

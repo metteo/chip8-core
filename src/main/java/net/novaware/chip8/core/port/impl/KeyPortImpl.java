@@ -62,7 +62,7 @@ public class KeyPortImpl implements KeyPort {
     }
 
     public void attachToRegister() {
-        inputCheck.setCallback(ic -> onInputCheck());
+        inputCheck.subscribe(ic -> onInputCheck());
     }
 
     private void onInputCheck() {

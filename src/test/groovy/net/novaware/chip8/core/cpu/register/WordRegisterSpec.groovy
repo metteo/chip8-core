@@ -10,7 +10,7 @@ class WordRegisterSpec extends Specification {
         given:
         Register<WordRegister> reportedRegister = null
 
-        register.setCallback({ r -> reportedRegister = r})
+        register.subscribe({ r -> reportedRegister = r})
 
         when:
         register.set(1)
@@ -23,7 +23,7 @@ class WordRegisterSpec extends Specification {
 
     def "should ignore null callback"() {
         given:
-        register.setCallback(null)
+        register.subscribe(null)
 
         when:
         register.set(1)

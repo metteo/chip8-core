@@ -20,8 +20,8 @@ class KeyPortImplSpec extends Specification {
         instance.attachToRegister()
 
         then:
-        !inputRegister.hasCallback()
-        inputCheckReg.hasCallback()
+        inputRegister.pubSub.subscribers.isEmpty()
+        !inputCheckReg.pubSub.subscribers.isEmpty()
     }
 
     def "should allow connection, receive input and disconnect"() {

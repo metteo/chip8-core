@@ -32,5 +32,9 @@ class ImmutableConfigSpec extends Specification {
             !isEnforceMemoryRoRwState()
             !isTrimVarForFont()
         }
+
+        !instance.toString().isEmpty()
+        instance.hashCode() == instance.hashCode() //stable hashcode
+        instance.equals(instance) //reflexive equals
     }
 }

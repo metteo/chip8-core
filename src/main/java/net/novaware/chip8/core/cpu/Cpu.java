@@ -113,7 +113,7 @@ public class Cpu implements Unit {
         soundTimer.initialize();
 
         //unhalt / start clock after input change
-        registers.getInput().setCallback(in -> {
+        registers.getInput().subscribe(in -> {
             powerMgmt.cont();
             powerMgmt.startClock();
         });

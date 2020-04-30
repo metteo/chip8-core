@@ -26,7 +26,7 @@ public class AudioPortImpl implements AudioPort {
     }
 
     public void attachToRegister() {
-        soundOn.setCallback(so -> {
+        soundOn.subscribe(so -> {
             maybeCallReceiver();
         });
     }

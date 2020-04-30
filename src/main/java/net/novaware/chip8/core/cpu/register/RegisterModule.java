@@ -129,7 +129,8 @@ public class RegisterModule {
     @BoardScope
     @Named(GRAPHIC_CHANGE)
     static ByteRegister provideGraphicChange() {
-        return new ByteRegister("GC");
+        // GC register recursion is controlled by display related code
+        return new ByteRegister("GC", false);
     }
 
     @Provides

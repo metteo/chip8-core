@@ -13,7 +13,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.*
 
 class DisplayPortImplSpec extends Specification {
 
-    ByteRegister graphicChange = new ByteRegister("GC")
+    ByteRegister graphicChange = new ByteRegister("GC", false)
     Memory displayIo = new PhysicalMemory("Display IO", MemoryModule.DISPLAY_IO_SIZE)
 
     def instance = new DisplayPortImpl(graphicChange, displayIo)

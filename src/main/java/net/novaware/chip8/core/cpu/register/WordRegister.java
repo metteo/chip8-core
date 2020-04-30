@@ -25,7 +25,7 @@ public class WordRegister extends Register<WordRegister> {
     public void set(short data) {
         this.data = data;
 
-        fireCallback();
+        pubSub.publish();
     }
 
     public void set(int data) {

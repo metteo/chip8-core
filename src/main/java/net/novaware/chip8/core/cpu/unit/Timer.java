@@ -68,7 +68,7 @@ public class Timer implements Unit {
 
     private void configureOutput(final ByteRegister register) {
         LOG.debug(() -> "Will report values higher than 1 to " + register.getName());
-        timerRegister.setCallback(r -> {
+        timerRegister.subscribe(r -> {
             final int timer = timerRegister.getAsInt();
             final int state = register.getAsInt();
 
