@@ -1,6 +1,7 @@
 package net.novaware.chip8.core.port.impl;
 
 import net.novaware.chip8.core.port.StoragePort;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.function.Supplier;
 
@@ -10,7 +11,7 @@ public class StoragePortImpl implements StoragePort {
 
     private final StorageMemory storageMemory;
 
-    private Supplier<Packet> packetSupplier;
+    private @Nullable Supplier<Packet> packetSupplier;
 
     public StoragePortImpl(StorageMemory storageMemory) {
         this.storageMemory = storageMemory;
@@ -34,7 +35,7 @@ public class StoragePortImpl implements StoragePort {
         storageMemory.setPacket(null);
     }
 
-    public Supplier<Packet> getPacketSupplier() {
+    public @Nullable Supplier<Packet> getPacketSupplier() {
         return packetSupplier;
     }
 }

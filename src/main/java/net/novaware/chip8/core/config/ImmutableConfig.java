@@ -6,7 +6,10 @@ import com.google.auto.value.AutoValue;
 public abstract class ImmutableConfig implements CoreConfig {
 
     static ImmutableConfig.Builder builder() {
+        /* TODO: fix autovalue apt config in pom
         return new AutoValue_ImmutableConfig.Builder();
+        */
+        throw new UnsupportedOperationException("broken");
     }
 
     @AutoValue.Builder
