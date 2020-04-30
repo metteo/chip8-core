@@ -167,7 +167,7 @@ public class Board {
             if (output == 0x11) {
                 LOG.error("CPU stopped abruptly at " + toHexString(registers.getMemoryAddress().get()));
                 powerOff0(false);
-                //TODO: report this somehow outside (exception handler, outputport?)
+                //TODO: report exit code somehow outside (exception handler, outputport?)
             }
         });
 
