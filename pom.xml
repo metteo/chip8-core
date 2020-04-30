@@ -28,6 +28,7 @@
                     <compilerArguments>
                         <Xmaxerrs>10000</Xmaxerrs>
                         <Xmaxwarns>10000</Xmaxwarns>
+                        <Xpkginfo:always/><!-- prevent recompile -->
                     </compilerArguments>
                     <annotationProcessorPaths>
 <!--                        TODO: checker 3.2 is incompatible with auto value 1.7, disable for now-->
