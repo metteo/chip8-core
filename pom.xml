@@ -122,6 +122,7 @@
                         <include>**/*Spec.class</include>
                     </includes>
                     <argLine> <!-- TODO: Report here: https://issues.apache.org/jira/browse/SUREFIRE-1262  -->
+                        @{argLine}
                         ${jpms.opens}=ALL-UNNAMED
                         ${jpms.opens}.clock=ALL-UNNAMED
                         ${jpms.opens}.config=ALL-UNNAMED
@@ -169,6 +170,58 @@
                             <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
+                <executions>
+                    <execution>
+                        <id>jacoco-unit</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-it</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-merge</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>merge</goal>
+                        </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco-all.exec</destFile>
+                            <fileSets>
+                                <fileSet>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.exec</include>
+                                    </includes>
+                                </fileSet>
+                            </fileSets>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco-all.exec</dataFile>
+                            <excludes>
+                                <exclude>**/AutoValue_*.class</exclude>
+                                <!-- TODO: include more dagger2 generated classes -->
+                                <exclude>**/*Module_*Factory.class</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
