@@ -38,14 +38,30 @@ public class Board {
     private static final Logger LOG = LogManager.getLogger();
 
     public interface Config {
+
+        /**
+         * If true, program ROM in RAM is checked for writes to prevent self modification
+         */
         boolean isEnforceMemoryRoRwState();
 
+        /**
+         * Defaults to 60 Hz
+         */
         int getDelayTimerFrequency();
 
+        /**
+         * Defaults to 60 Hz
+         */
         int getSoundTimerFrequency();
 
+        /**
+         * Defaults to 60 Hz
+         */
         int getRenderTimerFrequency();
 
+        /**
+         * Defaults to 500 Hz
+         */
         int getCpuFrequency();
     }
 

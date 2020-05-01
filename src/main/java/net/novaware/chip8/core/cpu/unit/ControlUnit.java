@@ -30,9 +30,19 @@ public class ControlUnit implements Unit {
 
     public interface Config {
 
+        /**
+         * If true, uses Y instead of X as source during shifting
+         */
         boolean isLegacyShift();
+
+        /**
+         * If true, increments I during load and store operations
+         */
         boolean isLegacyLoadStore();
 
+        /**
+         * If true, adding register value to index that causes overflow is reported using VF
+         */
         boolean isLegacyAddressSum();
 
     }

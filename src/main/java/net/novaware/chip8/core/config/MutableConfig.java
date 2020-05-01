@@ -1,120 +1,108 @@
 package net.novaware.chip8.core.config;
 
-//TODO: @ThreadSafe
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
+//TODO: @ThreadSafe here
+//TODO: allow semi-dynamic changes of frequencies (adjust clocks on change)
 public class MutableConfig implements CoreConfig {
 
-    private int cpuFrequency = 500; // Hz
+    private final AtomicInteger cpuFrequency = new AtomicInteger(500); // Hz
 
-    private int delayTimerFrequency = 60; // Hz
+    private final AtomicInteger delayTimerFrequency = new AtomicInteger(60); // Hz
 
-    private int soundTimerFrequency = 60; // Hz
+    private final AtomicInteger soundTimerFrequency = new AtomicInteger(60); // Hz
 
-    private int renderTimerFrequency = 60; // Hz
+    private final AtomicInteger renderTimerFrequency = new AtomicInteger(60); // Hz
 
-    private boolean strictMode = true;
+    private AtomicBoolean enforceMemoryRoRwState = new AtomicBoolean(true); //strict
 
-    private boolean enforceMemoryRoRwState = true; //strict
+    private AtomicBoolean legacyShift = new AtomicBoolean(true);
 
-    private boolean enforceStackSize; //strict
+    private AtomicBoolean legacyLoadStore = new AtomicBoolean(true);
 
-    // e.g. can't write to stack and gpu in the same call
-    private boolean disallowCrossingMemoryBoundaries; //strict
+    private AtomicBoolean legacyAddressSum = new AtomicBoolean(true);
 
-    private boolean legacyMode = true;
+    private AtomicBoolean trimVarForFont = new AtomicBoolean(true);
 
-    /**
-     * If true, uses Y instead of X during as source during shifting
-     */
-    private boolean legacyShift = true;
-
-    /**
-     * If true, increments I during load and store operations
-     */
-    private boolean legacyLoadStore = true;
-
-    /**
-     * If true, adding register value to index that causes overflow is reported using VF
-     */
-    private boolean legacyAddressSum = true;
-
-    private boolean trimVarForFont = true;
-
-    private boolean haltOnInfJump;
-
-    private boolean stickyKeys;
-
-    private boolean tracing;
-
-    private boolean logging; // ??
-
-    private boolean debugging; // ??
-
-    public boolean isEnforceMemoryRoRwState() {
-        return enforceMemoryRoRwState;
-    }
-
-    public void setEnforceMemoryRoRwState(boolean enforceMemoryRoRwState) {
-        this.enforceMemoryRoRwState = enforceMemoryRoRwState;
-    }
-
+    @Override
     public int getCpuFrequency() {
-        return cpuFrequency;
+        return cpuFrequency.get();
     }
 
-    public void setCpuFrequency(int cpuFrequency) {
-        this.cpuFrequency = cpuFrequency;
-    }
-
+    @Override
     public int getDelayTimerFrequency() {
-        return delayTimerFrequency;
+        return delayTimerFrequency.get();
     }
 
-    public void setDelayTimerFrequency(int delayTimerFrequency) {
-        this.delayTimerFrequency = delayTimerFrequency;
-    }
-
+    @Override
     public int getSoundTimerFrequency() {
-        return soundTimerFrequency;
+        return soundTimerFrequency.get();
     }
 
-    public void setSoundTimerFrequency(int soundTimerFrequency) {
-        this.soundTimerFrequency = soundTimerFrequency;
-    }
-
+    @Override
     public int getRenderTimerFrequency() {
-        return renderTimerFrequency;
+        return renderTimerFrequency.get();
     }
 
-    public void setRenderTimerFrequency(int renderTimerFrequency) {
-        this.renderTimerFrequency = renderTimerFrequency;
+    @Override
+    public boolean isEnforceMemoryRoRwState() {
+        return enforceMemoryRoRwState.get();
     }
 
+    @Override
     public boolean isLegacyShift() {
-        return legacyShift;
+        return legacyShift.get();
     }
 
-    public void setLegacyShift(boolean legacyShift) {
-        this.legacyShift = legacyShift;
-    }
-
+    @Override
     public boolean isLegacyLoadStore() {
-        return legacyLoadStore;
+        return legacyLoadStore.get();
     }
 
-    public void setLegacyLoadStore(boolean legacyLoadStore) {
-        this.legacyLoadStore = legacyLoadStore;
-    }
-
+    @Override
     public boolean isLegacyAddressSum() {
-        return legacyAddressSum;
-    }
-
-    public void setLegacyAddressSum(boolean legacyAddressSum) {
-        this.legacyAddressSum = legacyAddressSum;
+        return legacyAddressSum.get();
     }
 
     @Override
     public boolean isTrimVarForFont() {
-        return trimVarForFont;
+        return trimVarForFont.get();
+    }
+
+    public void setCpuFrequency(int cpuFrequency) {
+        this.cpuFrequency.set(cpuFrequency);
+    }
+
+    public void setDelayTimerFrequency(int delayTimerFrequency) {
+        this.delayTimerFrequency.set(delayTimerFrequency);
+    }
+
+    public void setSoundTimerFrequency(int soundTimerFrequency) {
+        this.soundTimerFrequency.set(soundTimerFrequency);
+    }
+
+    public void setRenderTimerFrequency(int renderTimerFrequency) {
+        this.renderTimerFrequency.set(renderTimerFrequency);
+    }
+
+    public void setEnforceMemoryRoRwState(boolean enforceMemoryRoRwState) {
+        this.enforceMemoryRoRwState.set(enforceMemoryRoRwState);
+    }
+
+    public void setLegacyShift(boolean legacyShift) {
+        this.legacyShift.set(legacyShift);
+    }
+
+    public void setLegacyLoadStore(boolean legacyLoadStore) {
+        this.legacyLoadStore.set(legacyLoadStore);
+    }
+
+    public void setLegacyAddressSum(boolean legacyAddressSum) {
+        this.legacyAddressSum.set(legacyAddressSum);
+    }
+
+    public void setTrimVarForFont(boolean trimVarForFont) {
+        this.trimVarForFont.set(trimVarForFont);
     }
 }
