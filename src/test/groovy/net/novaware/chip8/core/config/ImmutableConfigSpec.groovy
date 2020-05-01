@@ -1,11 +1,9 @@
 package net.novaware.chip8.core.config
 
-import spock.lang.Ignore
 import spock.lang.Specification
 
 class ImmutableConfigSpec extends Specification {
 
-    @Ignore("until auto value apt setup is fixed")
     def "should construct proper instance"() {
         given:
 
