@@ -16,6 +16,4 @@ module net.novaware.chip8.core {
     exports net.novaware.chip8.core.util;
 
     uses net.novaware.chip8.core.clock.ClockGenerator;
-
-    exports net.novaware.chip8.core.gpu;
 }
