@@ -17,6 +17,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
  * X, Y - indices of V registers (VX, VY)
  *
  * NOTE: Every instruction instance name starts with capital 'O', not '0' because of Java syntax rules
+ * NOTE: legacy - original COSMAC VIP interpreter, modern - post CHIP48/SCHIP era
  *
  * @see <a href="http://devernay.free.fr/hacks/chip8/C8TECH10.HTM">Cowgod's Chip-8 Tech Ref v1.0</a>
  * @see <a href="http://mattmik.com/files/chip8/mastering/chip8.html">Mastering Chip-8 by mattmik</a>
@@ -161,8 +162,8 @@ public enum InstructionType {
 
     /**
      * 8xy6 - SHR Vx {, Vy}
-     * <br>Set Vx = Vx SHR 1. (legacy e.g. INVADERS)
-     * <br>Set Vx = Vy SHR 1. (modern e.g. TANK)
+     * <br>Set Vx = Vx SHR 1. (modern e.g. INVADERS)
+     * <br>Set Vx = Vy SHR 1. (legacy e.g. TANK)
      * <br>
      * <br>If the least-significant bit of Vx {Vy} is 1, then VF is set to 1, otherwise 0. Then Vx {Vy} is divided by 2.
      *
@@ -181,8 +182,8 @@ public enum InstructionType {
 
     /**
      * 8xyE - SHL Vx {, Vy}
-     * <br>Set Vx = Vx SHL 1. (legacy)
-     * <br>Set Vx = Vy SHL 1. (modern)
+     * <br>Set Vx = Vx SHL 1. (modern)
+     * <br>Set Vx = Vy SHL 1. (legacy)
      * <br>
      * <br>If the most-significant bit of Vx {Vy} is 1, then VF is set to 1, otherwise to 0. Then Vx {Vy} is multiplied by 2.
      *
@@ -286,6 +287,8 @@ public enum InstructionType {
      * NOTE: If the operation results in an overflow carry=1 otherwise 0
      *      (quirk for Spacefight 2091!, legacy applications didn't use it)
      *
+     * overflow doesn't touch VF (legacy)
+     * overflow affects VF (modern)
      */
     OxFX1E (0xF01E, OxF0FF.value()),
 
@@ -313,7 +316,7 @@ public enum InstructionType {
      *
      * The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
      *
-     * NOTE: legacy systems assume I is untouched, modern games expect I to be incremented.
+     * NOTE: modern systems assume I is untouched, legacy games expect I to be incremented.
      *
      * @see <a href="https://www.reddit.com/r/EmuDev/comments/8cbvz6/chip8_8xy6/" >Reddit - EmuDev - chip8 8xy6</a>
      * @see <a href="https://github.com/JohnEarnest/Octo/blob/gh-pages/docs/SuperChip.md#compatibility" >SCHIP - compatibility</a>
@@ -326,7 +329,7 @@ public enum InstructionType {
      *
      * The interpreter reads values from memory starting at location I into registers V0 through Vx.
      *
-     * NOTE: legacy systems assume I is untouched, modern games expect I to be incremented.
+     * NOTE: modern systems assume I is untouched, legacy games expect I to be incremented.
      *
      * @see InstructionType#OxFX55
      */

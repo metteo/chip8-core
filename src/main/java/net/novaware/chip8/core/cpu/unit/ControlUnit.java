@@ -41,7 +41,7 @@ public class ControlUnit implements Unit {
         boolean isLegacyLoadStore();
 
         /**
-         * If true, adding register value to index that causes overflow is reported using VF
+         * If true, adding register value to index that causes overflow is NOT reported using VF
          */
         boolean isLegacyAddressSum();
 
@@ -174,7 +174,7 @@ public class ControlUnit implements Unit {
 
         final boolean useY = config.isLegacyShift();
         final boolean incrementI = config.isLegacyLoadStore();
-        final boolean overflowI = config.isLegacyAddressSum();
+        final boolean overflowI = !config.isLegacyAddressSum();
 
         //FIXME: ugly, but compact, figure out how to make it nicer, but still compact and fast
 

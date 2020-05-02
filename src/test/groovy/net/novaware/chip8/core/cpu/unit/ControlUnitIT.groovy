@@ -148,7 +148,7 @@ class ControlUnitIT extends Specification {
 
     def "should increment register I with value of register X (no carry)"() {
         given:
-        config.isLegacyAddressSum() >> overflowI
+        config.isLegacyAddressSum() >> !overflowI
 
         registers.getIndex().set(0x0123)
         registers.getVariable(4).set(0xEE as byte)
@@ -164,10 +164,8 @@ class ControlUnitIT extends Specification {
         registers.getIndex().get() == 0x0211 as short
         registers.getProgramCounter().get() == 0x0 as short
 
-        if (overflowI) {
-            registers.getStatus().getAsInt() == 0x00
-            registers.getStatusType().get() == RegisterFile.VF_CARRY_I
-        }
+        registers.getStatus().getAsInt() == 0
+        registers.getStatusType().get() == (overflowI ? RegisterFile.VF_CARRY_I : 0 as byte)
 
         where:
         overflowI << [true, false]
@@ -175,7 +173,7 @@ class ControlUnitIT extends Specification {
 
     def "should increment register I with value of register X (carry)"() {
         given:
-        config.isLegacyAddressSum() >> overflowI
+        config.isLegacyAddressSum() >> !overflowI
 
         registers.getIndex().set(0xFFF9)
         registers.getVariable(4).set(0xEE as byte)
@@ -191,10 +189,8 @@ class ControlUnitIT extends Specification {
         registers.getIndex().get() == 0x0E7 as short
         registers.getProgramCounter().get() == 0x0 as short
 
-        if (overflowI) {
-            registers.getStatus().getAsInt() == 0x01
-            registers.getStatusType().get() == RegisterFile.VF_CARRY_I
-        }
+        registers.getStatus().getAsInt() == (overflowI ? 0x01 : 0)
+        registers.getStatusType().get() == (overflowI ? RegisterFile.VF_CARRY_I : 0 as byte)
 
         where:
         overflowI << [true, false]
