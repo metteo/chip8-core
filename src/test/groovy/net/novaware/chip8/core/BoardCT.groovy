@@ -3,6 +3,7 @@ package net.novaware.chip8.core
 import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
 import net.novaware.chip8.core.config.CoreConfig
 import net.novaware.chip8.core.config.MutableConfig
+import net.novaware.chip8.core.cpu.CpuState
 import net.novaware.chip8.core.port.DisplayPort
 import net.novaware.chip8.core.port.KeyPort
 import net.novaware.chip8.core.port.StoragePort
@@ -70,15 +71,13 @@ class BoardCT extends Specification {
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
-        board.initialize()
-
-        board.runOnScheduler(64)
+        board.powerOn0()
 
         then:
         noExceptionThrown()
 
         conditions.eventually {
-            assert !board.isRunning()
+            assert board.cpu.registers.cpuState.getAsInt() == CpuState.STOP_CLOCK.value()
         }
     }
 
@@ -111,15 +110,13 @@ class BoardCT extends Specification {
         board.getAudioPort().connect({ p -> println "sound on: " + p.isSoundOn()})
         board.getDisplayPort(DisplayPort.Type.PRIMARY).connect({ packet -> /* noop */})
 
-        board.initialize()
-
-        board.runOnScheduler(256)
+        board.powerOn0()
 
         then:
         noExceptionThrown()
 
         conditions.eventually {
-            assert !board.isRunning()
+            assert board.cpu.registers.cpuState.getAsInt() == CpuState.SLEEP.value()
             assert board.cpu.registers.output.getAsInt() == 0x11
         }
     }

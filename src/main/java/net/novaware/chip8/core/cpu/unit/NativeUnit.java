@@ -49,10 +49,11 @@ public class NativeUnit implements Unit {
                 gpu.scrollUp(ushort(6));
                 break;
             case 0x001:
-                //TODO: figure out what it did and fix Boot-128 after 0x20E
+                //TODO: clear some registers / memory, used by Boot-128
                 break;
             case 0x010:
             case 0x011:
+                //TODO: document these mls as exit 0/1 routines
                 output.set(address);
                 powerMgmt.sleep();
                 break;

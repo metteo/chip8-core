@@ -8,6 +8,7 @@ import net.novaware.chip8.core.config.CoreConfig;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
 import net.novaware.chip8.core.cpu.unit.UnitModule;
 import net.novaware.chip8.core.memory.MemoryModule;
+import net.novaware.chip8.core.port.impl.PortModule;
 import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
@@ -20,6 +21,7 @@ import static net.novaware.chip8.core.cpu.unit.UnitModule.RANDOM;
         RegisterModule.class,
         MemoryModule.class,
         UnitModule.class,
+        PortModule.class,
         ConfigModule.class
 })
 public abstract class BoardFactory {

@@ -1,6 +1,7 @@
 package net.novaware.chip8.core;
 
 import net.novaware.chip8.core.clock.ClockGenerator;
+import net.novaware.chip8.core.clock.ClockGenerator.Handle;
 import net.novaware.chip8.core.cpu.Cpu;
 import net.novaware.chip8.core.cpu.register.RegisterFile;
 import net.novaware.chip8.core.memory.Memory;
@@ -11,27 +12,32 @@ import net.novaware.chip8.core.port.AudioPort;
 import net.novaware.chip8.core.port.DisplayPort;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.port.StoragePort;
-import net.novaware.chip8.core.port.impl.*;
+import net.novaware.chip8.core.port.impl.AudioPortImpl;
+import net.novaware.chip8.core.port.impl.DisplayPortImpl;
+import net.novaware.chip8.core.port.impl.KeyPortImpl;
+import net.novaware.chip8.core.port.impl.StoragePortImpl;
 import net.novaware.chip8.core.storage.Bootloader;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
 import static net.novaware.chip8.core.memory.MemoryModule.*;
+import static net.novaware.chip8.core.port.impl.PortModule.PRIMARY;
+import static net.novaware.chip8.core.port.impl.PortModule.SECONDARY;
 import static net.novaware.chip8.core.util.HexUtil.toHexString;
-import static net.novaware.chip8.core.util.UnsignedUtil.*;
+import static net.novaware.chip8.core.util.UnsignedUtil.uint;
+import static net.novaware.chip8.core.util.UnsignedUtil.ushort;
 
-//TODO: public methods should schedule commands to clock generator
-//TODO: don't forget to handle exceptions in the Future
 @BoardScope
 public class Board {
 
@@ -78,89 +84,69 @@ public class Board {
     private ClockGenerator clock;
 
     @Used
-    private final Memory displayIo;
-
-    @Used
     private final Memory bootloaderRom;
 
     @Used
     private final Memory program;
 
-    //TODO: class for managing handles
+    @Owned
+    private final List<Handle> clockHandles = new ArrayList<>();
 
-    private volatile ClockGenerator.@Nullable Handle cycleHandle;
-    private volatile ClockGenerator.@Nullable Handle delayHandle;
-    private volatile ClockGenerator.@Nullable Handle soundHandle;
-    private volatile ClockGenerator.@Nullable Handle renderHandle;
-
+    @Owned
     private DisplayPortImpl primaryDisplayPort;
+
+    @Owned
     private DisplayPortImpl secondaryDisplayPort;
 
+    @Owned
     private AudioPortImpl audioPort;
 
+    @Owned
     private KeyPortImpl keyPort;
 
+    @Owned
     private StoragePortImpl storagePort;
+
+    @Owned
+    private Consumer<Exception> exceptionHandler = e -> LOG.error("Unexpected exception: ", e);
 
     @Inject
     /* package */ Board(
         final Board.Config config,
         @Named(PROGRAM) final Memory program,
         @Named(BOOTLOADER_ROM) final Memory bootloaderRom,
-        @Named(DISPLAY_IO) final Memory displayIo,
-        @Named(STORAGE_ROM) final Memory storageRom,
         @Named(MMU) final Memory mmu,
         final ClockGenerator clock,
-        final Cpu cpu
+        final Cpu cpu,
+
+        @Named(PRIMARY) final DisplayPortImpl primaryDisplayPort,
+        @Named(SECONDARY) final DisplayPortImpl secondaryDisplayPort,
+        final AudioPortImpl audioPort,
+        final KeyPortImpl keyPort,
+        final StoragePortImpl storagePort
     ) {
         this.config = config;
 
         this.program = program;
         this.bootloaderRom = bootloaderRom;
-        this.displayIo = displayIo;
         this.mmu = mmu;
 
         this.clock = clock;
         this.cpu = cpu;
 
-        //TODO: inject those
-        primaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
-        secondaryDisplayPort = new DisplayPortImpl(cpu.getRegisters().getGraphicChange(), displayIo);
-        audioPort = new AudioPortImpl(cpu.getRegisters().getSoundOn());
-        keyPort = new KeyPortImpl(cpu.getRegisters().getInput(), cpu.getRegisters().getInputCheck());
-        storagePort = new StoragePortImpl((StorageMemory) storageRom);
+        this.primaryDisplayPort = primaryDisplayPort;
+        this.secondaryDisplayPort = secondaryDisplayPort;
+        this.audioPort = audioPort;
+        this.keyPort = keyPort;
+        this.storagePort = storagePort;
     }
 
-    public void powerOn() {
+    private void powerOn0() {
         initialize();
-        runOnScheduler(Integer.MAX_VALUE);
+        start();
     }
 
-    private void powerOff0(boolean force) {
-        if (cycleHandle != null) {
-            cycleHandle.cancel(force);
-            cycleHandle = null;
-        }
-
-        if (delayHandle != null) {
-            delayHandle.cancel(force);
-            delayHandle = null;
-        }
-
-        if (soundHandle != null) {
-            soundHandle.cancel(force);
-            soundHandle = null;
-        }
-
-        if (renderHandle != null) {
-            renderHandle.cancel(false);
-            renderHandle = null;
-        }
-
-        clock.shutdown();
-    }
-
-    public void initialize() {
+    private void initialize() {
         LOG.traceEntry();
 
         final RegisterFile registers = cpu.getRegisters();
@@ -201,7 +187,7 @@ public class Board {
     }
 
     private void loadProgram(){
-        //TODO: rewrite loading procedure as copying from ROM into RAM (all: bootloader, boot-128, program from tape)
+        //TODO: rewrite loading procedure as copying from ROM into RAM (all: bootloader, boot-128, program)
 
         SplittableMemory programMemory = (SplittableMemory) program; //TODO: add check
         programMemory.setStrict(false); //disable RO mode
@@ -217,16 +203,8 @@ public class Board {
         programMemory.setStrict(config::isEnforceMemoryRoRwState);
     }
 
-    public void softReset() {
-        clock.schedule(() -> softReset0());
-    }
-
     /* package */ void softReset0() {
         cpu.reset();
-    }
-
-    public void hardReset() {
-        clock.schedule(() -> hardReset0());
     }
 
     /* package */ void hardReset0() {
@@ -235,51 +213,44 @@ public class Board {
         cpu.reset();
     }
 
-    public void runOnScheduler(int maxCycles) {
-        final boolean countCycles = maxCycles != Integer.MAX_VALUE;
-        final AtomicInteger cycles = new AtomicInteger();
+    private void start() {
+        Handle delayHandle = clock.schedule(cpu::delayTick, config.getDelayTimerFrequency());
+        Handle soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
 
-        // TODO: handle threading of handle references xD
-        delayHandle = clock.schedule(cpu::delayTick, config.getDelayTimerFrequency());
-        soundHandle = clock.schedule(cpu::soundTick, config.getSoundTimerFrequency());
-        renderHandle = clock.schedule(() -> {
+        Handle renderHandle = clock.schedule(() -> {
             primaryDisplayPort.tick();
             secondaryDisplayPort.tick();
         }, config.getRenderTimerFrequency());
 
         //TODO: react to cpu state and control the clock properly
-        cycleHandle = clock.schedule(() -> {
+        Handle cycleHandle = clock.schedule(() -> {
             try {
-                //TODO: report exceptions back to Board owner
                 cpu.cycle();
             } catch(Exception e) {
-                LOG.error("Exception during CPU cycle: ", e);
-                clock.shutdown(); //TODO: maybe trigger stop clock instead?
-            }
-
-            if (countCycles) { // bypass counting
-                int currentCycles = cycles.incrementAndGet();
-
-                if (currentCycles >= maxCycles && cycleHandle != null) {
-                    LOG.warn("Reached maxCycles: {}", maxCycles);
-
-                    powerOff0(false);
-                }
+                exceptionHandler.accept(e);
+                cpu.sleep();
             }
         }, config.getCpuFrequency());
+
+        clockHandles.addAll(List.of(cycleHandle, delayHandle, soundHandle, renderHandle));
     }
 
-    public void pause() {
-        clock.schedule(() -> cpu.sleep());
+    private void powerOff0(boolean force) {
+        cpu.sleep();
+
+        clockHandles.stream().forEach(h -> h.cancel(force));
+        clockHandles.clear();
+
+        clock.shutdown();
     }
 
-    public void resume() {
-        clock.schedule(() -> cpu.wakeUp());
+    private void scheduleAndHandle(final Runnable target) {
+        final Handle handle = clock.schedule(target);
+
+        //TODO: handle exceptions in the Futures returned from clock
     }
 
-    public AudioPort getAudioPort() {
-        return audioPort;
-    }
+    // 1. Connect peripherals -------------------------------------------------
 
     public DisplayPort getDisplayPort(final DisplayPort.Type type) {
         requireNonNull(type, "type must not be null");
@@ -292,6 +263,10 @@ public class Board {
         }
     }
 
+    public AudioPort getAudioPort() {
+        return audioPort;
+    }
+
     public KeyPort getKeyPort() {
         return keyPort;
     }
@@ -300,8 +275,47 @@ public class Board {
         return storagePort;
     }
 
-    //TODO: maybe use cpu state register?
-    public boolean isRunning() {
-        return cycleHandle != null;
+    public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
+        scheduleAndHandle(() -> setExceptionHandler0(exceptionHandler));
+    }
+
+    private void setExceptionHandler0(Consumer<Exception> exceptionHandler) {
+        requireNonNull(exceptionHandler, "exceptionHandler must not be null");
+
+        this.exceptionHandler = exceptionHandler;
+    }
+
+    // 2. Power ON ------------------------------------------------------------
+
+    public void powerOn() {
+        scheduleAndHandle(() -> powerOn0());
+    }
+
+    // 3. Pause / Resume when needed ------------------------------------------
+
+    public void pause() {
+        scheduleAndHandle(() -> cpu.sleep());
+    }
+
+    public void resume() {
+        scheduleAndHandle(() -> cpu.wakeUp());
+    }
+
+    // 4. Soft reset to restart the program -----------------------------------
+
+    public void softReset() {
+        scheduleAndHandle(() -> softReset0());
+    }
+
+    // 5. Hard reset to restart the board -------------------------------------
+
+    public void hardReset() {
+        scheduleAndHandle(() -> hardReset0());
+    }
+
+    // 6. Power OFF to finish and cleanup -------------------------------------
+
+    public void powerOff(final boolean force) {
+        scheduleAndHandle(() -> powerOff0(force));
     }
 }

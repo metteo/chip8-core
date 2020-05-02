@@ -148,7 +148,7 @@ public class KeyPortImpl implements KeyPort {
 
         @Override
         public void accept(InputPacket inputPacket) {
-            //TODO: schedule this instead of direct call
+            //FIXME: schedule this instead of direct call
             if (keyPort != null) {
                 keyPort.receive(inputPacket);
             }

@@ -6,7 +6,11 @@ import net.novaware.chip8.core.config.MutableConfig
 import net.novaware.chip8.core.cpu.Cpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.SplittableMemory
+import net.novaware.chip8.core.port.impl.AudioPortImpl
+import net.novaware.chip8.core.port.impl.DisplayPortImpl
+import net.novaware.chip8.core.port.impl.KeyPortImpl
 import net.novaware.chip8.core.port.impl.StorageMemory
+import net.novaware.chip8.core.port.impl.StoragePortImpl
 import spock.lang.Specification
 
 import static net.novaware.chip8.core.cpu.register.RegistersHelper.newRegisters
@@ -29,7 +33,18 @@ class BoardSpec extends Specification {
     void setup() {
         cpu.getRegisters() >> newRegisters()
 
-        instance = new Board(config, program, bootloader, Mock(Memory), storage, mmu, clock, cpu)
+        instance = new Board(config,
+                program,
+                bootloader,
+                mmu,
+                clock,
+                cpu,
+                Mock(DisplayPortImpl),
+                Mock(DisplayPortImpl),
+                Mock(AudioPortImpl),
+                Mock(KeyPortImpl),
+                Mock(StoragePortImpl)
+        )
     }
 
     def "should reset cpu and memory"() {
