@@ -230,7 +230,7 @@ public class Board {
                 exceptionHandler.accept(e);
                 cpu.sleep();
             }
-        }, config.getCpuFrequency());
+        }, config::getCpuFrequency);
 
         clockHandles.addAll(List.of(cycleHandle, delayHandle, soundHandle, renderHandle));
     }

@@ -15,7 +15,7 @@ public class MutableConfig implements CoreConfig {
 
     private final AtomicInteger renderTimerFrequency = new AtomicInteger(60); // Hz
 
-    private AtomicBoolean enforceMemoryRoRwState = new AtomicBoolean(true); //strict
+    private AtomicBoolean enforceMemoryRoRwState = new AtomicBoolean(false); //strict
 
     private AtomicBoolean legacyShift = new AtomicBoolean(true);
 

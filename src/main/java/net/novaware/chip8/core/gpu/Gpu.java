@@ -60,6 +60,8 @@ public class Gpu {
 
     private byte[] resultBuffer;
 
+    //FIXME: separate wrapping / clipping into x & y axis
+    //TODO: BLITZ doesn't like y wrapping, VERS requires y wrapping
     final boolean wrapping = true;
     final boolean clipping = false;
     final boolean dump = true;

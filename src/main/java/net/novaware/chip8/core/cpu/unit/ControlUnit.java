@@ -134,7 +134,7 @@ public class ControlUnit implements Unit {
 
     private void zeroOutRegisters() {
         registers.getMemoryAddress().set(0);
-        registers.getProgramCounter().set(0);
+        registers.getProgramCounter().set(0); //TODO: set it to code segment (0x200 after boot128 soft reset)
         registers.getCurrentInstruction().set(0);
         stream(registers.getDecodedInstruction()).forEach(wr -> wr.set(0));
     }

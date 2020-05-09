@@ -4,7 +4,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.IntSupplier;
 
+//FIXME: check errors from futures!
 public class ClockGeneratorJvmImpl implements ClockGenerator {
 
     private final String name;
@@ -20,12 +24,39 @@ public class ClockGeneratorJvmImpl implements ClockGenerator {
 
     @Override
     public Handle schedule(Runnable target, int frequency) {
-        final long period = (long)((double)TimeUnit.SECONDS.toNanos(1) / frequency);
-
-        final ScheduledFuture<?> future =
-                executor.scheduleAtFixedRate(target, 1, period, TimeUnit.NANOSECONDS);
+        final ScheduledFuture<?> future = schedule0(target, frequency);
 
         return future::cancel;
+    }
+
+    private ScheduledFuture<?> schedule0(Runnable target, int frequency) {
+        final long period = (long)((double) TimeUnit.SECONDS.toNanos(1) / frequency);
+
+        return executor.scheduleAtFixedRate(target, 1, period, TimeUnit.NANOSECONDS);
+    }
+
+    //FIXME: rewrite and test!
+    @Override
+    public Handle schedule(Runnable target, IntSupplier frequency) {
+        final AtomicInteger freq = new AtomicInteger(frequency.getAsInt());
+        final AtomicReference<ScheduledFuture<?>> sfr = new AtomicReference<>();
+
+        final ScheduledFuture<?> sf1 = executor.scheduleAtFixedRate(() -> {
+            if (freq.get() != frequency.getAsInt()) {
+                sfr.get().cancel(false);
+
+                freq.set(frequency.getAsInt());
+                sfr.set(schedule0(target, freq.get()));
+            }
+        }, 1, 1, TimeUnit.SECONDS);
+
+        final ScheduledFuture<?> sf2 = schedule0(target, freq.get());
+        sfr.set(sf2);
+
+        return force -> {
+            sf1.cancel(force);
+            return sfr.get().cancel(force);
+        };
     }
 
     @Override
