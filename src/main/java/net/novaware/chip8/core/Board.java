@@ -28,6 +28,7 @@ import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
@@ -107,8 +108,17 @@ public class Board {
     @Owned
     private StoragePortImpl storagePort;
 
+    //TODO should be part of diagnostics / debug port
     @Owned
     private Consumer<Exception> exceptionHandler = e -> LOG.error("Unexpected exception: ", e);
+
+    //TODO should be part of diagnostics / debug port
+    @Owned
+    private IntConsumer delayTimerMonitor = dt -> {};
+
+    //TODO should be part of diagnostics / debug port
+    @Owned
+    private IntConsumer soundTimerMonitor = st -> {};
 
     @Inject
     /* package */ Board(
@@ -178,6 +188,14 @@ public class Board {
             primaryDisplayPort.onGraphicChange();
             secondaryDisplayPort.onGraphicChange();
             gcr.set(GC_IDLE);
+        });
+
+        registers.getDelay().subscribe(dt -> {
+            delayTimerMonitor.accept(dt.getAsInt());
+        });
+
+        registers.getSound().subscribe(st -> {
+            soundTimerMonitor.accept(st.getAsInt());
         });
 
         audioPort.attachToRegister();
@@ -276,13 +294,31 @@ public class Board {
     }
 
     public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
-        scheduleAndHandle(() -> setExceptionHandler0(exceptionHandler));
-    }
-
-    private void setExceptionHandler0(Consumer<Exception> exceptionHandler) {
         requireNonNull(exceptionHandler, "exceptionHandler must not be null");
 
-        this.exceptionHandler = exceptionHandler;
+        scheduleAndHandle(() -> this.exceptionHandler = exceptionHandler);
+    }
+
+    /**
+     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
+     *
+     * TODO: create separate thread for outputing data?
+     */
+    public void setDelayTimerMonitor(IntConsumer delayTimerMonitor) {
+        requireNonNull(delayTimerMonitor, "delayTimerMonitor must not be null");
+
+        scheduleAndHandle(() -> this.delayTimerMonitor = delayTimerMonitor);
+    }
+
+    /**
+     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
+     *
+     * TODO: create separate thread for outputing data?
+     */
+    public void setSoundTimerMonitor(IntConsumer soundTimerMonitor) {
+        requireNonNull(soundTimerMonitor, "soundTimerMonitor must not be null");
+
+        scheduleAndHandle(() -> this.soundTimerMonitor = soundTimerMonitor);
     }
 
     // 2. Power ON ------------------------------------------------------------
