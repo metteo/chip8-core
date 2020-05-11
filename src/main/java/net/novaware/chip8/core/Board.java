@@ -17,6 +17,7 @@ import net.novaware.chip8.core.port.impl.DisplayPortImpl;
 import net.novaware.chip8.core.port.impl.KeyPortImpl;
 import net.novaware.chip8.core.port.impl.StoragePortImpl;
 import net.novaware.chip8.core.storage.Bootloader;
+import net.novaware.chip8.core.util.FrequencyCounter;
 import net.novaware.chip8.core.util.di.BoardScope;
 import net.novaware.chip8.core.util.uml.Owned;
 import net.novaware.chip8.core.util.uml.Used;
@@ -120,6 +121,12 @@ public class Board {
     @Owned
     private IntConsumer soundTimerMonitor = st -> {};
 
+    private final FrequencyCounter frequencyCounter = new FrequencyCounter(200, 0.1);
+
+    //TODO should be part of diagnostics / debug port
+    @Owned
+    private IntConsumer cpuFrequencyMonitor = f -> {};
+
     @Inject
     /* package */ Board(
         final Board.Config config,
@@ -198,6 +205,9 @@ public class Board {
             soundTimerMonitor.accept(st.getAsInt());
         });
 
+        frequencyCounter.initialize();
+        frequencyCounter.subscribe(fc -> cpuFrequencyMonitor.accept(fc.getFrequency()));
+
         audioPort.attachToRegister();
         keyPort.attachToRegister();
 
@@ -243,7 +253,9 @@ public class Board {
         //TODO: react to cpu state and control the clock properly
         Handle cycleHandle = clock.schedule(() -> {
             try {
+                frequencyCounter.takeASample();
                 cpu.cycle();
+                frequencyCounter.maybePublish();
             } catch(Exception e) {
                 exceptionHandler.accept(e);
                 cpu.sleep();
@@ -319,6 +331,17 @@ public class Board {
         requireNonNull(soundTimerMonitor, "soundTimerMonitor must not be null");
 
         scheduleAndHandle(() -> this.soundTimerMonitor = soundTimerMonitor);
+    }
+
+    /**
+     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
+     *
+     * TODO: create separate thread for outputing data?
+     */
+    public void setCpuFrequencyMonitor(IntConsumer cpuFrequencyMonitor) {
+        requireNonNull(cpuFrequencyMonitor, "cpuFrequencyMonitor must not be null");
+
+        scheduleAndHandle(() -> this.cpuFrequencyMonitor = cpuFrequencyMonitor);
     }
 
     // 2. Power ON ------------------------------------------------------------
