@@ -360,6 +360,8 @@ public class Board {
         scheduleAndHandle(() -> cpu.wakeUp());
     }
 
+    //TODO: create method isPaused
+
     // 4. Soft reset to restart the program -----------------------------------
 
     public void softReset() {

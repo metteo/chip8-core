@@ -32,6 +32,7 @@ public class DisplayPortImpl implements DisplayPort {
 
     @Owned
     private final boolean[][] frontBuffer = new boolean[viewPort.getMaxHeight()][viewPort.getMaxWidth()]; // [y][x]
+    private boolean frontBufferTouched = true;
 
     private final boolean[][] backBuffer = new boolean[viewPort.getMaxHeight()][viewPort.getMaxWidth()]; // [y][x]
     private final boolean[][] prevBuffer = new boolean[viewPort.getMaxHeight()][viewPort.getMaxWidth()]; // [y][x]
@@ -105,9 +106,11 @@ public class DisplayPortImpl implements DisplayPort {
     }
 
     private void maybeCallReceiver() {
-        if (receiver != null) {
+        if (receiver != null && frontBufferTouched) {
             receiver.accept(packet);
         }
+
+        frontBufferTouched = false;
     }
 
     //TODO: consider switching array references instead of copying bits of data when switching buffers
@@ -132,16 +135,19 @@ public class DisplayPortImpl implements DisplayPort {
                 switch(mode) {
                     case MERGE_FRAME:
                         frontBuffer[y][x] = backBuffer[y][x] | prevBuffer[y][x];
+                        frontBufferTouched = true;
                         break;
 
                     case FALLING_EDGE:
                         if (fallingEdge) {
                             frontBuffer[y][x] = prevBuffer[y][x];
+                            frontBufferTouched = true;
                         }
                         break;
                     case DIRECT:
                     default:
                         frontBuffer[y][x] = backBuffer[y][x];
+                        frontBufferTouched = true;
                         break;
                 }
             }
@@ -187,6 +193,7 @@ public class DisplayPortImpl implements DisplayPort {
         for (int y  = 0; y < viewPort.getMaxHeight(); ++y) {
             for (int x  = 0; x < viewPort.getMaxWidth(); ++x) {
                 frontBuffer[y][x] = backBuffer[y][x];
+                frontBufferTouched = true;
             }
         }
 
