@@ -8,14 +8,8 @@ import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.memory.MemoryModule;
 import net.novaware.chip8.core.memory.ReadOnlyMemory;
 import net.novaware.chip8.core.memory.SplittableMemory;
-import net.novaware.chip8.core.port.AudioPort;
-import net.novaware.chip8.core.port.DisplayPort;
-import net.novaware.chip8.core.port.KeyPort;
-import net.novaware.chip8.core.port.StoragePort;
-import net.novaware.chip8.core.port.impl.AudioPortImpl;
-import net.novaware.chip8.core.port.impl.DisplayPortImpl;
-import net.novaware.chip8.core.port.impl.KeyPortImpl;
-import net.novaware.chip8.core.port.impl.StoragePortImpl;
+import net.novaware.chip8.core.port.*;
+import net.novaware.chip8.core.port.impl.*;
 import net.novaware.chip8.core.storage.Bootloader;
 import net.novaware.chip8.core.util.FrequencyCounter;
 import net.novaware.chip8.core.util.di.BoardScope;
@@ -28,8 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.register.RegisterFile.GC_IDLE;
@@ -109,23 +101,10 @@ public class Board {
     @Owned
     private StoragePortImpl storagePort;
 
-    //TODO should be part of diagnostics / debug port
     @Owned
-    private Consumer<Exception> exceptionHandler = e -> LOG.error("Unexpected exception: ", e);
-
-    //TODO should be part of diagnostics / debug port
-    @Owned
-    private IntConsumer delayTimerMonitor = dt -> {};
-
-    //TODO should be part of diagnostics / debug port
-    @Owned
-    private IntConsumer soundTimerMonitor = st -> {};
+    private DebugPortImpl debugPort;
 
     private final FrequencyCounter frequencyCounter = new FrequencyCounter(200, 0.1);
-
-    //TODO should be part of diagnostics / debug port
-    @Owned
-    private IntConsumer cpuFrequencyMonitor = f -> {};
 
     @Inject
     /* package */ Board(
@@ -140,7 +119,8 @@ public class Board {
         @Named(SECONDARY) final DisplayPortImpl secondaryDisplayPort,
         final AudioPortImpl audioPort,
         final KeyPortImpl keyPort,
-        final StoragePortImpl storagePort
+        final StoragePortImpl storagePort,
+        final DebugPortImpl debugPort
     ) {
         this.config = config;
 
@@ -156,6 +136,7 @@ public class Board {
         this.audioPort = audioPort;
         this.keyPort = keyPort;
         this.storagePort = storagePort;
+        this.debugPort = debugPort;
     }
 
     private void powerOn0() {
@@ -186,7 +167,7 @@ public class Board {
             if (output == 0x11) {
                 LOG.error("CPU stopped abruptly at " + toHexString(registers.getMemoryAddress().get()));
                 powerOff0(false);
-                //TODO: report exit code somehow outside (exception handler, outputport?)
+                //TODO: report exit code using status port (segment display)
             }
         });
 
@@ -197,19 +178,12 @@ public class Board {
             gcr.set(GC_IDLE);
         });
 
-        registers.getDelay().subscribe(dt -> {
-            delayTimerMonitor.accept(dt.getAsInt());
-        });
-
-        registers.getSound().subscribe(st -> {
-            soundTimerMonitor.accept(st.getAsInt());
-        });
-
         frequencyCounter.initialize();
-        frequencyCounter.subscribe(fc -> cpuFrequencyMonitor.accept(fc.getFrequency()));
+        frequencyCounter.subscribe(fc -> debugPort.onCpuFrequencyChange(fc.getFrequency()));
 
         audioPort.attachToRegister();
         keyPort.attachToRegister();
+        debugPort.attachToRegister();
 
         LOG.traceExit();
     }
@@ -227,7 +201,7 @@ public class Board {
             ++sourceAddr;
         }
 
-        //programMemory.setSplit(data.length); //TODO: reactivate split, get program size from packet?
+        programMemory.setSplit(cpu.getRegisters().getStorage().getAsInt());
         programMemory.setStrict(config::isEnforceMemoryRoRwState);
     }
 
@@ -236,7 +210,7 @@ public class Board {
     }
 
     /* package */ void hardReset0() {
-        mmu.clear(); //TODO: reload program ROM, clear the rest
+        mmu.clear();
         loadProgram();
         cpu.reset();
     }
@@ -257,7 +231,7 @@ public class Board {
                 cpu.cycle();
                 frequencyCounter.maybePublish();
             } catch(Exception e) {
-                exceptionHandler.accept(e);
+                debugPort.onException(e);
                 cpu.sleep();
             }
         }, config::getCpuFrequency);
@@ -275,9 +249,13 @@ public class Board {
     }
 
     private void scheduleAndHandle(final Runnable target) {
-        final Handle handle = clock.schedule(target);
-
-        //TODO: handle exceptions in the Futures returned from clock
+        clock.schedule(() -> {
+            try {
+                target.run();
+            } catch (Exception e) {
+                debugPort.onException(e);
+            }
+        });
     }
 
     // 1. Connect peripherals -------------------------------------------------
@@ -305,43 +283,8 @@ public class Board {
         return storagePort;
     }
 
-    public void setExceptionHandler(Consumer<Exception> exceptionHandler) {
-        requireNonNull(exceptionHandler, "exceptionHandler must not be null");
-
-        scheduleAndHandle(() -> this.exceptionHandler = exceptionHandler);
-    }
-
-    /**
-     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
-     *
-     * TODO: create separate thread for outputing data?
-     */
-    public void setDelayTimerMonitor(IntConsumer delayTimerMonitor) {
-        requireNonNull(delayTimerMonitor, "delayTimerMonitor must not be null");
-
-        scheduleAndHandle(() -> this.delayTimerMonitor = delayTimerMonitor);
-    }
-
-    /**
-     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
-     *
-     * TODO: create separate thread for outputing data?
-     */
-    public void setSoundTimerMonitor(IntConsumer soundTimerMonitor) {
-        requireNonNull(soundTimerMonitor, "soundTimerMonitor must not be null");
-
-        scheduleAndHandle(() -> this.soundTimerMonitor = soundTimerMonitor);
-    }
-
-    /**
-     * Monitor runs on Board clock thread. It should forward the work to another thread and exit
-     *
-     * TODO: create separate thread for outputing data?
-     */
-    public void setCpuFrequencyMonitor(IntConsumer cpuFrequencyMonitor) {
-        requireNonNull(cpuFrequencyMonitor, "cpuFrequencyMonitor must not be null");
-
-        scheduleAndHandle(() -> this.cpuFrequencyMonitor = cpuFrequencyMonitor);
+    public DebugPort getDebugPort() {
+        return debugPort;
     }
 
     // 2. Power ON ------------------------------------------------------------
@@ -359,8 +302,6 @@ public class Board {
     public void resume() {
         scheduleAndHandle(() -> cpu.wakeUp());
     }
-
-    //TODO: create method isPaused
 
     // 4. Soft reset to restart the program -----------------------------------
 

@@ -34,6 +34,8 @@ public class RegisterModule {
 
     public static final String OUTPUT = "output";
 
+    public static final String STORAGE = "storage";
+
     public static final String DELAY = "delay";
     public static final String SOUND = "sound";
     public static final String SOUND_ON = "soundOn";
@@ -152,6 +154,13 @@ public class RegisterModule {
     @Named(OUTPUT)
     static WordRegister provideOutput() {
         return new WordRegister("OUT");
+    }
+
+    @Provides
+    @BoardScope
+    @Named(STORAGE)
+    static TribbleRegister provideStorage() {
+        return new TribbleRegister("STRG");
     }
 
     @Provides

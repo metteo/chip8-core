@@ -129,6 +129,12 @@ public class RegisterFile {
     private final WordRegister output;
 
     /**
+     * Hardware register holding the size of data in storage port
+     */
+    @Owned
+    private final TribbleRegister storage;
+
+    /**
      * Delay timer register value
      */
     @Owned
@@ -175,6 +181,7 @@ public class RegisterFile {
         @Named(INPUT) final WordRegister input,
         @Named(INPUT_CHECK) final WordRegister inputCheck,
         @Named(OUTPUT) final WordRegister output,
+        @Named(STORAGE) final TribbleRegister storage,
         @Named(DELAY) final ByteRegister delay,
         @Named(SOUND) final ByteRegister sound,
         @Named(SOUND_ON) final ByteRegister soundOn,
@@ -202,6 +209,7 @@ public class RegisterFile {
         this.input = input;
         this.inputCheck = inputCheck;
         this.output = output;
+        this.storage = storage;
 
         this.delay = delay;
         this.sound = sound;
@@ -285,6 +293,10 @@ public class RegisterFile {
 
     public WordRegister getOutput() {
         return output;
+    }
+
+    public TribbleRegister getStorage() {
+        return storage;
     }
 
     public ByteRegister getDelay() {

@@ -7,6 +7,7 @@ import net.novaware.chip8.core.cpu.Cpu
 import net.novaware.chip8.core.memory.Memory
 import net.novaware.chip8.core.memory.SplittableMemory
 import net.novaware.chip8.core.port.impl.AudioPortImpl
+import net.novaware.chip8.core.port.impl.DebugPortImpl
 import net.novaware.chip8.core.port.impl.DisplayPortImpl
 import net.novaware.chip8.core.port.impl.KeyPortImpl
 import net.novaware.chip8.core.port.impl.StorageMemory
@@ -43,7 +44,8 @@ class BoardSpec extends Specification {
                 Mock(DisplayPortImpl),
                 Mock(AudioPortImpl),
                 Mock(KeyPortImpl),
-                Mock(StoragePortImpl)
+                Mock(StoragePortImpl),
+                Mock(DebugPortImpl)
         )
     }
 

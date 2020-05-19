@@ -4,12 +4,15 @@ import dagger.Module;
 import dagger.Provides;
 import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.RegisterModule;
+import net.novaware.chip8.core.cpu.register.TribbleRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
+import net.novaware.chip8.core.cpu.unit.PowerMgmt;
 import net.novaware.chip8.core.memory.Memory;
 import net.novaware.chip8.core.util.di.BoardScope;
 
 import javax.inject.Named;
 
+import static net.novaware.chip8.core.cpu.register.RegisterModule.STORAGE;
 import static net.novaware.chip8.core.memory.MemoryModule.DISPLAY_IO;
 import static net.novaware.chip8.core.memory.MemoryModule.STORAGE_ROM;
 
@@ -63,8 +66,20 @@ public class PortModule {
     @Provides
     @BoardScope
     static StoragePortImpl provideStoragePort(
-            @Named(STORAGE_ROM) final Memory storageRom
+            @Named(STORAGE_ROM) final Memory storageRom,
+            @Named(STORAGE) final TribbleRegister storageRegister
     ) {
-        return new StoragePortImpl((StorageMemory)storageRom);
+        return new StoragePortImpl((StorageMemory)storageRom, storageRegister);
+    }
+
+    @Provides
+    @BoardScope
+    static DebugPortImpl provideDebugPort(
+            @Named(RegisterModule.DELAY) final ByteRegister delay,
+            @Named(RegisterModule.SOUND) final ByteRegister sound,
+            @Named(RegisterModule.CPU_STATE) final ByteRegister cpuState,
+            final PowerMgmt powerMgmt
+    ) {
+        return new DebugPortImpl(delay, sound, cpuState, powerMgmt);
     }
 }

@@ -10,8 +10,7 @@ import static net.novaware.chip8.core.util.AssertUtil.assertState;
 
 public class FrequencyCounter {
 
-    @Nullable
-    private PubSub<FrequencyCounter> pubSub;
+    private @Nullable PubSub<FrequencyCounter> pubSub;
 
     private final LongSupplier nanoTime;
     private int publishEvery;

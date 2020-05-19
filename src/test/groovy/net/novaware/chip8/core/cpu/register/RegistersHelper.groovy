@@ -20,6 +20,7 @@ class RegistersHelper {
                 provideInput(),
                 provideInputCheck(),
                 provideOutput(),
+                provideStorage(),
                 provideDelay(),
                 provideSound(),
                 provideSoundOn(),
