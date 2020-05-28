@@ -37,7 +37,7 @@ public class ArithmeticLogic implements Unit {
     private final WordRegister input;
 
     @Used
-    private final WordRegister inputCheck;
+    private final ByteRegister inputCheck;
 
     @Used
     private final ByteRegister status;
@@ -50,7 +50,7 @@ public class ArithmeticLogic implements Unit {
         @Named(RANDOM) final IntUnaryOperator randomSource,
         @Named(VARIABLES) final ByteRegister[] variables,
         @Named(INPUT) final WordRegister input,
-        @Named(INPUT_CHECK) final WordRegister inputCheck,
+        @Named(INPUT_CHECK) final ByteRegister inputCheck,
         @Named(STATUS) final ByteRegister status,
         @Named(STATUS_TYPE) final ByteRegister statusType
     ) {

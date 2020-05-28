@@ -144,9 +144,9 @@ public class RegisterModule {
 
     @Provides
     @BoardScope
-    @Named(INPUT_CHECK) //TODO: should be byte since we only store bit index
-    static WordRegister provideInputCheck() {
-        return new WordRegister("IC");
+    @Named(INPUT_CHECK)
+    static ByteRegister provideInputCheck() {
+        return new ByteRegister("IC");
     }
 
     @Provides

@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.port.impl;
 
+import net.novaware.chip8.core.cpu.register.ByteRegister;
 import net.novaware.chip8.core.cpu.register.WordRegister;
 import net.novaware.chip8.core.port.KeyPort;
 import net.novaware.chip8.core.util.uml.Owned;
@@ -23,7 +24,7 @@ public class KeyPortImpl implements KeyPort {
     private final WordRegister input;
 
     @Used
-    private final WordRegister inputCheck;
+    private final ByteRegister inputCheck;
 
     @Owned
     private @Nullable Consumer<OutputPacket> receiver;
@@ -42,7 +43,7 @@ public class KeyPortImpl implements KeyPort {
         return (keyMask & inputsChecked) > 0;
     };
 
-    public KeyPortImpl(final WordRegister input, final WordRegister inputCheck) {
+    public KeyPortImpl(final WordRegister input, final ByteRegister inputCheck) {
         this.input = input;
         this.inputCheck = inputCheck;
     }

@@ -58,7 +58,7 @@ public class PortModule {
     @BoardScope
     static KeyPortImpl provideKeyPort(
             @Named(RegisterModule.INPUT) final WordRegister input,
-            @Named(RegisterModule.INPUT_CHECK) final WordRegister inputCheck
+            @Named(RegisterModule.INPUT_CHECK) final ByteRegister inputCheck
     ) {
         return new KeyPortImpl(input, inputCheck);
     }

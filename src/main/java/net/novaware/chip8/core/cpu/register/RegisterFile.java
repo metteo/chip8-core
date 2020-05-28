@@ -117,10 +117,10 @@ public class RegisterFile {
     private final WordRegister input;
 
     /**
-     * Holds info about which input bits were checked by the app
+     * Holds info about which input bit was last checked by the app
      */
     @Owned
-    private final WordRegister inputCheck;
+    private final ByteRegister inputCheck;
 
     /**
      * Dedicated Output register (16 bits) mapped to 16 CPU pins
@@ -179,7 +179,7 @@ public class RegisterFile {
         @Named(GRAPHIC_SEGMENT) final TribbleRegister graphicSegment,
         @Named(GRAPHIC_CHANGE) final ByteRegister graphicChange,
         @Named(INPUT) final WordRegister input,
-        @Named(INPUT_CHECK) final WordRegister inputCheck,
+        @Named(INPUT_CHECK) final ByteRegister inputCheck,
         @Named(OUTPUT) final WordRegister output,
         @Named(STORAGE) final TribbleRegister storage,
         @Named(DELAY) final ByteRegister delay,
@@ -287,7 +287,7 @@ public class RegisterFile {
         return input;
     }
 
-    public WordRegister getInputCheck() {
+    public ByteRegister getInputCheck() {
         return inputCheck;
     }
 

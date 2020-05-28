@@ -1,5 +1,6 @@
 package net.novaware.chip8.core.port.impl
 
+import net.novaware.chip8.core.cpu.register.ByteRegister
 import net.novaware.chip8.core.cpu.register.WordRegister
 import net.novaware.chip8.core.port.KeyPort
 import spock.lang.Specification
@@ -11,7 +12,7 @@ import static net.novaware.chip8.core.util.UnsignedUtil.ubyte
 class KeyPortImplSpec extends Specification {
 
     def inputRegister = new WordRegister("IN")
-    def inputCheckReg = new WordRegister("IC")
+    def inputCheckReg = new ByteRegister("IC")
 
     def instance = new KeyPortImpl(inputRegister, inputCheckReg)
 
