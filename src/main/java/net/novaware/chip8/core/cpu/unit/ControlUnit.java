@@ -39,12 +39,6 @@ public class ControlUnit implements Unit {
          * If true, increments I during load and store operations
          */
         boolean isLegacyLoadStore();
-
-        /**
-         * If true, adding register value to index that causes overflow is NOT reported using VF
-         */
-        boolean isLegacyAddressSum();
-
     }
     @Owned
     private final Config config;
@@ -174,7 +168,6 @@ public class ControlUnit implements Unit {
 
         final boolean useY = config.isLegacyShift();
         final boolean incrementI = config.isLegacyLoadStore();
-        final boolean overflowI = !config.isLegacyAddressSum();
 
         //FIXME: ugly, but compact, figure out how to make it nicer, but still compact and fast
 
@@ -214,7 +207,7 @@ public class ControlUnit implements Unit {
             case OxFX0A: skip = lsu_storeInputIntoVariable(p1) ? 0 : -2; break;
             case OxFX15: delayTimer.loadTimerWithVariable(p1); break;
             case OxFX18: soundTimer.loadTimerWithVariable(p1); break;
-            case OxFX1E: agu.sumIndexWithVariable(p1, overflowI); break;
+            case OxFX1E: agu.sumIndexWithVariable(p1); break;
             case OxFX29: gpu.loadFontAddressIntoRegister(p1); break;
             case OxFX33: lsu.loadMemoryWithBcdVariable(p1); break;
             case OxFX55: lsu.loadMemoryWithVariables(p1, incrementI); break;
