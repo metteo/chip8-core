@@ -52,22 +52,25 @@ public class Gpu {
     @Owned
     private final ViewPort viewPort = new ViewPort();
 
-    private byte[] spriteBuffer;
+    private byte[] spriteBuffer; //extracted from memory
 
     private short[] memoryBuffer; //optimizes misaligned memory access
 
-    private byte[] paintBuffer;
+    private byte[] paintBuffer; //part of memory where sprite will be drawn
 
-    private byte[] resultBuffer;
+    private byte[] resultBuffer; //result of xoring sprite and paint buffers
 
     //FIXME: separate wrapping / clipping into x & y axis
     //TODO: BLITZ doesn't like y wrapping, VERS requires y wrapping
     final boolean wrapping = true;
     final boolean clipping = false;
-    final boolean dump = true;
 
     @Inject
-    public Gpu(Config config, RegisterFile registers, @Named(MMU) Memory memory) {
+    public Gpu(
+            final Config config,
+            final RegisterFile registers,
+            final @Named(MMU) Memory memory
+    ) {
         this.config = config;
         this.registers = registers;
         this.memory = memory;
@@ -95,6 +98,9 @@ public class Gpu {
         registers.getGraphicChange().set(GC_ERASE);
     }
 
+    /**
+     * Special instruction for Boot-128 accessible as MLS
+     */
     //TODO: unit test
     public void scrollUp(final short n) {
         final int gs = registers.getGraphicSegment().getAsInt();
@@ -183,7 +189,7 @@ public class Gpu {
     /* package */ void fillSpriteBuffer(final short address, final byte[] buffer, final int height) {
         memory.getBytes(address, buffer, height);
 
-        if (dump) dumpBuffer("sprite", ushort(height), buffer);
+        maybeDumpBuffer("sprite", ushort(height), buffer);
     }
 
     /* package */ void fillPaintBuffer(int xBit, int yBit, final byte[] buffer, final int height) {
@@ -218,7 +224,7 @@ public class Gpu {
             buffer[row] = rowData;
         }
 
-        if (dump) dumpBuffer("paint " + xBit + ", " + yBit + " ", ushort(height), buffer);
+        maybeDumpBuffer("paint " + xBit + ", " + yBit + " ", ushort(height), buffer);
     }
 
     private short getRowAsWord(int graphicSegment, Index idx1, Index idx2) {
@@ -257,7 +263,7 @@ public class Gpu {
             }
         }
 
-        if (dump) dumpBuffer("result", ushort(height), resultBuffer);
+        maybeDumpBuffer("result", ushort(height), resultBuffer);
 
         return getGraphicChange(erasing, drawing);
     }
@@ -317,7 +323,11 @@ public class Gpu {
         }
     }
 
-    private void dumpBuffer(String title, short height, byte[] buffer) {
+    private void maybeDumpBuffer(String title, short height, byte[] buffer) {
+        if (!LOG.isDebugEnabled()) {
+            return;
+        }
+
         LOG.debug("buffer: " + title);
         for (int i = 0; i < height; i++) { //y
             StringBuilder sb = new StringBuilder();
