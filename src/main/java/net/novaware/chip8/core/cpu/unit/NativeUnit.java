@@ -46,6 +46,7 @@ public class NativeUnit implements Unit {
 
         switch(addrInt) {
             case 0x000:
+                // 0x0000 - SCU 6 - Scroll up 6 pixels. For David's Winter Boot-128.
                 gpu.scrollUp(ushort(6));
                 break;
             case 0x001:
@@ -54,6 +55,8 @@ public class NativeUnit implements Unit {
             case 0x010:
             case 0x011:
                 //TODO: document these mls as exit 0/1 routines
+                //https://github.com/trapexit/chip-8_documentation#opcodes
+                //0x001N - EXIT N -  Exit emulator with a return value of N. From Peter Miller's chip8run.
                 output.set(address);
                 powerMgmt.sleep();
                 break;
