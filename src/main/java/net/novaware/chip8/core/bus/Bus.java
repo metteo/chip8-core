@@ -4,7 +4,9 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 
 /**
  * Bus interface hiding memory details from CPU
- * TODO: create MemoryBus implementation, optimize mapped memory access (specify method caches entry)
+ *
+ * https://stackoverflow.com/questions/8134545/difference-between-memory-bus-and-address-bus
+ * http://www-mdp.eng.cam.ac.uk/web/library/enginfo/mdp_micro/lecture1/lecture1-3-1.html
  */
 public interface Bus {
 
