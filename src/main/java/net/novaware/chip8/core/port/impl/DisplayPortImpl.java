@@ -47,7 +47,7 @@ public class DisplayPortImpl implements DisplayPort {
     /**
      * Keeps time of the last GC
      */
-    private long prevGcTime = -1;
+    private long prevRealGcTime = -1;
 
     @Owned
     private final Packet packet = new Packet() {
@@ -86,8 +86,6 @@ public class DisplayPortImpl implements DisplayPort {
     }
 
     public void onGraphicChange() {
-        prevGcTime = System.nanoTime();
-
         final short gc = graphicChange.get();
 
         if (gc == GC_IDLE || gc == GC_NOOP) {
@@ -98,6 +96,7 @@ public class DisplayPortImpl implements DisplayPort {
 
         maybeCallReceiver();
 
+        prevRealGcTime = System.nanoTime();
         prevRealGc = gc;
 
         if (attachedToRegister) {
@@ -181,9 +180,9 @@ public class DisplayPortImpl implements DisplayPort {
     public void tick() {
         if (mode == Mode.FALLING_EDGE) {
             long now = System.nanoTime();
-            if (now - prevGcTime > TimeUnit.SECONDS.toNanos(1)) {
+            if (now - prevRealGcTime > TimeUnit.MILLISECONDS.toNanos(100)) { //TODO: configurable!
                 updateFrontBuffer();
-                prevGcTime = now;
+                prevRealGcTime = now;
             }
         }
     }
