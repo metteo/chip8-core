@@ -38,6 +38,17 @@ public class Gpu {
          * after font area...
          */
         boolean isTrimVarForFont();
+
+        boolean isWrapping();
+
+        /**
+         * BLITZ needs y clipping enabled,
+         * VERS needs y clipping disabled
+         */
+        boolean isVerticalClipping();
+
+        //TODO: implement horizontal clipping
+        boolean isHorizontalClipping();
     }
 
     @Owned
@@ -59,11 +70,6 @@ public class Gpu {
     private byte[] paintBuffer; //part of memory where sprite will be drawn
 
     private byte[] resultBuffer; //result of xoring sprite and paint buffers
-
-    //FIXME: separate wrapping / clipping into x & y axis
-    //TODO: BLITZ doesn't like y wrapping, VERS requires y wrapping
-    final boolean wrapping = true;
-    final boolean clipping = false;
 
     @Inject
     public Gpu(
@@ -167,8 +173,7 @@ public class Gpu {
         final int xBit = registers.getVariable(x).getAsInt();
         final int yBit = registers.getVariable(y).getAsInt();
 
-        if (viewPort.isOutOfBounds(xBit, yBit) && !wrapping) {
-            //TODO: handle no wrapping scenario: do not read from memory
+        if (viewPort.isOutOfBounds(xBit, yBit) && !config.isWrapping()) {
             return;
         }
 
@@ -206,14 +211,14 @@ public class Gpu {
             bit.x = xBit;
             bit.y = currentYBit;
 
-            viewPort.toIndex(bit, idx1, !clipping);
+            viewPort.toIndex(bit, idx1, !config.isVerticalClipping());
 
             byte rowData;
             if (idx1.byteBit == 0) { // byte aligned
                 rowData = memory.getByte(ushort(graphicSegment + idx1.arrayByte));
             } else { // misaligned
                 bit.x = bit.x + 8;
-                viewPort.toIndex(bit, idx2,  !clipping);
+                viewPort.toIndex(bit, idx2,  !config.isVerticalClipping());
 
                 short word = getRowAsWord(graphicSegment, idx1, idx2);
                 memoryBuffer[row] = word;
@@ -237,7 +242,6 @@ public class Gpu {
         return ushort((uint(rowData1) << 8) | uint(rowData2));
     }
 
-    //TODO: handle clipping in xor method
     /* package */ byte xorBuffers(int xBit, int yBit, final int height) {
         boolean erasing = false;
         boolean drawing = false;
@@ -296,13 +300,13 @@ public class Gpu {
             bit.x = xBit;
             bit.y = currentYBit;
 
-            viewPort.toIndex(bit, idx1, !clipping);
+            viewPort.toIndex(bit, idx1, !config.isVerticalClipping());
 
             if (idx1.byteBit == 0) { // byte aligned
                 memory.setByte(ushort(graphicSegment + idx1.arrayByte), buffer[row]);
             } else { // misaligned
                 bit.x = bit.x + 8;
-                viewPort.toIndex(bit, idx2, !clipping);
+                viewPort.toIndex(bit, idx2, !config.isVerticalClipping());
 
                 short rowIndex1 = ushort(graphicSegment + idx1.arrayByte);
                 short rowIndex2 = ushort(graphicSegment + idx2.arrayByte);

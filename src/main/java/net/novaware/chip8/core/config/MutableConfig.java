@@ -15,15 +15,21 @@ public class MutableConfig implements CoreConfig {
 
     private final AtomicInteger renderTimerFrequency = new AtomicInteger(60); // Hz
 
-    private AtomicBoolean enforceMemoryRoRwState = new AtomicBoolean(false); //strict
+    private final AtomicBoolean enforceMemoryRoRwState = new AtomicBoolean(false); //strict
 
-    private AtomicBoolean legacyShift = new AtomicBoolean(true);
+    private final AtomicBoolean legacyShift = new AtomicBoolean(true);
 
-    private AtomicBoolean legacyLoadStore = new AtomicBoolean(true);
+    private final AtomicBoolean legacyLoadStore = new AtomicBoolean(true);
 
-    private AtomicBoolean legacyAddressSum = new AtomicBoolean(true);
+    private final AtomicBoolean legacyAddressSum = new AtomicBoolean(true);
 
-    private AtomicBoolean trimVarForFont = new AtomicBoolean(true);
+    private final AtomicBoolean trimVarForFont = new AtomicBoolean(true);
+
+    private final AtomicBoolean wrapping = new AtomicBoolean(true);
+
+    private final AtomicBoolean verticalClipping = new AtomicBoolean(false);
+
+    private final AtomicBoolean horizontalClipping = new AtomicBoolean(false);
 
     @Override
     public int getCpuFrequency() {
@@ -70,6 +76,21 @@ public class MutableConfig implements CoreConfig {
         return trimVarForFont.get();
     }
 
+    @Override
+    public boolean isWrapping() {
+        return wrapping.get();
+    }
+
+    @Override
+    public boolean isVerticalClipping() {
+        return verticalClipping.get();
+    }
+
+    @Override
+    public boolean isHorizontalClipping() {
+        return horizontalClipping.get();
+    }
+
     public void setCpuFrequency(int cpuFrequency) {
         this.cpuFrequency.set(cpuFrequency);
     }
@@ -104,5 +125,17 @@ public class MutableConfig implements CoreConfig {
 
     public void setTrimVarForFont(boolean trimVarForFont) {
         this.trimVarForFont.set(trimVarForFont);
+    }
+
+    public void setWrapping(boolean wrapping) {
+        this.wrapping.set(wrapping);
+    }
+
+    public void setVerticalClipping(boolean verticalClipping) {
+        this.verticalClipping.set(verticalClipping);
+    }
+
+    public void setHorizontalClipping(boolean horizontalClipping) {
+        this.horizontalClipping.set(horizontalClipping);
     }
 }

@@ -18,6 +18,9 @@ class ImmutableConfigSpec extends Specification {
             .setLegacyAddressSum(true)
             .setEnforceMemoryRoRwState(false)
             .setTrimVarForFont(false)
+            .setWrapping(true)
+            .setVerticalClipping(false)
+            .setHorizontalClipping(true)
             .build()
 
         then:
@@ -31,6 +34,9 @@ class ImmutableConfigSpec extends Specification {
             isLegacyAddressSum()
             !isEnforceMemoryRoRwState()
             !isTrimVarForFont()
+            isWrapping()
+            !isVerticalClipping()
+            isHorizontalClipping()
         }
 
         !instance.toString().isEmpty()
