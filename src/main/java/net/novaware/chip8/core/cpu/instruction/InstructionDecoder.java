@@ -7,6 +7,8 @@ import org.checkerframework.checker.signedness.qual.Unsigned;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 import static net.novaware.chip8.core.cpu.instruction.InstructionDefinition.notSupported;
@@ -17,6 +19,8 @@ public class InstructionDecoder {
 
     @Owned
     private final InstructionRegistry registry;
+
+    private final Map<Short, short[]> cache;
 
     @Used
     private final WordRegister currentInstruction;
@@ -31,18 +35,34 @@ public class InstructionDecoder {
             final InstructionRegistry instructionRegistry
     ) {
         this.registry = instructionRegistry;
+
+        this.cache = new HashMap<>();
+
         this.currentInstruction = currentInstruction;
         this.decodedInstruction = decodedInstruction;
     }
 
     public void decode() {
         final @Unsigned short instruction = currentInstruction.get();
+        final short[] decoded = cache.computeIfAbsent(instruction, this::decode);
+
+        decodedInstruction[0].set(decoded[0]);
+        decodedInstruction[1].set(decoded[1]);
+        decodedInstruction[2].set(decoded[2]);
+        decodedInstruction[3].set(decoded[3]);
+    }
+
+    private short[] decode(Short instruction) {
         final InstructionDefinition def = requireNonNull(
                 registry.getDefinition(instruction), notSupported(instruction));
 
-        decodedInstruction[0].set(def.getOpCode());
-        decodedInstruction[1].set(def.getParam(0, instruction));
-        decodedInstruction[2].set(def.getParam(1, instruction));
-        decodedInstruction[3].set(def.getParam(2, instruction));
+        short[] decoded = new short[4];
+
+        decoded[0] = def.getOpCode();
+        decoded[1] = def.getParam(0, instruction);
+        decoded[2] = def.getParam(1, instruction);
+        decoded[3] = def.getParam(2, instruction);
+
+        return decoded;
     }
 }
