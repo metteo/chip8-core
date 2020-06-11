@@ -9,6 +9,8 @@ public abstract class ImmutableConfig implements CoreConfig {
         return new AutoValue_ImmutableConfig.Builder();
     }
 
+    abstract Builder toBuilder();
+
     @AutoValue.Builder
     abstract static class Builder {
         abstract Builder setLegacyShift(boolean value);

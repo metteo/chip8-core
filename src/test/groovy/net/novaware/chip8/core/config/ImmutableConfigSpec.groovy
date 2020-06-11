@@ -42,5 +42,15 @@ class ImmutableConfigSpec extends Specification {
         !instance.toString().isEmpty()
         instance.hashCode() == instance.hashCode() //stable hashcode
         instance.equals(instance) //reflexive equals
+        instance.equals(instance.toBuilder().build()) //reflexive equals
+        !instance.equals(instance.toBuilder())
+    }
+
+    def "should fail when building with missing properties" () {
+        when:
+        ImmutableConfig.builder().build()
+
+        then:
+        thrown(IllegalStateException)
     }
 }

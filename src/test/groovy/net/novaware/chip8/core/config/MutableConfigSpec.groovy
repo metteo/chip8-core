@@ -17,6 +17,9 @@ class MutableConfigSpec extends Specification {
             setLegacyLoadStore(true)
             setLegacyAddressSum(false)
             setTrimVarForFont(true)
+            setWrapping(false)
+            setVerticalClipping(true)
+            setHorizontalClipping(false)
         }
 
         then:
@@ -30,6 +33,9 @@ class MutableConfigSpec extends Specification {
             isLegacyLoadStore()
             !isLegacyAddressSum()
             isTrimVarForFont()
+            !isWrapping()
+            isVerticalClipping()
+            !isHorizontalClipping()
         }
     }
 }
