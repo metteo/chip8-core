@@ -137,7 +137,7 @@ public class MappedMemory extends AbstractMemory implements Memory {
 
 
     @Override
-    public short getWord(short address) {
+    public short getWord(short address) { //FIXME: hot spot in profiler, use B+tree or binary search to optimise
         final Entry segment = getSegment(address);
         short localAddress = translateToSegmentAddress(segment, address);
 
