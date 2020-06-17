@@ -4,7 +4,7 @@ package net.novaware.chip8.core.clock
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
-class ClockGeneratorJvmImplSpec extends Specification {
+class ScheduledClockGeneratorSpec extends Specification {
 
     String threadName
 
@@ -12,7 +12,7 @@ class ClockGeneratorJvmImplSpec extends Specification {
         given:
         def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
 
-        ClockGenerator instance = new ClockGeneratorJvmImpl("test")
+        ClockGenerator instance = new ScheduledClockGenerator("test")
 
         when:
         ClockGenerator.Handle handle = instance.schedule(this.&sampleTarget)
@@ -37,7 +37,7 @@ class ClockGeneratorJvmImplSpec extends Specification {
         def threadNames = new ArrayList<String>()
         def execTimes = new ArrayList<Long>();
 
-        ClockGenerator instance = new ClockGeneratorJvmImpl("test")
+        ClockGenerator instance = new ScheduledClockGenerator("test")
 
         when:
         ClockGenerator.Handle handle = instance.schedule({_ ->

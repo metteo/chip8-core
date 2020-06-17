@@ -1,6 +1,6 @@
 package net.novaware.chip8.core
 
-import net.novaware.chip8.core.clock.ClockGeneratorJvmImpl
+import net.novaware.chip8.core.clock.ScheduledClockGenerator
 import net.novaware.chip8.core.config.CoreConfig
 import net.novaware.chip8.core.config.MutableConfig
 import net.novaware.chip8.core.cpu.CpuState
@@ -45,7 +45,7 @@ class BoardCT extends Specification {
         given:
         def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
 
-        def clock = new ClockGeneratorJvmImpl("Test");
+        def clock = new ScheduledClockGenerator("Test");
 
         def factory = newBoardFactory(config, clock, new Random().&nextInt)
 
@@ -85,7 +85,7 @@ class BoardCT extends Specification {
         given:
         def conditions = new PollingConditions(timeout: 1, initialDelay: 0.1, factor: 2.0)
 
-        def clock = new ClockGeneratorJvmImpl("Test");
+        def clock = new ScheduledClockGenerator("Test");
         def factory = newBoardFactory(config, clock, new Random().&nextInt)
 
         byte[] data = [0x00, 0x11] //exit with 1
@@ -123,7 +123,7 @@ class BoardCT extends Specification {
 
     def "should properly fetch first instruction"() {
         given:
-        def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
+        def board = newBoardFactory(config, new ScheduledClockGenerator("Test"), new Random().&nextInt).newBoard()
         board.initialize()
 
         def cpu = board.cpu
@@ -144,7 +144,7 @@ class BoardCT extends Specification {
 
     def "should properly fetch 'last' instruction"() {
         given:
-        def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
+        def board = newBoardFactory(config, new ScheduledClockGenerator("Test"), new Random().&nextInt).newBoard()
         board.initialize()
 
         def cpu = board.cpu
@@ -166,7 +166,7 @@ class BoardCT extends Specification {
 
     def "should properly decode MVI / LD I instruction"() {
         given:
-        def board = newBoardFactory(config, new ClockGeneratorJvmImpl("Test"), new Random().&nextInt).newBoard()
+        def board = newBoardFactory(config, new ScheduledClockGenerator("Test"), new Random().&nextInt).newBoard()
         board.initialize()
 
         def cpu = board.cpu

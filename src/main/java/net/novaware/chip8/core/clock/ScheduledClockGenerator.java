@@ -9,13 +9,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.IntSupplier;
 
 //FIXME: check errors from futures!
-public class ClockGeneratorJvmImpl implements ClockGenerator {
+public class ScheduledClockGenerator implements ClockGenerator {
 
     private final String name;
 
     private ScheduledExecutorService executor;
 
-    public ClockGeneratorJvmImpl(String name) {
+    public ScheduledClockGenerator(String name) {
         this.name = name;
 
         executor = Executors.newScheduledThreadPool(1,
