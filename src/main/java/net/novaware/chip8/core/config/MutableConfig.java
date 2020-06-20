@@ -25,6 +25,8 @@ public class MutableConfig implements CoreConfig {
 
     private final AtomicBoolean trimVarForFont = new AtomicBoolean(true);
 
+    private final AtomicBoolean clsCollision = new AtomicBoolean(false);
+
     private final AtomicBoolean wrapping = new AtomicBoolean(true);
 
     private final AtomicBoolean verticalClipping = new AtomicBoolean(false);
@@ -77,6 +79,11 @@ public class MutableConfig implements CoreConfig {
     }
 
     @Override
+    public boolean isClsCollision() {
+        return clsCollision.get();
+    }
+
+    @Override
     public boolean isWrapping() {
         return wrapping.get();
     }
@@ -125,6 +132,10 @@ public class MutableConfig implements CoreConfig {
 
     public void setTrimVarForFont(boolean trimVarForFont) {
         this.trimVarForFont.set(trimVarForFont);
+    }
+
+    public void setClsCollision(boolean clsCollision) {
+        this.clsCollision.set(clsCollision);
     }
 
     public void setWrapping(boolean wrapping) {

@@ -22,6 +22,7 @@ public abstract class ImmutableConfig implements CoreConfig {
         abstract Builder setRenderTimerFrequency(int value);
         abstract Builder setCpuFrequency(int value);
         abstract Builder setTrimVarForFont(boolean value);
+        abstract Builder setClsCollision(boolean value);
         abstract Builder setWrapping(boolean value);
         abstract Builder setVerticalClipping(boolean value);
         abstract Builder setHorizontalClipping(boolean value);

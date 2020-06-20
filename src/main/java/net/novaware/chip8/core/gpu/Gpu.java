@@ -39,6 +39,12 @@ public class Gpu {
          */
         boolean isTrimVarForFont();
 
+        /**
+         * Should clear screen trigger collision
+         * @return true if yes
+         */
+        boolean isClsCollision();
+
         boolean isWrapping();
 
         /**
@@ -93,13 +99,26 @@ public class Gpu {
 
     public void clearScreen() {
         final int gs = registers.getGraphicSegment().getAsInt();
+        final boolean checkCollision = config.isClsCollision();
+        boolean collision = false;
 
-        for(int i = 0; i < MemoryModule.DISPLAY_IO_SIZE; ++i) {
-            memory.setByte(ushort(gs + i), UBYTE_0);
+        for (int i = 0; i < MemoryModule.DISPLAY_IO_SIZE; ++i) {
+            final short address = ushort(gs + i);
+
+            if (checkCollision) {
+                final int value = uint(memory.getByte(address));
+                if (value > 0) {
+                    collision = true;
+                }
+            }
+
+            memory.setByte(address, UBYTE_0);
         }
 
-        registers.getStatus().set(0x1);
-        registers.getStatusType().set(VF_COLLISION);
+        if (checkCollision) {
+            registers.getStatus().set(collision ? 0x1 : 0x0);
+            registers.getStatusType().set(collision ? VF_COLLISION : VF_EMPTY);
+        }
 
         registers.getGraphicChange().set(GC_ERASE);
     }

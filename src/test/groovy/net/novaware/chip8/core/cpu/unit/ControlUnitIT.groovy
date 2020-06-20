@@ -14,6 +14,7 @@ import java.util.function.IntUnaryOperator
 
 import static net.novaware.chip8.core.cpu.instruction.InstructionType.*
 import static net.novaware.chip8.core.cpu.register.RegisterFile.VF_COLLISION
+import static net.novaware.chip8.core.cpu.register.RegisterFile.VF_EMPTY
 
 class ControlUnitIT extends Specification {
 
@@ -27,8 +28,11 @@ class ControlUnitIT extends Specification {
     Memory memory = board.mmu
     def registers = board.cpu.registers
 
-    def "should clear the screen"() {
+    @Unroll
+    def "should clear the screen (checkCollision: #checkCollision)"() {
         given:
+        config.isClsCollision() >> checkCollision
+
         short graphicsSegment = 0x100
         int graphicsSize = 32 * 64 / 8 as int
         registers.getGraphicSegment().set(graphicsSegment)
@@ -57,10 +61,15 @@ class ControlUnitIT extends Specification {
 
         registers.getProgramCounter().get() == 0x0 as short
 
-        registers.getStatus().getAsInt() == 0x1
-        registers.getStatusType().get() == VF_COLLISION
+        registers.getStatus().getAsInt() == status
+        registers.getStatusType().get() == statusType
 
         registers.getGraphicChange().get() == RegisterFile.GC_ERASE
+
+        where:
+        checkCollision || status | statusType
+        true           || 0x1    | VF_COLLISION
+        false          || 0x0    | VF_EMPTY
     }
 
     def "should populate I register with address from instruction"() {

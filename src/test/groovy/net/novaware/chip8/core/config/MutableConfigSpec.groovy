@@ -20,6 +20,7 @@ class MutableConfigSpec extends Specification {
             setWrapping(false)
             setVerticalClipping(true)
             setHorizontalClipping(false)
+            setClsCollision(true)
         }
 
         then:
@@ -36,6 +37,7 @@ class MutableConfigSpec extends Specification {
             !isWrapping()
             isVerticalClipping()
             !isHorizontalClipping()
+            isClsCollision()
         }
     }
 }

@@ -21,6 +21,7 @@ class ImmutableConfigSpec extends Specification {
             .setWrapping(true)
             .setVerticalClipping(false)
             .setHorizontalClipping(true)
+            .setClsCollision(false)
             .build()
 
         then:
@@ -37,6 +38,7 @@ class ImmutableConfigSpec extends Specification {
             isWrapping()
             !isVerticalClipping()
             isHorizontalClipping()
+            !isClsCollision()
         }
 
         !instance.toString().isEmpty()
