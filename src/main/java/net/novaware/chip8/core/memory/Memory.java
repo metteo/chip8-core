@@ -3,6 +3,7 @@ package net.novaware.chip8.core.memory;
 /**
  * Stores data + instructions
  */
+//TODO: allow subscription for memory ranges / ops (read / write) to allow cache invalidation
 public interface Memory {
 
     String getName();
